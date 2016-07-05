@@ -1,0 +1,466 @@
+package com.trophonix.tradeplus.trade;
+
+import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.extras.Extra;
+import com.trophonix.tradeplus.extras.economy.EconomyExtra;
+import com.trophonix.tradeplus.extras.economy.ExperienceExtra;
+import com.trophonix.tradeplus.util.InvUtils;
+import com.trophonix.tradeplus.util.MsgUtils;
+import com.trophonix.tradeplus.util.Sounds;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Trade implements Listener {
+
+    private static TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
+    private Player player1, player2;
+    private Inventory inv1, inv2;
+    public Inventory spectatorInv;
+    private List<Extra> extras = new ArrayList<>();
+    private boolean accept1, accept2;
+    private boolean forced = false;
+    private BukkitTask task = null;
+
+    public Trade(Player player1, Player player2) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.inv1 = InvUtils.getTradeInventory(player1, player2);
+        this.inv2 = InvUtils.getTradeInventory(player2, player1);
+        this.spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            if (p.hasPermission("tradeplus.admin") && !p.hasPermission("tradeplus.admin.silent")) {
+                MsgUtils.send(p, "&6&lClick here to spectate this trade", "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
+                        new String[]{
+                                "&6&l(!) &e" + player1.getName() + " &6and &e" + player2.getName() + " &6have started a trade",
+                                "&6&l(!) &6Type &e/tradeplus spectate " + player1.getName() + " " + player2.getName() + " &6to spectate"
+                        });
+            }
+        });
+        player1.openInventory(inv1);
+        player2.openInventory(inv2);
+        if (pl.getConfig().getBoolean("extras.economy.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("Vault")) {
+            try {
+                if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null)
+                    extras.add(new EconomyExtra(player1, player2, pl));
+            } catch (Exception ex) {}
+        }
+        if (pl.getConfig().getBoolean("extras.experience.enabled", true)) {
+            extras.add(new ExperienceExtra(player1, player2, pl));
+        }
+        updateExtras();
+        pl.getServer().getPluginManager().registerEvents(this, pl);
+    }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) event.getWhoClicked();
+        Inventory inv = event.getInventory();
+        if (inv == null) return;
+        if (inv.equals(inv1) || inv.equals(inv2)) {
+            for (int slot : event.getInventorySlots()) {
+                if (!InvUtils.leftSlots.contains(slot)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            if (event.getInventorySlots().size() > 0) {
+                if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
+                    event.setCancelled(true);
+                    return;
+                }
+                Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
+                if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+                    Sounds.click(player1, 2);
+                    Sounds.click(player2, 2);
+                    spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                            Sounds.click((Player)p, 2));
+                }
+            }
+        } else if (inv.equals(spectatorInv)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) event.getWhoClicked();
+        Inventory inv = event.getClickedInventory();
+        if (inv == null || ((event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) &&
+                (event.getCursor() == null || event.getCursor().getType().equals(Material.AIR)))) return;
+        int slot = event.getSlot();
+        if (inv.equals(inv1) || inv.equals(inv2)) {
+            if (inv.getItem(49) == null || inv.getItem(49).getType().equals(Material.AIR)) {
+                event.setCancelled(true);
+                return;
+            }
+            if (InvUtils.leftSlots.contains(slot)) {
+                if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
+                    event.setCancelled(true);
+                    return;
+                }
+                if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+                    accept1 = false;
+                    accept2 = false;
+                    updateAcceptance();
+                }
+                Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
+                if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+                    Sounds.click(player1, 2);
+                    Sounds.click(player2, 2);
+                    spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                            Sounds.click((Player)p, 2));
+                }
+            } else {
+                event.setCancelled(true);
+                if (slot == 0) {
+                    if (!forced) {
+                        if (player.equals(player1)) {
+                            accept1 = !accept1;
+                        } else {
+                            accept2 = !accept2;
+                        }
+                        updateAcceptance();
+                        checkAcceptance();
+                    }
+                } else if (slot == 49){
+                    if (inv.getItem(slot).getType().equals(Material.WATCH)) {
+                        if (forced && task == null) {
+                            forced = false;
+                            accept1 = false;
+                            accept2 = false;
+                            updateAcceptance();
+                            checkAcceptance();
+                        } else {
+                            forced = true;
+                            accept1 = true;
+                            accept2 = true;
+                            updateAcceptance();
+                            checkAcceptance();
+                        }
+                    }
+                } else {
+                    Extra extra = getExtra(slot);
+                    if (extra != null) {
+                        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2)))
+                            return;
+                        if (task != null)
+                            return;
+                        extra.onClick(player, event.getClick());
+                        updateExtras();
+                        if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+                            Sounds.click(player1, 2);
+                            Sounds.click(player2, 2);
+                            spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                                    Sounds.click((Player)p, 2));
+                        }
+                    }
+                }
+            }
+        } else if (inv.equals(player.getInventory())) {
+            Inventory open = player.getOpenInventory().getTopInventory();
+            if (open != null && open.equals(inv1) || open.equals(inv2)) {
+                if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
+                    event.setCancelled(true);
+                    return;
+                }
+                if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+                    accept1 = false;
+                    accept2 = false;
+                    updateAcceptance();
+                }
+                ClickType click = event.getClick();
+                if (click.isShiftClick()) {
+                    event.setCancelled(true);
+                    ItemStack current = event.getCurrentItem();
+                    if (current != null) {
+                        player.getInventory().setItem(event.getSlot(), putOnLeft(player.equals(player1) ? inv1 : inv2, current));
+                        if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+                            Sounds.click(player1, 2);
+                            Sounds.click(player2, 2);
+                            spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                                    Sounds.click((Player)p, 2));
+                        }
+                    }
+                }
+                Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
+            }
+        } else if (inv.equals(spectatorInv)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        Inventory closed = event.getInventory();
+        if (closed == null || closed.getSize() < 54) return;
+        if (closed.getItem(49) == null) return;
+        if (closed.equals(inv1) || closed.equals(inv2)) {
+            HandlerList.unregisterAll(this);
+            if (task != null) {
+                task.cancel();
+                task = null;
+            }
+            inv1.setItem(49, null);
+            inv2.setItem(49, null);
+            giveItemsOnLeft(inv1, player1);
+            giveItemsOnLeft(inv2, player2);
+            player1.closeInventory();
+            player2.closeInventory();
+            MsgUtils.send(player1, pl.getLang().getString("cancelled"));
+            MsgUtils.send(player2, pl.getLang().getString("cancelled"));
+        }
+    }
+
+    @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (event.getMessage().replace("/", "").equalsIgnoreCase("tradeplus spectate " + player1.getName() + " " + player2.getName())) {
+            event.getPlayer().openInventory(spectatorInv);
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player p = event.getPlayer();
+        if (p.equals(player1) || p.equals(player2)) {
+            p.closeInventory();
+        }
+    }
+
+    @EventHandler
+    public void onDisable(PluginDisableEvent event) {
+        if (event.getPlugin().getName().equalsIgnoreCase("TradePlus")) {
+            player1.closeInventory();
+        }
+    }
+
+    private void giveItemsOnLeft(Inventory inv, Player player) {
+        InvUtils.leftSlots.forEach(slot -> {
+            ItemStack item = inv.getItem(slot);
+            if (item != null)
+                player.getInventory().addItem(item).values().stream().findFirst().ifPresent(i ->
+                    player.getWorld().dropItemNaturally(player.getLocation(), i));
+        });
+    }
+
+    private void updateInventories() {
+        InvUtils.leftSlots.forEach(slot -> {
+            ItemStack item1 = inv1.getItem(slot);
+            if (isBlocked(item1)) {
+                Sounds.villagerHit(player1, 1);
+                inv1.setItem(slot, null);
+                player1.getInventory().addItem(item1).values().stream().findFirst().ifPresent(i ->
+                        player1.getWorld().dropItemNaturally(player1.getLocation(), i));
+            } else {
+                inv2.setItem(getRight(slot), item1);
+                spectatorInv.setItem(slot, item1);
+            }
+            ItemStack item2 = inv2.getItem(slot);
+            if (isBlocked(item2)) {
+                Sounds.villagerHit(player2, 1);
+                inv2.setItem(slot, null);
+                player2.getInventory().addItem(item2).values().stream().findFirst().ifPresent(i ->
+                        player2.getWorld().dropItemNaturally(player2.getLocation(), i));
+            } else {
+                inv1.setItem(getRight(slot), item2);
+                spectatorInv.setItem(getRight(slot), item2);
+            }
+        });
+        player1.updateInventory();
+        player2.updateInventory();
+    }
+
+    private void updateExtras() {
+        int slot1 = 45;
+        int slot2a = 45;
+        int slot2b = 45;
+        for (int i = 45; i <= 53; i++) {
+            if (i == 49) continue;
+            inv1.setItem(i, InvUtils.placeHolder);
+            inv2.setItem(i, InvUtils.placeHolder);
+        }
+        for (Extra extra : extras) {
+            inv1.setItem(slot1, extra.getIcon(player1));
+            inv2.setItem(slot1, extra.getIcon(player2));
+            slot1++;
+            if (extra.value1 > 0) {
+                inv2.setItem(getRight(slot2a), extra.getTheirIcon(player1));
+                spectatorInv.setItem(slot2a, extra.getTheirIcon(player1));
+                slot2a++;
+            }
+            if (extra.value2 > 0) {
+                inv1.setItem(getRight(slot2b), extra.getTheirIcon(player2));
+                spectatorInv.setItem(getRight(slot2b), extra.getTheirIcon(player2));
+                slot2b++;
+            }
+        }
+        player1.updateInventory();
+        player2.updateInventory();
+    }
+
+    private void updateAcceptance() {
+        inv1.setItem(0, accept1 ? InvUtils.cancelTrade : InvUtils.acceptTrade);
+        inv1.setItem(8, accept2 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
+        inv2.setItem(0, accept2 ? InvUtils.cancelTrade : InvUtils.acceptTrade);
+        inv2.setItem(8, accept1 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
+        spectatorInv.setItem(4, accept1 && accept2 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
+    }
+
+    private void checkAcceptance() {
+        if (accept1 && accept2) {
+            if (task != null) return;
+            if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onaccept", true)) {
+                Sounds.pling(player1, 1);
+                Sounds.pling(player2, 1);
+                spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                        Sounds.pling((Player)p, 1));
+            }
+            task = Bukkit.getScheduler().runTaskTimer(pl, () -> {
+                int current = inv1.getItem(0).getAmount();
+                if (current > 1) {
+                    inv1.getItem(0).setAmount(current - 1);
+                    inv1.getItem(8).setAmount(current - 1);
+                    inv2.getItem(0).setAmount(current - 1);
+                    inv2.getItem(8).setAmount(current - 1);
+                    spectatorInv.getItem(4).setAmount(current - 1);
+                    if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncountdown")) {
+                        Sounds.click(player1, 2);
+                        Sounds.click(player2, 2);
+                        spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                                Sounds.click((Player)p, 2));
+                    }
+                } else {
+                    if (task != null) {
+                        HandlerList.unregisterAll(this);
+                        task.cancel();
+                        task = null;
+                        inv1.setItem(49, null);
+                        inv2.setItem(49, null);
+                        giveItemsOnLeft(inv1, player2);
+                        giveItemsOnLeft(inv2, player1);
+                        for (Extra extra : extras)
+                            extra.onTradeEnd();
+                        player1.closeInventory();
+                        player2.closeInventory();
+                        if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
+                            Sounds.levelUp(player1, 1);
+                            Sounds.levelUp(player2, 1);
+                            spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                                    Sounds.levelUp((Player) p, 1));
+                        }
+                        MsgUtils.send(player1, pl.getLang().getString("tradecomplete"));
+                        MsgUtils.send(player2, pl.getLang().getString("tradecomplete"));
+                    } else {
+                        updateAcceptance();
+                    }
+                }
+            }, 20L, 20L);
+        } else {
+            if (task != null) {
+                task.cancel();
+                accept1 = false;
+                accept2 = false;
+                task = null;
+                if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+                    Sounds.click(player1, 2);
+                    Sounds.click(player2, 2);
+                    spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+                            Sounds.click((Player)p, 2));
+                }
+            }
+        }
+    }
+
+    private Extra getExtra(int slot) {
+        for (Extra extra : extras) {
+            ItemStack icon = inv1.getItem(slot);
+            if (icon != null && icon.getType().equals(extra.icon.getType())) {
+                return extra;
+            }
+        }
+        return null;
+    }
+
+    private int getRight(int slot) {
+        return roundUpToNine(slot) - 1 - Integer.remainderUnsigned(slot, 9);
+    }
+
+    private int roundUpToNine(int slot) {
+        if (slot < 9) return 9;
+        if (slot < 18) return 18;
+        if (slot < 27) return 27;
+        if (slot < 36) return 36;
+        if (slot < 45) return 45;
+        return 54;
+    }
+
+    private ItemStack putOnLeft(Inventory inv, ItemStack item) {
+        for (int slot : InvUtils.leftSlots) {
+            ItemStack i = inv.getItem(slot);
+            if (i != null && i.isSimilar(item) && i.getAmount() < i.getType().getMaxStackSize()) {
+                while (i.getAmount() < i.getType().getMaxStackSize() && item.getAmount() > 0) {
+                    i.setAmount(i.getAmount() + 1);
+                    item.setAmount(item.getAmount() - 1);
+                }
+                if (item.getAmount() <= 0) {
+                    return null;
+                }
+            }
+        }
+        for (int slot : InvUtils.leftSlots) {
+            ItemStack i = inv.getItem(slot);
+            if (!(i == null || i.getType().equals(Material.AIR))) continue;
+            inv.setItem(slot, item);
+            item = null;
+        }
+        return item;
+    }
+
+    private boolean isBlocked(ItemStack item) {
+        if (item == null || item.getType() == null || item.getType().equals(Material.AIR)) return false;
+        List<String> blocked = pl.getConfig().getStringList("blocked-items");
+        if (blocked == null) return false;
+        List<String> checks = new ArrayList<>();
+        String type = item.getType().toString();
+        byte data = item.getData().getData();
+        checks.add(type + ":" + data);
+        checks.add(type.replace("_", "") + ":" + data);
+        checks.add(type.replace("_", " ") + ":" + data);
+        checks.add(item.getTypeId() + ":" + data);
+        checks.add(type);
+        checks.add(type.replace("_", ""));
+        checks.add(type.replace("_", " "));
+        checks.add(Integer.toString(item.getTypeId()));
+        boolean isBlocked = false;
+        for (String block : blocked) {
+            for (String check : checks) {
+                if (block.equalsIgnoreCase(check)) {
+                    isBlocked = true;
+                    break;
+                }
+            }
+            if (isBlocked) break;
+        }
+        return isBlocked;
+    }
+
+}

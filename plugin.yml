@@ -1,0 +1,20 @@
+name: TradePlus
+version: 2.07
+author: Trophonix
+main: com.trophonix.tradeplus.TradePlus
+commands:
+  trade:
+    description: Trade command
+    permission: tradeplus.trade
+  tradeplus:
+    description: TradePlus admin command
+    permission: tradeplus.admin
+permissions:
+  tradeplus.admin:
+    description: TradePlus admin permission
+    default: op
+    children:
+      tradeplus.trade: true
+  tradeplus.trade:
+    description: TradePlus trade command permission
+    default: true

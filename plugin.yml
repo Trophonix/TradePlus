@@ -1,5 +1,5 @@
 name: TradePlus
-version: 2.07
+version: 2.1
 author: Trophonix
 main: com.trophonix.tradeplus.TradePlus
 commands:

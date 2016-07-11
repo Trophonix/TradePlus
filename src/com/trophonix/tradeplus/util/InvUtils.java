@@ -16,7 +16,8 @@ public class InvUtils {
     private static TradePlus pl;
 
     public static List<Integer> leftSlots = new LinkedList<>(Arrays.asList(1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21,
-                                                                            27, 28, 29, 30, 36, 37, 38, 39));
+                                                                            27, 28, 29, 30, 36, 37, 38, 39, 45, 46,
+                                                                            47, 48));
 
     public static ItemStack placeHolder;
 
@@ -38,8 +39,6 @@ public class InvUtils {
     public static Inventory getTradeInventory(Player player1, Player player2) {
         Inventory inv = Bukkit.createInventory(player1.getInventory().getHolder(), 54, pl.getConfig().getString("gui.title"));
         for (int i = 4; i <= 49; i += 9)
-            inv.setItem(i, placeHolder);
-        for (int i = 45; i <= 53; i++)
             inv.setItem(i, placeHolder);
         inv.setItem(0, acceptTrade);
         inv.setItem(8, theyCancelled);

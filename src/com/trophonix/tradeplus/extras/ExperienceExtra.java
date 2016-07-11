@@ -1,4 +1,4 @@
-package com.trophonix.tradeplus.extras.economy;
+package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.extras.Extra;

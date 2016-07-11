@@ -2,8 +2,9 @@ package com.trophonix.tradeplus.trade;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.extras.Extra;
-import com.trophonix.tradeplus.extras.economy.EconomyExtra;
-import com.trophonix.tradeplus.extras.economy.ExperienceExtra;
+import com.trophonix.tradeplus.extras.EconomyExtra;
+import com.trophonix.tradeplus.extras.ExperienceExtra;
+import com.trophonix.tradeplus.extras.PlayerPointsExtra;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
@@ -25,6 +26,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Trade implements Listener {
@@ -64,6 +67,9 @@ public class Trade implements Listener {
         if (pl.getConfig().getBoolean("extras.experience.enabled", true)) {
             extras.add(new ExperienceExtra(player1, player2, pl));
         }
+        if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints")) {
+            extras.add(new PlayerPointsExtra(player1, player2, pl));
+        }
         updateExtras();
         pl.getServer().getPluginManager().registerEvents(this, pl);
     }
@@ -76,7 +82,7 @@ public class Trade implements Listener {
         if (inv == null) return;
         if (inv.equals(inv1) || inv.equals(inv2)) {
             for (int slot : event.getInventorySlots()) {
-                if (!InvUtils.leftSlots.contains(slot)) {
+                if (!(InvUtils.leftSlots.contains(slot) || getExtra(slot) == null)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -104,6 +110,7 @@ public class Trade implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
         Player player = (Player) event.getWhoClicked();
         Inventory inv = event.getClickedInventory();
+        ClickType click = event.getClick();
         if (inv == null || ((event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) &&
                 (event.getCursor() == null || event.getCursor().getType().equals(Material.AIR)))) return;
         int slot = event.getSlot();
@@ -112,7 +119,11 @@ public class Trade implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (InvUtils.leftSlots.contains(slot)) {
+            if (click.equals(ClickType.DOUBLE_CLICK)) {
+                event.setCancelled(true);
+                return;
+            }
+            if (InvUtils.leftSlots.contains(slot) && getExtra(slot) == null) {
                 if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
                     event.setCancelled(true);
                     return;
@@ -143,7 +154,7 @@ public class Trade implements Listener {
                     }
                 } else if (slot == 49){
                     if (inv.getItem(slot).getType().equals(Material.WATCH)) {
-                        if (forced && task == null) {
+                        if (forced) {
                             forced = false;
                             accept1 = false;
                             accept2 = false;
@@ -187,7 +198,6 @@ public class Trade implements Listener {
                     accept2 = false;
                     updateAcceptance();
                 }
-                ClickType click = event.getClick();
                 if (click.isShiftClick()) {
                     event.setCancelled(true);
                     ItemStack current = event.getCurrentItem();
@@ -255,61 +265,68 @@ public class Trade implements Listener {
 
     private void giveItemsOnLeft(Inventory inv, Player player) {
         InvUtils.leftSlots.forEach(slot -> {
-            ItemStack item = inv.getItem(slot);
-            if (item != null)
-                player.getInventory().addItem(item).values().stream().findFirst().ifPresent(i ->
-                    player.getWorld().dropItemNaturally(player.getLocation(), i));
+            if (getExtra(slot) == null) {
+                ItemStack item = inv.getItem(slot);
+                if (item != null)
+                    player.getInventory().addItem(item).values().stream().findFirst().ifPresent(i ->
+                            player.getWorld().dropItemNaturally(player.getLocation(), i));
+            }
         });
     }
 
     private void updateInventories() {
         InvUtils.leftSlots.forEach(slot -> {
-            ItemStack item1 = inv1.getItem(slot);
-            if (isBlocked(item1)) {
-                Sounds.villagerHit(player1, 1);
-                inv1.setItem(slot, null);
-                player1.getInventory().addItem(item1).values().stream().findFirst().ifPresent(i ->
-                        player1.getWorld().dropItemNaturally(player1.getLocation(), i));
-            } else {
-                inv2.setItem(getRight(slot), item1);
-                spectatorInv.setItem(slot, item1);
-            }
-            ItemStack item2 = inv2.getItem(slot);
-            if (isBlocked(item2)) {
-                Sounds.villagerHit(player2, 1);
-                inv2.setItem(slot, null);
-                player2.getInventory().addItem(item2).values().stream().findFirst().ifPresent(i ->
-                        player2.getWorld().dropItemNaturally(player2.getLocation(), i));
-            } else {
-                inv1.setItem(getRight(slot), item2);
-                spectatorInv.setItem(getRight(slot), item2);
+            if (getExtra(slot) == null) {
+                ItemStack item1 = inv1.getItem(slot);
+                if (isBlocked(item1)) {
+                    Sounds.villagerHit(player1, 1);
+                    inv1.setItem(slot, null);
+                    player1.getInventory().addItem(item1).values().stream().findFirst().ifPresent(i ->
+                            player1.getWorld().dropItemNaturally(player1.getLocation(), i));
+                } else {
+                    inv2.setItem(getRight(slot), item1);
+                    spectatorInv.setItem(slot, item1);
+                }
+                ItemStack item2 = inv2.getItem(slot);
+                if (isBlocked(item2)) {
+                    Sounds.villagerHit(player2, 1);
+                    inv2.setItem(slot, null);
+                    player2.getInventory().addItem(item2).values().stream().findFirst().ifPresent(i ->
+                            player2.getWorld().dropItemNaturally(player2.getLocation(), i));
+                } else {
+                    inv1.setItem(getRight(slot), item2);
+                    spectatorInv.setItem(getRight(slot), item2);
+                }
             }
         });
         player1.updateInventory();
         player2.updateInventory();
     }
 
+    private static List<Integer> extraSlots = new LinkedList<>(Arrays.asList(45, 46, 47, 48, 39, 38, 37, 36, 27, 28, 29, 30));
+
     private void updateExtras() {
-        int slot1 = 45;
-        int slot2a = 45;
-        int slot2b = 45;
-        for (int i = 45; i <= 53; i++) {
-            if (i == 49) continue;
-            inv1.setItem(i, InvUtils.placeHolder);
-            inv2.setItem(i, InvUtils.placeHolder);
+        int slot1 = 0, slot2a = 0, slot2b = 0;
+        for (int i = 0; i < extraSlots.size(); i++) {
+            if (i >= extras.size()) break;
+            int slot = extraSlots.get(i);
+            inv1.setItem(slot, InvUtils.placeHolder);
+            inv1.setItem(getRight(slot), InvUtils.placeHolder);
+            inv2.setItem(slot, InvUtils.placeHolder);
+            inv2.setItem(getRight(slot), InvUtils.placeHolder);
         }
         for (Extra extra : extras) {
-            inv1.setItem(slot1, extra.getIcon(player1));
-            inv2.setItem(slot1, extra.getIcon(player2));
+            inv1.setItem(extraSlots.get(slot1), extra.getIcon(player1));
+            inv2.setItem(extraSlots.get(slot1), extra.getIcon(player2));
             slot1++;
             if (extra.value1 > 0) {
-                inv2.setItem(getRight(slot2a), extra.getTheirIcon(player1));
-                spectatorInv.setItem(slot2a, extra.getTheirIcon(player1));
+                inv2.setItem(getRight(extraSlots.get(slot2a)), extra.getTheirIcon(player1));
+                spectatorInv.setItem(extraSlots.get(slot2a), extra.getTheirIcon(player1));
                 slot2a++;
             }
             if (extra.value2 > 0) {
-                inv1.setItem(getRight(slot2b), extra.getTheirIcon(player2));
-                spectatorInv.setItem(getRight(slot2b), extra.getTheirIcon(player2));
+                inv1.setItem(getRight(extraSlots.get(slot2b)), extra.getTheirIcon(player2));
+                spectatorInv.setItem(getRight(extraSlots.get(slot2b)), extra.getTheirIcon(player2));
                 slot2b++;
             }
         }

@@ -74,6 +74,16 @@ public class TradePlus extends JavaPlugin {
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
             config.set("extras.experience.increment", 5);
             config.set("extras.experience.taxpercent", 0);
+            config.set("extras.playerpoints.enabled", true);
+            config.set("extras.playerpoints.material", "diamond");
+            config.set("extras.playerpoints.display", "&7Your current PlayerPoints offer is &b%AMOUNT%");
+            config.set("extras.playerpoints.theirdisplay", "&7Their current PlayerPoints offer is &b%AMOUNT%");
+            config.set("extras.playerpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                    "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                    "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                    "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            config.set("extras.playerpoints.increment", 5);
+            config.set("extras.playerpoints.taxpercent", 0);
             config.set("soundeffects.enabled", true);
             config.set("soundeffects.onchange", true);
             config.set("soundeffects.onaccept", true);
@@ -213,6 +223,19 @@ public class TradePlus extends JavaPlugin {
                 config.set("gui.head", config.getString("gui.headname", "&7You are trading with: &3&l%PLAYER%").replace("%PLAYERNAME%", "%PLAYER%"));
                 config.set("gui.headname", null);
                 saveLang();
+            }
+
+            if (configVersion < 2.1) {
+                config.set("extras.playerpoints.enabled", true);
+                config.set("extras.playerpoints.material", "diamond");
+                config.set("extras.playerpoints.display", "&7Your current PlayerPoints offer is &b%AMOUNT%");
+                config.set("extras.playerpoints.theirdisplay", "&7Their current PlayerPoints offer is &b%AMOUNT%");
+                config.set("extras.playerpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                        "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                        "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                        "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+                config.set("extras.playerpoints.increment", 5);
+                config.set("extras.playerpoints.taxpercent", 0);
             }
         }
         getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));

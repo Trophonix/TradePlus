@@ -454,6 +454,7 @@ public class Trade implements Listener {
 
     private boolean isBlocked(ItemStack item) {
         if (item == null || item.getType() == null || item.getType().equals(Material.AIR)) return false;
+        if (pl.getConfig().getBoolean("blocked.named-items") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) return true;
         List<String> blocked = pl.getConfig().getStringList("blocked-items");
         if (blocked == null) return false;
         List<String> checks = new ArrayList<>();

@@ -36,7 +36,8 @@ public class TradePlus extends JavaPlugin {
             try { configFile.createNewFile(); } catch (IOException ex) { ex.printStackTrace(); }
             config.set("permissionnode", "tradeplus.trade");
             config.set("permissionrequired", false);
-            config.set("blocked-items", Arrays.asList("bedrock", "97:3"));
+            config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
+            config.set("blocked.named-items", false);
             config.set("action", "crouchrightclick");
             config.set("ranges.sameworld", 10.0);
             config.set("ranges.crossworld", 0.0);
@@ -236,6 +237,11 @@ public class TradePlus extends JavaPlugin {
                         "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
                 config.set("extras.playerpoints.increment", 5);
                 config.set("extras.playerpoints.taxpercent", 0);
+            }
+
+            if (configVersion < 2.11) {
+                config.set("blocked.blacklist", config.getStringList("blocked-items"));
+                config.set("blocked.named-items", false);
             }
         }
         getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));

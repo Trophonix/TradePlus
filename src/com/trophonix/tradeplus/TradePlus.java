@@ -6,16 +6,13 @@ import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class TradePlus extends JavaPlugin {
     private File configFile;
@@ -85,6 +82,16 @@ public class TradePlus extends JavaPlugin {
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
             config.set("extras.playerpoints.increment", 5);
             config.set("extras.playerpoints.taxpercent", 0);
+            config.set("extras.griefprevention.enabled", true);
+            config.set("extras.griefprevention.material", "diamond_pickaxe");
+            config.set("extras.griefprevention.display", "&7Your current GriefPrevention offer is &b%AMOUNT%");
+            config.set("extras.griefprevention.theirdisplay", "&7Their current GriefPrevention offer is &b%AMOUNT%");
+            config.set("extras.griefprevention.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                    "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                    "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                    "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            config.set("extras.griefprevention.increment", 1);
+            config.set("extras.griefprevention.taxperecent", 0);
             config.set("soundeffects.enabled", true);
             config.set("soundeffects.onchange", true);
             config.set("soundeffects.onaccept", true);
@@ -242,6 +249,19 @@ public class TradePlus extends JavaPlugin {
             if (configVersion < 2.11) {
                 config.set("blocked.blacklist", config.getStringList("blocked-items"));
                 config.set("blocked.named-items", false);
+            }
+
+            if (configVersion < 2.12) {
+                config.set("extras.griefprevention.enabled", true);
+                config.set("extras.griefprevention.material", "diamond_pickaxe");
+                config.set("extras.griefprevention.display", "&7Your current GriefPrevention offer is &b%AMOUNT%");
+                config.set("extras.griefprevention.theirdisplay", "&7Their current GriefPrevention offer is &b%AMOUNT%");
+                config.set("extras.griefprevention.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                        "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                        "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                        "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+                config.set("extras.griefprevention.increment", 1);
+                config.set("extras.griefprevention.taxperecent", 0);
             }
         }
         getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));

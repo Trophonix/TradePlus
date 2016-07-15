@@ -1,10 +1,7 @@
 package com.trophonix.tradeplus.trade;
 
 import com.trophonix.tradeplus.TradePlus;
-import com.trophonix.tradeplus.extras.Extra;
-import com.trophonix.tradeplus.extras.EconomyExtra;
-import com.trophonix.tradeplus.extras.ExperienceExtra;
-import com.trophonix.tradeplus.extras.PlayerPointsExtra;
+import com.trophonix.tradeplus.extras.*;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
@@ -64,12 +61,12 @@ public class Trade implements Listener {
                     extras.add(new EconomyExtra(player1, player2, pl));
             } catch (Exception ex) {}
         }
-        if (pl.getConfig().getBoolean("extras.experience.enabled", true)) {
+        if (pl.getConfig().getBoolean("extras.experience.enabled", true))
             extras.add(new ExperienceExtra(player1, player2, pl));
-        }
-        if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints")) {
+        if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints"))
             extras.add(new PlayerPointsExtra(player1, player2, pl));
-        }
+        if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention"))
+            extras.add(new GriefPreventionExtra(player1, player2, pl));
         updateExtras();
         pl.getServer().getPluginManager().registerEvents(this, pl);
     }

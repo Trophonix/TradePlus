@@ -18,7 +18,7 @@ public class InteractListener implements Listener {
         if (event.getRightClicked() instanceof Player) {
             Player player = event.getPlayer();
             Player interacted = (Player) event.getRightClicked();
-            String action = pl.getConfig().getString("action", "crouchrightclick").toLowerCase();
+            String action = pl.getConfig().getString("action", "").toLowerCase();
             if ((action.contains("sneak") || action.contains("crouch") || action.contains("shift")) && !player.isSneaking())
                 return;
             if (action.contains("right")) {
@@ -33,7 +33,7 @@ public class InteractListener implements Listener {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
             Player player = (Player) event.getDamager();
             Player interacted = (Player) event.getEntity();
-            String action = pl.getConfig().getString("action", "crouchrightclick").toLowerCase();
+            String action = pl.getConfig().getString("action", "").toLowerCase();
             if ((action.contains("sneak") || action.contains("crouch") || action.contains("shift")) && !player.isSneaking())
                 return;
             if (action.contains("left")) {

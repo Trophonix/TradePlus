@@ -13,15 +13,6 @@ public class MsgUtils {
 
     private static int version;
 
-    public static void send(CommandSender sender, String[] messages) {
-        for (String m : messages)
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', m));
-    }
-
-    public static void send(CommandSender sender, String message) {
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-    }
-
     public static void send(Player player, String onHover, String onClick, String[] messages) {
         if (version < 18) {
             send(player, messages);
@@ -30,13 +21,14 @@ public class MsgUtils {
         }
     }
 
-    public static ChatColor getColor(String string) {
-        if (string == null) return null;
-        try {
-            return ChatColor.valueOf(string.toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            return ChatColor.getByChar(string);
+    public static void send(CommandSender sender, String[] messages) {
+        for (String message : messages) {
+            send(sender, message);
         }
+    }
+
+    public static void send(CommandSender sender, String message) {
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
     private static String center(String string) {
@@ -68,6 +60,7 @@ public class MsgUtils {
         });
         if (reason != null) {
             send(Bukkit.getConsoleSender(), "&4&lSorry, your copy of Trade+ has been disabled for " + reason + ".");
+            Bukkit.getPluginManager().disablePlugin(Bukkit.getPluginManager().getPlugin("TradePlus"));
         }
         String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
         version = Integer.parseInt(split[0].replace("v", "") + split[1]);

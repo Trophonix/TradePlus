@@ -29,11 +29,11 @@ import java.util.List;
 
 public class Trade implements Listener {
 
-    private static TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
+    private final TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
     private Player player1, player2;
     private Inventory inv1, inv2;
     public Inventory spectatorInv;
-    private List<Extra> extras = new ArrayList<>();
+    private final List<Extra> extras = new ArrayList<>();
     private boolean accept1, accept2;
     private boolean forced = false;
     private BukkitTask task = null;

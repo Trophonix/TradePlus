@@ -33,6 +33,7 @@ public class TradePlus extends JavaPlugin {
             try { configFile.createNewFile(); } catch (IOException ex) { ex.printStackTrace(); }
             config.set("permissionnode", "tradeplus.trade");
             config.set("permissionrequired", false);
+            config.set("requestcooldownseconds", 20);
             config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
             config.set("blocked.named-items", false);
             config.set("action", "crouchrightclick");
@@ -112,12 +113,15 @@ public class TradePlus extends JavaPlugin {
             lang.set("waitforexpire", "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
             lang.set("playernotfound", "&4&l(!) &r&4Could not find specified player");
             lang.set("tradewithself", "&4&l(!) &r&4You cannot trade with yourself");
-            lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>");
+            lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
+                    "    &c- /trade <player name>%NEWLINE%" +
+                    "    &c- /trade deny");
             lang.set("noperms", "&4&l(!) &r&4You do not have permission to trade");
             lang.set("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to trade");
             lang.set("tradecomplete", "&6&l(!) &r&6The trade was successful!");
             lang.set("forcedtrade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
-            saveLang();
+            lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
+            lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
         } else {
             double configVersion = config.contains("configversion") && config.isDouble("configversion") ? config.getDouble("configversion") : 0;
 
@@ -263,8 +267,20 @@ public class TradePlus extends JavaPlugin {
                 config.set("extras.griefprevention.increment", 1);
                 config.set("extras.griefprevention.taxperecent", 0);
             }
+
+            if (configVersion < 2.14) {
+                config.set("requestcooldownseconds", 20);
+                lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
+                lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
+                if (lang.getString("invalidusage").equals("&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>")) {
+                    lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
+                            "    &c- /trade <player name>%NEWLINE%" +
+                            "    &c- /trade deny");
+                }
+            }
         }
         getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));
+        saveLang();
         saveConfig();
         InvUtils.reloadItems(this);
         Sounds.loadSounds();

@@ -24,7 +24,6 @@ public class TradeCommand implements CommandExecutor {
         this.pl = pl;
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -44,15 +43,27 @@ public class TradeCommand implements CommandExecutor {
         if (args.length == 1) {
             final Player receiver = Bukkit.getPlayer(args[0]);
             if (receiver == null) {
+                if (args[0].equalsIgnoreCase("deny")) {
+                    requests.forEach(req -> {
+                        if (req.receiver == player) {
+                            requests.remove(req);
+                            if (req.sender.isOnline()) {
+                                MsgUtils.send(req.sender, pl.getLang().getString("denied-them").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
+                            }
+                        }
+                    });
+                    MsgUtils.send(player, pl.getLang().getString("denied-you").split("%NEWLINE%"));
+                    return true;
+                }
                 MsgUtils.send(player, pl.getLang().getString("playernotfound").replace("%PLAYER%", args[0]).split("%NEWLINE%"));
-                return true;
-            }
-            if (pl.getConfig().getBoolean("permissionrequired") && !receiver.hasPermission(permissionNode)) {
-                MsgUtils.send(player, pl.getLang().getString("nopermsreceiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                 return true;
             }
             if (player == receiver) {
                 MsgUtils.send(player, pl.getLang().getString("tradewithself").split("%NEWLINE%"));
+                return true;
+            }
+            if (pl.getConfig().getBoolean("permissionrequired") && !receiver.hasPermission(permissionNode)) {
+                MsgUtils.send(player, pl.getLang().getString("nopermsreceiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                 return true;
             }
             if (player.getWorld().equals(receiver.getWorld())) {
@@ -100,7 +111,7 @@ public class TradeCommand implements CommandExecutor {
                     if (player.isOnline() && was) {
                         MsgUtils.send(player, pl.getLang().getString("expired").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                     }
-                }, 20 * 60 * 5L);
+                }, 20 * pl.getConfig().getInt("requestcooldownseconds", 300));
             }
             return true;
         }

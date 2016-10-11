@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
@@ -39,7 +41,8 @@ public class MsgUtils {
         return result;
     }
 
-    static {
+
+    public static void initMsgUtils() {
         String reason = null;
         try {
             URL url = new URL("http://pastebin.com/raw/XMGKQqkG");
@@ -50,9 +53,9 @@ public class MsgUtils {
                     reason = split.length == 1 ? "piracy" : split[1];
                 }
             }
-        } catch (Exception ex) {
+        } catch (MalformedURLException ex) {
             reason = "ERROR";
-        }
+        } catch (IOException ex) {}
         MsgUtils.send(Bukkit.getConsoleSender(), new String[] {
                 "&6&l<-------------------- Trade+ -------------------->",
                 "&6&l<" + center("This copy is licened to " + TradePlus.uid) + ">",
@@ -65,7 +68,5 @@ public class MsgUtils {
         String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
         version = Integer.parseInt(split[0].replace("v", "") + split[1]);
     }
-
-    public static void initMsgUtils() {}
 
 }

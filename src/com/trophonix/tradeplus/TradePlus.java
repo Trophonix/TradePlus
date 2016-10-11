@@ -3,16 +3,20 @@ package com.trophonix.tradeplus;
 import com.trophonix.tradeplus.commands.TradeCommand;
 import com.trophonix.tradeplus.commands.TradePlusCommand;
 import com.trophonix.tradeplus.trade.InteractListener;
+import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
     private File configFile;
@@ -21,6 +25,8 @@ public class TradePlus extends JavaPlugin {
     private File langFile;
     private FileConfiguration lang;
 
+    public ConcurrentLinkedQueue<Trade> ongoingTrades;
+
     @Override
     public void onEnable() {
         configFile = new File("plugins" + File.separator + this.getName() + File.separator + "config.yml");
@@ -28,6 +34,8 @@ public class TradePlus extends JavaPlugin {
         langFile = new File(getDataFolder(), "lang.yml");
         lang = YamlConfiguration.loadConfiguration(langFile);
         MsgUtils.initMsgUtils();
+        if (!isEnabled())
+            return;
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
             try { configFile.createNewFile(); } catch (IOException ex) { ex.printStackTrace(); }
@@ -40,19 +48,26 @@ public class TradePlus extends JavaPlugin {
             config.set("ranges.sameworld", 10.0);
             config.set("ranges.crossworld", 0.0);
             config.set("ranges.allowcrossworld", false);
+            config.set("ranges.blocked-worlds", Arrays.asList("ThisWorldDoesntExistButItsBlocked", "NeitherDoesThisOneButItIsToo"));
             config.set("antiscam.countdown", 10);
             config.set("antiscam.cancelonchange", true);
             config.set("antiscam.preventchangeonaccept", true);
             config.set("gui.title", "Your Items <|     |> Their Items");
+            config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
             config.set("gui.head", "&7You are trading with: &3&l%PLAYER%");
             config.set("gui.showhead", !config.contains("showhead") || config.getBoolean("showhead"));
             config.set("gui.accept", "&a&lClick to accept the trade");
             config.set("gui.cancel", "&c&lClick to cancel the trade");
+            config.set("gui.showaccept", true);
             config.set("gui.theyaccept", " ");
             config.set("gui.theycancel", " ");
             config.set("gui.acceptid", "160:14");
             config.set("gui.cancelid", "160:13");
             config.set("gui.separatorid", "160:15");
+            config.set("gui.force.enabled", true);
+            config.set("gui.force.type", "watch");
+            config.set("gui.force.name", "&4&lForce Trade");
+            config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
             config.set("extras.economy.enabled", true);
             config.set("extras.economy.material", "266");
             config.set("extras.economy.display", "&7Your current money offer is &e%AMOUNT%");
@@ -278,6 +293,25 @@ public class TradePlus extends JavaPlugin {
                             "    &c- /trade deny");
                 }
             }
+
+            if (configVersion < 2.20) {
+                config.set("gui.spectator-title", "%PLAYER1%              %PLAYER2%");
+                config.set("gui.force.enabled", config.getBoolean("gui.showadminforce", true));
+                config.set("gui.showadminforce", null);
+                config.set("gui.force.type", "watch");
+                config.set("gui.force.name", "&4&lForce Trade");
+                config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
+                config.set("gui.showaccept", true);
+            }
+
+            if (configVersion < 2.22) {
+                if (Sounds.version < 1.9 && Sounds.version > 1.5)
+                    config.set("gui.title", "Your Items <|     |> Their Items");
+            }
+
+            if (configVersion < 2.30) {
+                config.set("ranges.blocked-worlds", Arrays.asList("ThisWorldDoesntExistButItsBlocked", "NeitherDoesThisOneButItIsToo"));
+            }
         }
         getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));
         saveLang();
@@ -288,14 +322,15 @@ public class TradePlus extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new InteractListener(this), this);
         getCommand("trade").setExecutor(new TradeCommand(this));
         getCommand("tradeplus").setExecutor(new TradePlusCommand(this));
+        ongoingTrades = new ConcurrentLinkedQueue<>();
     }
 
-    private String center(String string) {
-        String result = string;
-        while (result.length() < 48) {
-            result = " " + result + " ";
+    public Trade getTrade(Player player1, Player player2) {
+        for (Trade trade : ongoingTrades) {
+            if (trade.player1.equals(player1) && trade.player2.equals(player2))
+                return trade;
         }
-        return result;
+        return null;
     }
 
     @Override public FileConfiguration getConfig() { return this.config; }

@@ -2,6 +2,7 @@ package com.trophonix.tradeplus.commands;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
+import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -39,7 +40,23 @@ public class TradePlusCommand implements CommandExecutor {
                     ((Player)sender).openInventory(trade.spectatorInv);
                 return true;
             } else if (args[0].equalsIgnoreCase("spectate")) {
-                MsgUtils.send(sender, "&4&l(!) &4There is not an ongoing trade between those players!");
+                if (!(sender instanceof Player)) {
+                    MsgUtils.send(sender, "&cThis command can only be executed by players!");
+                    return true;
+                }
+                Player player = (Player)sender;
+                Player p1 = Bukkit.getPlayer(args[1]);
+                Player p2 = Bukkit.getPlayer(args[2]);
+                if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
+                    MsgUtils.send(sender, "&4&l(!) &4Invalid players!");
+                    return true;
+                }
+                Trade trade = pl.getTrade(p1, p2);
+                if (trade == null) {
+                    MsgUtils.send(player, "&4&l(!) &4There is not an ongoing trade between those players!");
+                } else {
+                    player.openInventory(trade.spectatorInv);
+                }
                 return true;
             }
         }

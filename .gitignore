@@ -12,4 +12,5 @@
 hs_err_pid*
 
 out/
-.idea/
+.idea
+.project

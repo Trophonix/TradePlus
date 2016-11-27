@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Trade+:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/Trade__jar</output-path>
-    <root id="archive" name="TradePlus_2.33.jar">
-      <element id="module-output" name="Trade+" />
-      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
-    </root>
-  </artifact>
-</component>

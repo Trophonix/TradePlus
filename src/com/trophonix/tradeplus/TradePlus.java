@@ -305,7 +305,7 @@ public class TradePlus extends JavaPlugin {
             }
 
             if (configVersion < 2.22) {
-                if (Sounds.version < 1.9 && Sounds.version > 1.5)
+                if (Sounds.version < 19 && Sounds.version > 15)
                     config.set("gui.title", "Your Items <|     |> Their Items");
             }
 

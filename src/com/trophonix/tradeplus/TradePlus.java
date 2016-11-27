@@ -361,6 +361,4 @@ public class TradePlus extends JavaPlugin {
         }
     }
 
-    public static final String uid = "%%__USER__%%";
-
 }

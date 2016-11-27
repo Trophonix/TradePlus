@@ -41,30 +41,7 @@ public class MsgUtils {
         return result;
     }
 
-
     public static void initMsgUtils() {
-        String reason = null;
-        try {
-            URL url = new URL("http://pastebin.com/raw/XMGKQqkG");
-            Scanner scan = new Scanner(url.openStream());
-            while (scan.hasNextLine()) {
-                String[] split = scan.nextLine().split(";");
-                if (TradePlus.uid.equals(split[0])) {
-                    reason = split.length == 1 ? "piracy" : split[1];
-                }
-            }
-        } catch (MalformedURLException ex) {
-            reason = "ERROR";
-        } catch (IOException ex) {}
-        MsgUtils.send(Bukkit.getConsoleSender(), new String[] {
-                "&6&l<-------------------- Trade+ -------------------->",
-                "&6&l<" + center("This copy is licened to " + TradePlus.uid) + ">",
-                "&6&l<------------------------------------------------>"
-        });
-        if (reason != null) {
-            send(Bukkit.getConsoleSender(), "&4&lSorry, your copy of Trade+ has been disabled for " + reason + ".");
-            Bukkit.getPluginManager().disablePlugin(Bukkit.getPluginManager().getPlugin("TradePlus"));
-        }
         String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
         version = Integer.parseInt(split[0].replace("v", "") + split[1]);
     }

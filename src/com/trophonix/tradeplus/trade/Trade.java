@@ -276,7 +276,7 @@ public class Trade implements Listener {
         Player player = event.getPlayer();
         if (player.equals(player1) || player.equals(player2)) {
             if (System.currentTimeMillis() < startTime + 1000) return;
-            player.closeInventory();
+            event.setCancelled(true);
         }
     }
 

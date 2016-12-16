@@ -11,4 +11,4 @@ If the commits look like a mess, that's because I'm still not great with git yet
 
 #UPDATE 12/15/2016:
 
-**Every purchase of TradePlus up through New Years will be donated to [St. Jude Children's Hospital](https://www.stjude.org/). If you haven't already, please consider [buying Trade+ on Spigot](https://www.spigotmc.org/resources/23138/). I will be doing a video showing how many times it was purchased and actually doing the donating so you know I actually used your money for what I claim.**
+**Every purchase of TradePlus up through New Years will be donated to [St. Jude Children's Hospital](https://www.stjude.org/). If you haven't already, please consider [buying Trade+ on Spigot](https://www.spigotmc.org/resources/23138/). I will be doing a video showing how many times it was purchased and actually doing the donating so you know I actually did donate it.**

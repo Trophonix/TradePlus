@@ -43,7 +43,7 @@ public class Experience {
 		//}
 		//return 0;
 	}
-	
+
 	private static int getExpToNext(int level) {
 		if (level > 30) {
 			return 9 * level - 158;

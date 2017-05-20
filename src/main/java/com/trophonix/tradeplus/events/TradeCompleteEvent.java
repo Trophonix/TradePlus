@@ -12,15 +12,19 @@ public class TradeCompleteEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
+    private Trade trade;
     private Player playerOne, playerTwo;
     private Set<ItemStack> playerOneTrades, playerTwoTrades;
 
     public TradeCompleteEvent(Trade trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
+        this.trade = trade;
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
         this.playerOneTrades = playerOneTrades;
         this.playerTwoTrades = playerTwoTrades;
     }
+
+    public Trade getTrade() { return trade; }
 
     public Player getPlayerOne() { return playerOne; }
 

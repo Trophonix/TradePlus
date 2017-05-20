@@ -1,5 +1,5 @@
 name: TradePlus
-version: 2.34
+version: ${project.version}
 author: Trophonix
 main: com.trophonix.tradeplus.TradePlus
 commands:

@@ -1,6 +1,8 @@
 package com.trophonix.tradeplus.commands;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.events.TradeAcceptEvent;
+import com.trophonix.tradeplus.events.TradeRequestEvent;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.trade.TradeRequest;
 import com.trophonix.tradeplus.util.MsgUtils;
@@ -90,19 +92,24 @@ public class TradeCommand implements CommandExecutor {
                     return true;
                 }
             }
-            final TradeRequest request = new TradeRequest(player, receiver);
-            requests.add(request);
+
             boolean accept = false;
             for (TradeRequest req : requests) {
                 if (req.sender.equals(receiver) && req.receiver.equals(player))
                     accept = true;
             }
             if (accept) {
+                Bukkit.getPluginManager().callEvent(new TradeAcceptEvent(receiver, player));
                 MsgUtils.send(receiver, pl.getLang().getString("senderaccept").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
                 MsgUtils.send(player, pl.getLang().getString("receiveraccept").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                 new Trade(player, receiver);
-                requests.stream().filter(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player))).forEach(requests::remove);
+                requests.removeIf(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player)));
             } else {
+                TradeRequestEvent event = new TradeRequestEvent(player, receiver);
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled()) return true;
+                final TradeRequest request = new TradeRequest(player, receiver);
+                requests.add(request);
                 MsgUtils.send(player, pl.getLang().getString("sentrequest").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                 MsgUtils.send(receiver, pl.getLang().getString("receivedrequesthover").replace("%PLAYER%", player.getName()), "/trade " + player.getName(),
                         pl.getLang().getString("receivedrequest").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
@@ -111,7 +118,7 @@ public class TradeCommand implements CommandExecutor {
                     if (player.isOnline() && was) {
                         MsgUtils.send(player, pl.getLang().getString("expired").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                     }
-                }, 20 * pl.getConfig().getInt("requestcooldownseconds", 300));
+                }, 20 * pl.getConfig().getInt("requestcooldownseconds", 15));
             }
             return true;
         }

@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
@@ -28,7 +29,7 @@ public class TradePlus extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        configFile = new File("plugins" + File.separator + this.getName() + File.separator + "config.yml");
+        configFile = new File(getDataFolder(), "config.yml");
         config = YamlConfiguration.loadConfiguration(configFile);
         langFile = new File(getDataFolder(), "lang.yml");
         lang = YamlConfiguration.loadConfiguration(langFile);
@@ -43,6 +44,8 @@ public class TradePlus extends JavaPlugin {
             config.set("requestcooldownseconds", 20);
             config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
             config.set("blocked.named-items", false);
+            config.set("blocked.lore", Collections.singletonList("EXAMPLE_BLOCKED_LORE"));
+            config.set("blocked.regex", "");
             config.set("action", "crouchrightclick");
             config.set("ranges.sameworld", 10.0);
             config.set("ranges.crossworld", 0.0);
@@ -304,12 +307,17 @@ public class TradePlus extends JavaPlugin {
             }
 
             if (configVersion < 2.22) {
-                if (Sounds.version < 19 && Sounds.version > 15)
+                if (Sounds.version < 19)
                     config.set("gui.title", "Your Items <|     |> Their Items");
             }
 
             if (configVersion < 2.30) {
                 config.set("ranges.blocked-worlds", Arrays.asList("ThisWorldDoesntExistButItsBlocked", "NeitherDoesThisOneButItIsToo"));
+            }
+
+            if (configVersion < 2.42) {
+                config.set("blocked.lore", Collections.singletonList("EXAMPLE_BLOCKED_LORE"));
+                config.set("blocked.regex", "");
             }
         }
         getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));

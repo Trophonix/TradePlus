@@ -6,6 +6,7 @@ import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Trade implements Listener {
 
@@ -62,7 +65,7 @@ public class Trade implements Listener {
             try {
                 if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null)
                     extras.add(new EconomyExtra(player1, player2, pl));
-            } catch (Exception ex) {}
+            } catch (Exception ignored) {}
         }
         if (pl.getConfig().getBoolean("extras.experience.enabled", true))
             extras.add(new ExperienceExtra(player1, player2, pl));
@@ -516,6 +519,36 @@ public class Trade implements Listener {
     private boolean isBlocked(ItemStack item) {
         if (item == null || item.getType() == null || item.getType().equals(Material.AIR)) return false;
         if (pl.getConfig().getBoolean("blocked.named-items") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) return true;
+        if (item.hasItemMeta()) {
+            String regex = pl.getConfig().getString("blocked.regex", "");
+            if (!regex.isEmpty()) {
+                try {
+                    Pattern pattern = Pattern.compile(regex);
+                    if (item.getItemMeta().hasDisplayName()) {
+                        String displayName = item.getItemMeta().getDisplayName();
+                        if (pattern.matcher(displayName).find()) return true;
+                    }
+                    if (item.getItemMeta().hasLore()) {
+                        List<String> lore = item.getItemMeta().getLore();
+                        if (lore.stream().anyMatch(s -> pattern.matcher(s).find())) return true;
+                    }
+                } catch (PatternSyntaxException ex) {
+                    ex.printStackTrace();
+                    Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Your blocked.regex is invalid!");
+                }
+            }
+            List<String> blockedLore = pl.getConfig().getStringList("blocked.lore");
+            if (blockedLore != null) {
+                if (item.getItemMeta().hasDisplayName()) {
+                    String displayName = item.getItemMeta().getDisplayName();
+                    if (blockedLore.stream().anyMatch(displayName::contains)) return true;
+                }
+                if (item.getItemMeta().hasLore()) {
+                    List<String> lore = item.getItemMeta().getLore();
+                    if (blockedLore.stream().anyMatch(s -> lore.stream().anyMatch(ln -> ln.contains(s)))) return true;
+                }
+            }
+        }
         List<String> blocked = pl.getConfig().getStringList("blocked-items");
         if (blocked == null) return false;
         List<String> checks = new ArrayList<>();

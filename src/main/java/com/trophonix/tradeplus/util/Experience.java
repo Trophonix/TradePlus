@@ -14,7 +14,7 @@ public class Experience {
 				+ Math.round(getExpToNext(player.getLevel()) * player.getExp());
 	}
 
-	public static int getExpFromLevel(int level) {
+	private static int getExpFromLevel(int level) {
 		if (level > 30) {
 			return (int) (4.5 * level * level - 162.5 * level + 2220);
 		}
@@ -31,7 +31,7 @@ public class Experience {
 	 * 
 	 * @return the level calculated
 	 */
-	public static double getLevelFromExp(int exp) {
+	private static double getLevelFromExp(int exp) {
 		if (exp > 1395) {
 			return (Math.sqrt(72 * exp - 54215) + 325) / 18;
 		}

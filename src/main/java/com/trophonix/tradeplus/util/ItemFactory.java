@@ -15,7 +15,7 @@ public class ItemFactory {
 
     private Material material;
     private int amount = 1;
-    private short damage = 0;
+    private final short damage = 0;
     private byte data = 0;
     private String display = "";
     private List<String> lore = new ArrayList<>();
@@ -30,16 +30,18 @@ public class ItemFactory {
             String[] split = parsable.split(":");
             try {
                 this.material = Material.getMaterial(Integer.parseInt(split[0]));
-            } catch (IllegalArgumentException | NullPointerException ex) {
+                material.getData();
+            } catch (NullPointerException ex) {
                 this.material = Material.getMaterial(split[0]);
             }
             try {
                 this.data = Byte.parseByte(split[1]);
-            } catch (IllegalArgumentException | NullPointerException ex) {}
+            } catch (NumberFormatException | NullPointerException ignored) {}
         } else {
             try {
                 this.material = Material.getMaterial(Integer.parseInt(parsable));
-            } catch (IllegalArgumentException | NullPointerException ex) {
+                material.getData();
+            } catch (NullPointerException ex) {
                 this.material = Material.getMaterial(parsable);
             }
         }
@@ -59,7 +61,7 @@ public class ItemFactory {
                 }
                 try {
                     this.data = Byte.parseByte(split[1]);
-                } catch (IllegalArgumentException | NullPointerException ex) {
+                } catch (IllegalArgumentException | NullPointerException ignored) {
                 }
             } else {
                 try {

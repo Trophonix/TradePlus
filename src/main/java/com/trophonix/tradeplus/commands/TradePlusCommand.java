@@ -2,7 +2,6 @@ package com.trophonix.tradeplus.commands;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
-import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -12,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class TradePlusCommand implements CommandExecutor {
 
-    private TradePlus pl;
+    private final TradePlus pl;
 
     public TradePlusCommand(TradePlus pl) { this.pl = pl; }
 

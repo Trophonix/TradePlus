@@ -11,8 +11,8 @@ public class TradeAcceptEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private Player sender;
-    private Player receiver;
+    private final Player sender;
+    private final Player receiver;
 
     public TradeAcceptEvent(Player sender, Player receiver) {
         this.sender = sender;

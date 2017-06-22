@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 public class InteractListener implements Listener {
 
-    private TradePlus pl;
+    private final TradePlus pl;
 
     public InteractListener(TradePlus pl) { this.pl = pl; }
 

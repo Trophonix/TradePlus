@@ -16,7 +16,7 @@ public class InvUtils {
 
     private static TradePlus pl;
 
-    public static List<Integer> leftSlots = new LinkedList<>(Arrays.asList(1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21,
+    public static final List<Integer> leftSlots = new LinkedList<>(Arrays.asList(1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21,
                                                                             27, 28, 29, 30, 36, 37, 38, 39, 45, 46,
                                                                             47, 48));
 

@@ -4,7 +4,7 @@ import net.md_5.bungee.api.chat.*;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class MsgUtils1_8 {
+class MsgUtils1_8 {
 
     public static void send(Player player, String onHover, String onClick, String[] messages) {
         for (String m : messages) {

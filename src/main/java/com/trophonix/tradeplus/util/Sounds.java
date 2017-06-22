@@ -12,7 +12,7 @@ public class Sounds {
     private static Sound levelUp;
     private static Sound villagerHit;
 
-    public static int version;
+    public static final int version;
 
     static {
         String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");

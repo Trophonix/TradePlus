@@ -1,15 +1,9 @@
 package com.trophonix.tradeplus.util;
 
-import com.trophonix.tradeplus.TradePlus;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Scanner;
 
 public class MsgUtils {
 
@@ -34,11 +28,11 @@ public class MsgUtils {
     }
 
     private static String center(String string) {
-        String result = string;
+        StringBuilder result = new StringBuilder(string);
         while (result.length() < 48) {
-            result = " " + result + " ";
+            result = new StringBuilder(" " + result + " ");
         }
-        return result;
+        return result.toString();
     }
 
     public static void initMsgUtils() {

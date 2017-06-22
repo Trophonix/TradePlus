@@ -35,9 +35,11 @@ import java.util.regex.PatternSyntaxException;
 public class Trade implements Listener {
 
     private final TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
-    public Player player1, player2;
-    private Inventory inv1, inv2;
-    public Inventory spectatorInv;
+    public final Player player1;
+    public final Player player2;
+    private final Inventory inv1;
+    private final Inventory inv2;
+    public final Inventory spectatorInv;
     private final List<Extra> extras = new ArrayList<>();
     private boolean accept1, accept2;
     private boolean forced = false;
@@ -362,7 +364,7 @@ public class Trade implements Listener {
         player2.updateInventory();
     }
 
-    private static List<Integer> extraSlots = new LinkedList<>(Arrays.asList(45, 46, 47, 48, 39, 38, 37, 36, 27, 28, 29, 30));
+    private static final List<Integer> extraSlots = new LinkedList<>(Arrays.asList(45, 46, 47, 48, 39, 38, 37, 36, 27, 28, 29, 30));
 
     private void updateExtras() {
         int slot1 = 0, slot2a = 0, slot2b = 0;

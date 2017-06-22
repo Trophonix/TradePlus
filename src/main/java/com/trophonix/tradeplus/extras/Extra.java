@@ -10,21 +10,22 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class Extra {
 
-    private ConfigurationSection section;
-
-    private TradePlus pl;
-    protected Player player1, player2;
-    protected double increment, increment1, increment2;
+    final Player player1;
+    final Player player2;
+    final double increment;
+    double increment1;
+    double increment2;
     public double value1 = 0, value2 = 0;
-    public ItemStack icon, theirIcon;
-    protected double taxPercent;
+    public final ItemStack icon;
+    final ItemStack theirIcon;
+    final double taxPercent;
 
-    public Extra(String name, Player player1, Player player2, TradePlus pl) {
-        this.section = pl.getConfig().getConfigurationSection("extras." + name);
+    Extra(String name, Player player1, Player player2, TradePlus pl) {
+        ConfigurationSection section = pl.getConfig().getConfigurationSection("extras." + name);
         this.player1 = player1;
         this.player2 = player2;
         this.increment = section.getDouble("increment");
-        this.pl = pl;
+        TradePlus pl1 = pl;
         this.increment1 = increment;
         this.increment2 = increment;
         ItemFactory factory = new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
@@ -77,7 +78,7 @@ public abstract class Extra {
         }
     }
 
-    public abstract double getMax(Player player);
+    protected abstract double getMax(Player player);
 
     public abstract void onTradeEnd();
 

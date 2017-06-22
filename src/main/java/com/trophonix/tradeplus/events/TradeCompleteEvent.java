@@ -8,13 +8,15 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Set;
 
-public class TradeCompleteEvent extends Event {
+class TradeCompleteEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private Trade trade;
-    private Player playerOne, playerTwo;
-    private Set<ItemStack> playerOneTrades, playerTwoTrades;
+    private final Trade trade;
+    private final Player playerOne;
+    private final Player playerTwo;
+    private final Set<ItemStack> playerOneTrades;
+    private final Set<ItemStack> playerTwoTrades;
 
     public TradeCompleteEvent(Trade trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
         this.trade = trade;

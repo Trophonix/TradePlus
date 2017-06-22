@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class EconomyExtra extends Extra {
 
-    private Economy economy;
+    private final Economy economy;
 
     public EconomyExtra(Player player1, Player player2, TradePlus pl) {
         super("economy", player1, player2, pl);

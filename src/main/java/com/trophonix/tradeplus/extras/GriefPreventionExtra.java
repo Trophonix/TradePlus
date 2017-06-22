@@ -1,7 +1,6 @@
 package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
-import com.trophonix.tradeplus.util.Experience;
 import com.trophonix.tradeplus.util.ItemFactory;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;

@@ -7,7 +7,6 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.trade.TradeRequest;
 import com.trophonix.tradeplus.util.MsgUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,7 +19,7 @@ public class TradeCommand implements CommandExecutor {
 
     private final ConcurrentLinkedQueue<TradeRequest> requests = new ConcurrentLinkedQueue<>();
 
-    private TradePlus pl;
+    private final TradePlus pl;
 
     public TradeCommand(TradePlus pl) {
         this.pl = pl;

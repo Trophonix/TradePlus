@@ -1,7 +1,6 @@
 package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
-import com.trophonix.tradeplus.util.Experience;
 import com.trophonix.tradeplus.util.ItemFactory;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -10,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerPointsExtra extends Extra {
 
-    private PlayerPointsAPI playerPointsAPI;
+    private final PlayerPointsAPI playerPointsAPI;
 
     public PlayerPointsExtra(Player player1, Player player2, TradePlus pl) {
         super("playerpoints", player1, player2, pl);

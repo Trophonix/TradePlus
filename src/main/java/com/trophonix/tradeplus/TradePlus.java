@@ -42,6 +42,7 @@ public class TradePlus extends JavaPlugin {
             config.set("permissionnode", "tradeplus.trade");
             config.set("permissionrequired", false);
             config.set("requestcooldownseconds", 20);
+            config.set("allow-trade-in-creative", false);
             config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
             config.set("blocked.named-items", false);
             config.set("blocked.lore", Collections.singletonList("EXAMPLE_BLOCKED_LORE"));
@@ -120,6 +121,8 @@ public class TradePlus extends JavaPlugin {
             lang.set("sentrequest", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
             lang.set("receivedrequest", "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
             lang.set("receivedrequesthover", "&6&lClick here to trade with &e&l%PLAYER%");
+            lang.set("creative", "&4&l(!) &r&4You can't trade in creative mode!");
+            lang.set("creativethem", "&4&l(!) &r&4That player is in creative mode!");
             lang.set("withinrange", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them");
             lang.set("withinrangecrossworld", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!");
             lang.set("nocrossworld", "&4&l(!) &r&4You must be in the same world as a player to trade with them!");
@@ -251,7 +254,6 @@ public class TradePlus extends JavaPlugin {
                 }
                 config.set("gui.head", config.getString("gui.headname", "&7You are trading with: &3&l%PLAYER%").replace("%PLAYERNAME%", "%PLAYER%"));
                 config.set("gui.headname", null);
-                saveLang();
             }
 
             if (configVersion < 2.1) {
@@ -316,13 +318,16 @@ public class TradePlus extends JavaPlugin {
             }
 
             if (configVersion < 2.42) {
+                config.set("allow-trade-in-creative", false);
                 config.set("blocked.lore", Collections.singletonList("EXAMPLE_BLOCKED_LORE"));
                 config.set("blocked.regex", "");
+                lang.set("creative", "&4&l(!) &r&4You can't trade in creative mode!");
+                lang.set("creativethem", "&4&l(!) &r&4That player is in creative mode!");
             }
         }
-        getConfig().set("configversion", Double.parseDouble(getDescription().getVersion()));
-        saveLang();
+        config.set("configversion", Double.parseDouble(getDescription().getVersion()));
         saveConfig();
+        saveLang();
         InvUtils.reloadItems(this);
         Sounds.loadSounds();
         if (Sounds.version > 17)

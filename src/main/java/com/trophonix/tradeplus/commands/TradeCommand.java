@@ -7,6 +7,7 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.trade.TradeRequest;
 import com.trophonix.tradeplus.util.MsgUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -58,6 +59,15 @@ public class TradeCommand implements CommandExecutor {
                 }
                 MsgUtils.send(player, pl.getLang().getString("playernotfound").replace("%PLAYER%", args[0]).split("%NEWLINE%"));
                 return true;
+            }
+            if (pl.getConfig().getBoolean("allow-trade-in-creative", true)) {
+                if (player.getGameMode().equals(GameMode.CREATIVE)) {
+                    MsgUtils.send(player, pl.getLang().getString("creative").split("%NEWLINE%"));
+                    return true;
+                } else if (receiver.getGameMode().equals(GameMode.CREATIVE)) {
+                    MsgUtils.send(player, pl.getLang().getString("creativethem").split("%NEWLINE%"));
+                    return true;
+                }
             }
             if (player == receiver) {
                 MsgUtils.send(player, pl.getLang().getString("tradewithself").split("%NEWLINE%"));

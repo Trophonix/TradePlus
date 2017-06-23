@@ -31,17 +31,17 @@ public class ItemFactory {
             try {
                 this.material = Material.getMaterial(Integer.parseInt(split[0]));
                 material.getData();
-            } catch (NullPointerException ex) {
+            } catch (Exception ex) {
                 this.material = Material.getMaterial(split[0]);
             }
             try {
                 this.data = Byte.parseByte(split[1]);
-            } catch (NumberFormatException | NullPointerException ignored) {}
+            } catch (Exception ignored) {}
         } else {
             try {
                 this.material = Material.getMaterial(Integer.parseInt(parsable));
                 material.getData();
-            } catch (NullPointerException ex) {
+            } catch (Exception ex) {
                 this.material = Material.getMaterial(parsable);
             }
         }
@@ -56,17 +56,16 @@ public class ItemFactory {
                 String[] split = parsable.split(":");
                 try {
                     this.material = Material.getMaterial(Integer.parseInt(split[0]));
-                } catch (IllegalArgumentException | NullPointerException ex) {
+                } catch (Exception ex) {
                     this.material = Material.getMaterial(split[0]);
                 }
                 try {
                     this.data = Byte.parseByte(split[1]);
-                } catch (IllegalArgumentException | NullPointerException ignored) {
-                }
+                } catch (Exception ignored) {}
             } else {
                 try {
                     this.material = Material.getMaterial(Integer.parseInt(parsable));
-                } catch (IllegalArgumentException | NullPointerException ex) {
+                } catch (Exception ex) {
                     this.material = Material.getMaterial(parsable);
                 }
             }

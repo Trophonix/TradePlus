@@ -522,7 +522,7 @@ public class Trade implements Listener {
         if (item == null || item.getType() == null || item.getType().equals(Material.AIR)) return false;
         if (pl.getConfig().getBoolean("blocked.named-items") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) return true;
         if (item.hasItemMeta()) {
-            String regex = pl.getConfig().getString("blocked.regex", "");
+            String regex = ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("blocked.regex", ""));
             if (!regex.isEmpty()) {
                 try {
                     Pattern pattern = Pattern.compile(regex);
@@ -547,7 +547,7 @@ public class Trade implements Listener {
                 }
                 if (item.getItemMeta().hasLore()) {
                     List<String> lore = item.getItemMeta().getLore();
-                    if (blockedLore.stream().anyMatch(s -> lore.stream().anyMatch(ln -> ln.contains(s)))) return true;
+                    if (blockedLore.stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).anyMatch(s -> lore.stream().anyMatch(ln -> ln.contains(s)))) return true;
                 }
             }
         }

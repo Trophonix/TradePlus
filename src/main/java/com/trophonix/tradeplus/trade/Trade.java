@@ -543,7 +543,7 @@ public class Trade implements Listener {
             if (blockedLore != null) {
                 if (item.getItemMeta().hasDisplayName()) {
                     String displayName = item.getItemMeta().getDisplayName();
-                    if (blockedLore.stream().anyMatch(displayName::contains)) return true;
+                    if (blockedLore.stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).anyMatch(displayName::contains)) return true;
                 }
                 if (item.getItemMeta().hasLore()) {
                     List<String> lore = item.getItemMeta().getLore();

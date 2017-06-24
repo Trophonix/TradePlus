@@ -541,13 +541,18 @@ public class Trade implements Listener {
             }
             List<String> blockedLore = pl.getConfig().getStringList("blocked.lore");
             if (blockedLore != null) {
+                for (int i = 0; i < blockedLore.size(); i++) {
+                    String line = ChatColor.translateAlternateColorCodes('&', blockedLore.get(i));
+                    if (line.length() > 2) line = line.substring(1, line.length() - 1);
+                    blockedLore.set(i, line);
+                }
                 if (item.getItemMeta().hasDisplayName()) {
                     String displayName = item.getItemMeta().getDisplayName();
-                    if (blockedLore.stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).anyMatch(displayName::contains)) return true;
+                    if (blockedLore.stream().anyMatch(displayName::contains)) return true;
                 }
                 if (item.getItemMeta().hasLore()) {
                     List<String> lore = item.getItemMeta().getLore();
-                    if (blockedLore.stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).anyMatch(s -> lore.stream().anyMatch(ln -> ln.contains(s)))) return true;
+                    if (blockedLore.stream().anyMatch(s -> lore.stream().anyMatch(ln -> ln.contains(s)))) return true;
                 }
             }
         }

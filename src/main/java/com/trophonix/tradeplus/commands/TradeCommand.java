@@ -45,7 +45,7 @@ public class TradeCommand implements CommandExecutor {
         if (args.length == 1) {
             final Player receiver = Bukkit.getPlayer(args[0]);
             if (receiver == null) {
-                if (args[0].equalsIgnoreCase("deny")) {
+                if (args[0].equalsIgnoreCase("non")) {
                     requests.forEach(req -> {
                         if (req.receiver == player) {
                             requests.remove(req);
@@ -55,6 +55,16 @@ public class TradeCommand implements CommandExecutor {
                         }
                     });
                     MsgUtils.send(player, pl.getLang().getString("denied-you").split("%NEWLINE%"));
+                    return true;
+                } else if (args[0].equalsIgnoreCase("oui")) {
+                    String lastRequest = "N/A";
+                    for (TradeRequest request : requests) {
+                        if (request.receiver.equals(sender)) {
+                            lastRequest = request.sender.getName();
+                            break;
+                        }
+                    }
+                    ((Player) sender).performCommand("trade " + lastRequest);
                     return true;
                 }
                 MsgUtils.send(player, pl.getLang().getString("playernotfound").replace("%PLAYER%", args[0]).split("%NEWLINE%"));

@@ -5,6 +5,7 @@ main: com.trophonix.tradeplus.TradePlus
 commands:
   trade:
     description: Trade command
+    aliases: [echange,exchange]
   tradeplus:
     description: TradePlus admin command
     permission: tradeplus.admin

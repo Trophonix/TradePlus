@@ -34,9 +34,10 @@ public class TradeCommand implements CommandExecutor {
         }
         final Player player = (Player)sender;
 
-        String permissionNode = pl.getConfig().getString("permissionnode");
-        if (pl.getConfig().getBoolean("permissionrequired")) {
-            if (!player.hasPermission(permissionNode)) {
+        boolean permissionRequired = pl.getConfig().getBoolean("permissions.required", false);
+        String sendPermission = pl.getConfig().getString("permissions.send");
+        if (permissionRequired) {
+            if (!player.hasPermission(sendPermission)) {
                 MsgUtils.send(player, pl.getLang().getString("noperms").split("%NEWLINE%"));
                 return true;
             }
@@ -73,7 +74,8 @@ public class TradeCommand implements CommandExecutor {
                 MsgUtils.send(player, pl.getLang().getString("tradewithself").split("%NEWLINE%"));
                 return true;
             }
-            if (pl.getConfig().getBoolean("permissionrequired") && !receiver.hasPermission(permissionNode)) {
+            String acceptPermission = pl.getConfig().getString("permissions.accept", "tradeplus.accept");
+            if (permissionRequired && !receiver.hasPermission(acceptPermission)) {
                 MsgUtils.send(player, pl.getLang().getString("nopermsreceiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
                 return true;
             }

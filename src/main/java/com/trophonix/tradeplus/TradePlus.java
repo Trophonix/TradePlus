@@ -39,8 +39,9 @@ public class TradePlus extends JavaPlugin {
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
             try { configFile.createNewFile(); } catch (IOException ex) { ex.printStackTrace(); }
-            config.set("permissionnode", "tradeplus.trade");
-            config.set("permissionrequired", false);
+            config.set("permissions.required", config.getBoolean("permissionrequired", false));
+            config.set("permissions.send", config.getString("permissionnode", "tradeplus.send"));
+            config.set("permissions.accept", "tradeplus.accept");
             config.set("requestcooldownseconds", 20);
             config.set("allow-trade-in-creative", false);
             config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
@@ -137,7 +138,7 @@ public class TradePlus extends JavaPlugin {
                     "    &c- /trade <player name>%NEWLINE%" +
                     "    &c- /trade deny");
             lang.set("noperms", "&4&l(!) &r&4You do not have permission to trade");
-            lang.set("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to trade");
+            lang.set("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to accept a trade");
             lang.set("tradecomplete", "&6&l(!) &r&6The trade was successful!");
             lang.set("forcedtrade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
             lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
@@ -323,6 +324,14 @@ public class TradePlus extends JavaPlugin {
                 config.set("blocked.regex", "");
                 lang.set("creative", "&4&l(!) &r&4You can't trade in creative mode!");
                 lang.set("creativethem", "&4&l(!) &r&4That player is in creative mode!");
+            }
+
+            if (configVersion < 2.45) {
+                config.set("permissions.required", config.getBoolean("permissionrequired", false));
+                config.set("permissions.send", config.getString("permissionnode", "tradeplus.send"));
+                config.set("permissions.accept", "tradeplus.accept");
+                config.set("permissionrequired", null);
+                config.set("permissionnode", null);
             }
         }
         config.set("configversion", Double.parseDouble(getDescription().getVersion()));

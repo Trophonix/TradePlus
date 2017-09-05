@@ -35,13 +35,6 @@ public class TradeCommand implements CommandExecutor {
         final Player player = (Player)sender;
 
         boolean permissionRequired = pl.getConfig().getBoolean("permissions.required", false);
-        String sendPermission = pl.getConfig().getString("permissions.send");
-        if (permissionRequired) {
-            if (!player.hasPermission(sendPermission)) {
-                MsgUtils.send(player, pl.getLang().getString("noperms").split("%NEWLINE%"));
-                return true;
-            }
-        }
 
         if (args.length == 1) {
             final Player receiver = Bukkit.getPlayer(args[0]);
@@ -116,6 +109,13 @@ public class TradeCommand implements CommandExecutor {
                 new Trade(player, receiver);
                 requests.removeIf(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player)));
             } else {
+                String sendPermission = pl.getConfig().getString("permissions.send");
+                if (permissionRequired) {
+                    if (!player.hasPermission(sendPermission)) {
+                        MsgUtils.send(player, pl.getLang().getString("noperms").split("%NEWLINE%"));
+                        return true;
+                    }
+                }
                 TradeRequestEvent event = new TradeRequestEvent(player, receiver);
                 Bukkit.getPluginManager().callEvent(event);
                 if (event.isCancelled()) return true;

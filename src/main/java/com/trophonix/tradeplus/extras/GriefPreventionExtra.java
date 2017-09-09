@@ -24,11 +24,11 @@ public class GriefPreventionExtra extends Extra {
         PlayerData data2 = GriefPrevention.instance.dataStore.getPlayerData(player2.getUniqueId());
         if (value1 > 0) {
             data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() - (int)value1);
-            data2.setAccruedClaimBlocks(data2.getAccruedClaimBlocks() + (int)((value1 / 100) * taxPercent));
+            data2.setAccruedClaimBlocks(data2.getAccruedClaimBlocks() + (int)(value1 - ((value1 / 100) * taxPercent)));
         }
         if (value2 > 0) {
             data2.setAccruedClaimBlocks(data2.getAccruedClaimBlocks() - (int)value2);
-            data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() + (int)((value2 / 100) * taxPercent));
+            data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() + (int)(value2 - ((value2 / 100) * taxPercent)));
         }
     }
 

@@ -25,7 +25,6 @@ public abstract class Extra {
         this.player1 = player1;
         this.player2 = player2;
         this.increment = section.getDouble("increment");
-        TradePlus pl1 = pl;
         this.increment1 = increment;
         this.increment2 = increment;
         ItemFactory factory = new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
@@ -44,22 +43,17 @@ public abstract class Extra {
             if (click.isShiftClick()) {
                 if (player.equals(player1)) {
                     increment1 -= increment;
-                    if (increment1 < 0) increment1 = 0;
                 } else if (player.equals(player2)) {
                     increment2 -= increment;
-                    if (increment2 < 0) increment1 = 0;
                 }
             } else {
                 if (player.equals(player1)) {
                     value1 -= increment1;
-                    if (value1 < 0) value1 = 0;
                 } else if (player.equals(player2)) {
                     value2 -= increment2;
-                    if (value2 < 0) value2 = 0;
                 }
             }
         } else if (click.isRightClick()) {
-            double max = getMax(player);
             if (click.isShiftClick()) {
                 if (player.equals(player1)) {
                     increment1 += increment;
@@ -69,13 +63,22 @@ public abstract class Extra {
             } else {
                 if (player.equals(player1)) {
                     value1 += increment1;
-                    if (value1 > max) value1 = max;
                 } else if (player.equals(player2)) {
                     value2 += increment2;
-                    if (value2 > max) value2 = max;
                 }
             }
         }
+
+        if (increment1 < 0) increment1 = 0;
+        if (increment2 < 0) increment2 = 0;
+
+        if (value1 < 0) value1 = 0;
+        if (value2 < 0) value2 = 0;
+
+        double max1 = getMax(player1);
+        double max2 = getMax(player2);
+        if (value1 > max1) value1 = max1;
+        if (value2 > max2) value2 = max2;
     }
 
     protected abstract double getMax(Player player);

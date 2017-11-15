@@ -182,7 +182,7 @@ public class Trade implements Listener {
                 } else {
                     Extra extra = getExtra(slot);
                     if (extra != null) {
-                        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2)))
+                        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept", true) && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2)))
                             return;
                         if (task != null)
                             return;

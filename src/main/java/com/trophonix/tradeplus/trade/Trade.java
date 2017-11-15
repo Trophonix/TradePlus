@@ -8,6 +8,7 @@ import com.trophonix.tradeplus.util.Sounds;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -257,7 +258,6 @@ public class Trade implements Listener {
         if (closed == null || closed.getSize() < 54) return;
         if (closed.getItem(49) == null) return;
         if (closed.equals(inv1) || closed.equals(inv2)) {
-            HandlerList.unregisterAll(this);
             pl.ongoingTrades.remove(this);
             if (task != null) {
                 task.cancel();
@@ -273,6 +273,8 @@ public class Trade implements Listener {
             player2.closeInventory();
             MsgUtils.send(player1, pl.getLang().getString("cancelled"));
             MsgUtils.send(player2, pl.getLang().getString("cancelled"));
+            spectatorInv.getViewers().forEach(HumanEntity::closeInventory);
+            HandlerList.unregisterAll(this);
         }
     }
 
@@ -431,7 +433,6 @@ public class Trade implements Listener {
                         }
                     } else {
                         if (task != null) {
-                            HandlerList.unregisterAll(this);
                             pl.ongoingTrades.remove(this);
                             task.cancel();
                             task = null;
@@ -446,11 +447,14 @@ public class Trade implements Listener {
                             if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
                                 Sounds.levelUp(player1, 1);
                                 Sounds.levelUp(player2, 1);
-                                spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
-                                        Sounds.levelUp((Player) p, 1));
+                                spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p -> {
+                                        Sounds.levelUp((Player) p, 1);
+                                        p.closeInventory();
+                                });
                             }
                             MsgUtils.send(player1, pl.getLang().getString("tradecomplete"));
                             MsgUtils.send(player2, pl.getLang().getString("tradecomplete"));
+                            HandlerList.unregisterAll(this);
                         } else {
                             updateAcceptance();
                         }

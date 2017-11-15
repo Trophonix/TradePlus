@@ -560,7 +560,7 @@ public class Trade implements Listener {
                 }
             }
         }
-        List<String> blocked = pl.getConfig().getStringList("blocked-items");
+        List<String> blocked = pl.getConfig().getStringList("blocked.blacklist");
         if (blocked == null) return false;
         List<String> checks = new ArrayList<>();
         String type = item.getType().toString();

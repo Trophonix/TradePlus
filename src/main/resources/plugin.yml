@@ -2,6 +2,7 @@ name: TradePlus
 version: ${project.version}
 author: Trophonix
 main: com.trophonix.tradeplus.TradePlus
+depend: ['Vault']
 commands:
   trade:
     description: Trade command

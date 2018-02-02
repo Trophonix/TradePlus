@@ -76,6 +76,8 @@ public class Trade implements Listener {
             extras.add(new PlayerPointsExtra(player1, player2, pl));
         if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention"))
             extras.add(new GriefPreventionExtra(player1, player2, pl));
+        if (pl.getConfig().getBoolean("extras.enjinpoints.enabled", false) && pl.getServer().getPluginManager().isPluginEnabled("EnjinMinecraftPlugin"))
+            extras.add(new EnjinPointsExtra(player1, player2, pl));
         updateExtras();
         pl.getServer().getPluginManager().registerEvents(this, pl);
         pl.ongoingTrades.add(this);

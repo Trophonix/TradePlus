@@ -42,20 +42,26 @@ public class TradePlus extends JavaPlugin {
             config.set("permissions.required", config.getBoolean("permissionrequired", false));
             config.set("permissions.send", config.getString("permissionnode", "tradeplus.send"));
             config.set("permissions.accept", "tradeplus.accept");
+
             config.set("requestcooldownseconds", 20);
             config.set("allow-trade-in-creative", false);
+
             config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
             config.set("blocked.named-items", false);
             config.set("blocked.lore", Collections.singletonList("EXAMPLE_BLOCKED_LORE"));
             config.set("blocked.regex", "");
+
             config.set("action", "crouchrightclick");
+
             config.set("ranges.sameworld", 10.0);
             config.set("ranges.crossworld", 0.0);
             config.set("ranges.allowcrossworld", false);
             config.set("ranges.blocked-worlds", Arrays.asList("ThisWorldDoesntExistButItsBlocked", "NeitherDoesThisOneButItIsToo"));
+
             config.set("antiscam.countdown", 10);
             config.set("antiscam.cancelonchange", true);
             config.set("antiscam.preventchangeonaccept", true);
+
             config.set("gui.title", "Your Items <|     |> Their Items");
             config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
             config.set("gui.head", "&7You are trading with: &3&l%PLAYER%");
@@ -72,6 +78,7 @@ public class TradePlus extends JavaPlugin {
             config.set("gui.force.type", "watch");
             config.set("gui.force.name", "&4&lForce Trade");
             config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
+
             config.set("extras.economy.enabled", true);
             config.set("extras.economy.material", "266");
             config.set("extras.economy.display", "&7Your current money offer is &e%AMOUNT%");
@@ -82,6 +89,7 @@ public class TradePlus extends JavaPlugin {
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
             config.set("extras.economy.increment", 10.0);
             config.set("extras.economy.taxpercent", 0);
+
             config.set("extras.experience.enabled", true);
             config.set("extras.experience.material", "exp_bottle");
             config.set("extras.experience.display", "&7Your current XP offer is &e%AMOUNT%");
@@ -92,6 +100,7 @@ public class TradePlus extends JavaPlugin {
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
             config.set("extras.experience.increment", 5);
             config.set("extras.experience.taxpercent", 0);
+
             config.set("extras.playerpoints.enabled", true);
             config.set("extras.playerpoints.material", "diamond");
             config.set("extras.playerpoints.display", "&7Your current PlayerPoints offer is &b%AMOUNT%");
@@ -102,6 +111,7 @@ public class TradePlus extends JavaPlugin {
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
             config.set("extras.playerpoints.increment", 5);
             config.set("extras.playerpoints.taxpercent", 0);
+
             config.set("extras.griefprevention.enabled", true);
             config.set("extras.griefprevention.material", "diamond_pickaxe");
             config.set("extras.griefprevention.display", "&7Your current GriefPrevention offer is &b%AMOUNT%");
@@ -112,11 +122,23 @@ public class TradePlus extends JavaPlugin {
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
             config.set("extras.griefprevention.increment", 1);
             config.set("extras.griefprevention.taxperecent", 0);
+
+            config.set("extras.enjinpoints.enabled", false);
+            config.set("extras.enjinpoints.material", "emerald");
+            config.set("extras.enjinpoints.display", "&7Your current EnjinPoints offer is &b%AMOUNT%");
+            config.set("extras.enjinpoints.theirdisplay", "&7Their current EnjinPoints offer is &b%AMOUNT%");
+            config.set("extras.enjinpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                    "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                    "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                    "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            config.set("extras.enjinpoints.taxpercent", 0);
+
             config.set("soundeffects.enabled", true);
             config.set("soundeffects.onchange", true);
             config.set("soundeffects.onaccept", true);
             config.set("soundeffects.oncomplete", true);
             config.set("soundeffects.oncountdown", true);
+
             config.set("configversion", Double.parseDouble(getDescription().getVersion()));
             try { langFile.createNewFile(); } catch (IOException ex) { ex.printStackTrace(); }
             lang.set("sentrequest", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
@@ -332,6 +354,18 @@ public class TradePlus extends JavaPlugin {
                 config.set("permissions.accept", "tradeplus.accept");
                 config.set("permissionrequired", null);
                 config.set("permissionnode", null);
+            }
+
+            if (configVersion < 2.50) {
+                config.set("extras.enjinpoints.enabled", false);
+                config.set("extras.enjinpoints.material", "emerald");
+                config.set("extras.enjinpoints.display", "&7Your current EnjinPoints offer is &b%AMOUNT%");
+                config.set("extras.enjinpoints.theirdisplay", "&7Their current EnjinPoints offer is &b%AMOUNT%");
+                config.set("extras.enjinpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                        "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                        "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                        "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+                config.set("extras.enjinpoints.taxpercent", 0);
             }
         }
         config.set("configversion", Double.parseDouble(getDescription().getVersion()));

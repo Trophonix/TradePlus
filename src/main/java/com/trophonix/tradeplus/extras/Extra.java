@@ -82,6 +82,8 @@ public abstract class Extra {
         if (now > lastUpdatedMax + 5000) {
             max1 = getMax(player1);
             max2 = getMax(player2);
+            lastUpdatedMax = now;
+            System.out.println("max1=" + max1 + ", max2=" + max2);
         }
         if (value1 > max1) value1 = max1;
         if (value2 > max2) value2 = max2;

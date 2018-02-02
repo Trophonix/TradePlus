@@ -11,18 +11,16 @@ import org.bukkit.inventory.ItemStack;
 public class EnjinPointsExtra extends Extra {
 
     private TradePlus pl;
-    private PointService pointService;
 
     public EnjinPointsExtra(Player player1, Player player2, TradePlus pl) {
         super("enjinpoints", player1, player2, pl);
         this.pl = pl;
-        this.pointService = EnjinServices.getService(PointService.class);
     }
 
     @Override
     protected double getMax(Player player) {
         try {
-            return pointService.get(player.getName()).getResult();
+            return EnjinServices.getService(PointService.class).get(player.getName()).getResult();
         } catch (Exception ex) {
             pl.getLogger().warning("Failed to get enjinpoints for player: " + player.getName());
             return 0;
@@ -30,6 +28,7 @@ public class EnjinPointsExtra extends Extra {
     }
 
     private void transact(Player take, Player give, double points) {
+        PointService pointService = EnjinServices.getService(PointService.class);
         RPCData<Integer> withdrawResponse = pointService.remove(take.getName(), (int)points);
         if (withdrawResponse == null) {
             pl.getLogger().warning("Failed to withdraw " + points + " points from " + take.getName() + ":");

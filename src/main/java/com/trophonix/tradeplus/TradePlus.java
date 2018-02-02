@@ -131,6 +131,7 @@ public class TradePlus extends JavaPlugin {
                     "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
                     "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
                     "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            config.set("extras.enjinpoints.increment", 1);
             config.set("extras.enjinpoints.taxpercent", 0);
 
             config.set("soundeffects.enabled", true);
@@ -365,6 +366,7 @@ public class TradePlus extends JavaPlugin {
                         "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
                         "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
                         "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+                config.set("extras.enjinpoints.increment", 1);
                 config.set("extras.enjinpoints.taxpercent", 0);
             }
         }

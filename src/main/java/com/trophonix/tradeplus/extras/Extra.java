@@ -13,6 +13,9 @@ public abstract class Extra {
     final Player player1;
     final Player player2;
     final double increment;
+    double max1;
+    double max2;
+    long lastUpdatedMax = System.currentTimeMillis();
     double increment1;
     double increment2;
     public double value1 = 0, value2 = 0;
@@ -75,8 +78,12 @@ public abstract class Extra {
         if (value1 < 0) value1 = 0;
         if (value2 < 0) value2 = 0;
 
-        double max1 = getMax(player1);
-        double max2 = getMax(player2);
+        long now = System.currentTimeMillis();
+        if (now > lastUpdatedMax + 5000) {
+            max1 = getMax(player1);
+            max2 = getMax(player2);
+            lastUpdatedMax = now;
+        }
         if (value1 > max1) value1 = max1;
         if (value2 > max2) value2 = max2;
     }

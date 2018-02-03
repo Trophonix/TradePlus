@@ -1,5 +1,6 @@
 package com.trophonix.tradeplus;
 
+import com.trophonix.tradeplus.commands.CommandHandler;
 import com.trophonix.tradeplus.commands.TradeCommand;
 import com.trophonix.tradeplus.commands.TradePlusCommand;
 import com.trophonix.tradeplus.trade.InteractListener;
@@ -7,6 +8,8 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
+import org.bukkit.command.Command;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -16,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
@@ -27,6 +31,8 @@ public class TradePlus extends JavaPlugin {
 
     public ConcurrentLinkedQueue<Trade> ongoingTrades;
 
+    private CommandHandler commandHandler;
+
     @Override
     public void onEnable() {
         configFile = new File(getDataFolder(), "config.yml");
@@ -34,11 +40,11 @@ public class TradePlus extends JavaPlugin {
         langFile = new File(getDataFolder(), "lang.yml");
         lang = YamlConfiguration.loadConfiguration(langFile);
         MsgUtils.initMsgUtils();
-        if (!isEnabled())
-            return;
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
             try { configFile.createNewFile(); } catch (IOException ex) { ex.printStackTrace(); }
+            config.set("aliases", Collections.singletonList("trade+"));
+
             config.set("permissions.required", config.getBoolean("permissionrequired", false));
             config.set("permissions.send", config.getString("permissionnode", "tradeplus.send"));
             config.set("permissions.accept", "tradeplus.accept");
@@ -369,6 +375,10 @@ public class TradePlus extends JavaPlugin {
                 config.set("extras.enjinpoints.increment", 1);
                 config.set("extras.enjinpoints.taxpercent", 0);
             }
+
+            if (configVersion < 2.51) {
+                config.set("aliases", Collections.singletonList("trade+"));
+            }
         }
         config.set("configversion", Double.parseDouble(getDescription().getVersion()));
         saveConfig();
@@ -377,8 +387,9 @@ public class TradePlus extends JavaPlugin {
         Sounds.loadSounds();
         if (Sounds.version > 17)
             getServer().getPluginManager().registerEvents(new InteractListener(this), this);
-        getCommand("trade").setExecutor(new TradeCommand(this));
-        getCommand("tradeplus").setExecutor(new TradePlusCommand(this));
+        commandHandler = new CommandHandler(this);
+        commandHandler.add(new TradeCommand(this));
+        commandHandler.add(new TradePlusCommand(this));
         ongoingTrades = new ConcurrentLinkedQueue<>();
     }
 
@@ -406,6 +417,9 @@ public class TradePlus extends JavaPlugin {
         config = YamlConfiguration.loadConfiguration(configFile);
         lang = YamlConfiguration.loadConfiguration(langFile);
         InvUtils.reloadItems(this);
+        commandHandler.clear();
+        commandHandler.add(new TradeCommand(this));
+        commandHandler.add(new TradePlusCommand(this));
     }
 
     public FileConfiguration getLang() { return lang; }

@@ -9,28 +9,33 @@ import com.trophonix.tradeplus.util.MsgUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class TradeCommand implements CommandExecutor {
+public class TradeCommand extends Command {
 
     private final ConcurrentLinkedQueue<TradeRequest> requests = new ConcurrentLinkedQueue<>();
 
     private final TradePlus pl;
 
     public TradeCommand(TradePlus pl) {
+        super(new ArrayList<String>(){{
+            add("trade");
+            if (pl.getConfig().contains("aliases")) {
+                addAll(pl.getConfig().getStringList("aliases"));
+            }
+        }});
         this.pl = pl;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public void onCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             MsgUtils.send(sender, "&cThis command can only be executed by players!");
-            return true;
+            return;
         }
         final Player player = (Player)sender;
 
@@ -49,51 +54,51 @@ public class TradeCommand implements CommandExecutor {
                         }
                     });
                     MsgUtils.send(player, pl.getLang().getString("denied-you").split("%NEWLINE%"));
-                    return true;
+                    return;
                 }
                 MsgUtils.send(player, pl.getLang().getString("playernotfound").replace("%PLAYER%", args[0]).split("%NEWLINE%"));
-                return true;
+                return;
             }
             if (pl.getConfig().getBoolean("allow-trade-in-creative", true)) {
                 if (player.getGameMode().equals(GameMode.CREATIVE)) {
                     MsgUtils.send(player, pl.getLang().getString("creative").split("%NEWLINE%"));
-                    return true;
+                    return;
                 } else if (receiver.getGameMode().equals(GameMode.CREATIVE)) {
                     MsgUtils.send(player, pl.getLang().getString("creativethem").split("%NEWLINE%"));
-                    return true;
+                    return;
                 }
             }
             if (player == receiver) {
                 MsgUtils.send(player, pl.getLang().getString("tradewithself").split("%NEWLINE%"));
-                return true;
+                return;
             }
             String acceptPermission = pl.getConfig().getString("permissions.accept", "tradeplus.accept");
             if (permissionRequired && !receiver.hasPermission(acceptPermission)) {
                 MsgUtils.send(player, pl.getLang().getString("nopermsreceiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
-                return true;
+                return;
             }
             if (player.getWorld().equals(receiver.getWorld())) {
                 double amount = pl.getConfig().getDouble("ranges.sameworld");
                 if (amount != 0.0 && player.getLocation().distance(receiver.getLocation()) > amount) {
                     MsgUtils.send(player, pl.getLang().getString("withinrange").replace("%PLAYER%", receiver.getName()).replace("%AMOUNT%", amount + "").split("%NEWLINE%"));
-                    return true;
+                    return;
                 }
             } else {
                 if (pl.getConfig().getBoolean("ranges.allowcrossworld")) {
                     double amount = pl.getConfig().getDouble("ranges.crossworld");
                     if (amount != 0.0 && player.getLocation().distance(new Location(player.getWorld(), receiver.getLocation().getX(), receiver.getLocation().getY(), receiver.getLocation().getZ())) > amount) {
                         MsgUtils.send(player, pl.getLang().getString("withinrangecrossworld").replace("%PLAYER%", receiver.getName()).replace("%AMOUNT%", amount + "").split("%NEWLINE%"));
-                        return true;
+                        return;
                     }
                 } else {
                     MsgUtils.send(player, pl.getLang().getString("nocrossworld").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
-                    return true;
+                    return;
                 }
             }
             for (TradeRequest req : requests) {
                 if (req.sender == player) {
                     MsgUtils.send(player, pl.getLang().getString("waitforexpire").split("%NEWLINE%"));
-                    return true;
+                    return;
                 }
             }
 
@@ -113,12 +118,12 @@ public class TradeCommand implements CommandExecutor {
                 if (permissionRequired) {
                     if (!player.hasPermission(sendPermission)) {
                         MsgUtils.send(player, pl.getLang().getString("noperms").split("%NEWLINE%"));
-                        return true;
+                        return;
                     }
                 }
                 TradeRequestEvent event = new TradeRequestEvent(player, receiver);
                 Bukkit.getPluginManager().callEvent(event);
-                if (event.isCancelled()) return true;
+                if (event.isCancelled()) return;
                 final TradeRequest request = new TradeRequest(player, receiver);
                 requests.add(request);
                 MsgUtils.send(player, pl.getLang().getString("sentrequest").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
@@ -131,10 +136,9 @@ public class TradeCommand implements CommandExecutor {
                     }
                 }, 20 * pl.getConfig().getInt("requestcooldownseconds", 15));
             }
-            return true;
+            return;
         }
         MsgUtils.send(player, pl.getLang().getString("invalidusage").split("%NEWLINE%"));
-        return true;
     }
 
 }

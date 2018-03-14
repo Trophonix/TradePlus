@@ -10,41 +10,39 @@ import java.util.Set;
 
 class TradeCompleteEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+  private static final HandlerList handlers = new HandlerList();
 
-    private final Trade trade;
-    private final Player playerOne;
-    private final Player playerTwo;
-    private final Set<ItemStack> playerOneTrades;
-    private final Set<ItemStack> playerTwoTrades;
+  private final Trade trade;
+  private final Player playerOne;
+  private final Player playerTwo;
+  private final Set<ItemStack> playerOneTrades;
+  private final Set<ItemStack> playerTwoTrades;
 
-    public TradeCompleteEvent(Trade trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
-        this.trade = trade;
-        this.playerOne = playerOne;
-        this.playerTwo = playerTwo;
-        this.playerOneTrades = playerOneTrades;
-        this.playerTwoTrades = playerTwoTrades;
-    }
+  public TradeCompleteEvent(Trade trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
+    this.trade = trade;
+    this.playerOne = playerOne;
+    this.playerTwo = playerTwo;
+    this.playerOneTrades = playerOneTrades;
+    this.playerTwoTrades = playerTwoTrades;
+  }
 
-    public Trade getTrade() { return trade; }
+  public static HandlerList getHandlerList() {
+    return handlers;
+  }
 
-    public Player getPlayerOne() { return playerOne; }
+  public Trade getTrade() { return trade; }
 
-    public Player getPlayerTwo() { return playerTwo; }
+  public Player getPlayerOne() { return playerOne; }
 
-    public Set<ItemStack> getPlayerOneTrades() { return playerOneTrades; }
+  public Player getPlayerTwo() { return playerTwo; }
 
-    public Set<ItemStack> getPlayerTwoTrades() { return playerTwoTrades; }
+  public Set<ItemStack> getPlayerOneTrades() { return playerOneTrades; }
 
-    @Override
-    public HandlerList getHandlers()
-    {
-        return handlers;
-    }
+  public Set<ItemStack> getPlayerTwoTrades() { return playerTwoTrades; }
 
-    public static HandlerList getHandlerList()
-    {
-        return handlers;
-    }
+  @Override
+  public HandlerList getHandlers() {
+    return handlers;
+  }
 
 }

@@ -9,33 +9,31 @@ import org.bukkit.event.HandlerList;
  */
 public class TradeAcceptEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+  private static final HandlerList handlers = new HandlerList();
 
-    private final Player sender;
-    private final Player receiver;
+  private final Player sender;
+  private final Player receiver;
 
-    public TradeAcceptEvent(Player sender, Player receiver) {
-        this.sender = sender;
-        this.receiver = receiver;
-    }
+  public TradeAcceptEvent(Player sender, Player receiver) {
+    this.sender = sender;
+    this.receiver = receiver;
+  }
 
-    public Player getSender() {
-        return sender;
-    }
+  public static HandlerList getHandlerList() {
+    return handlers;
+  }
 
-    public Player getReceiver() {
-        return receiver;
-    }
+  public Player getSender() {
+    return sender;
+  }
 
-    @Override
-    public HandlerList getHandlers()
-    {
-        return handlers;
-    }
+  public Player getReceiver() {
+    return receiver;
+  }
 
-    public static HandlerList getHandlerList()
-    {
-        return handlers;
-    }
+  @Override
+  public HandlerList getHandlers() {
+    return handlers;
+  }
 
 }

@@ -7,12 +7,12 @@ import org.bukkit.entity.Player;
  */
 public class TradeRequest {
 
-    public final Player sender;
-    public final Player receiver;
+  public final Player sender;
+  public final Player receiver;
 
-    public TradeRequest(Player sender, Player receiver) {
-        this.sender = sender;
-        this.receiver = receiver;
-    }
+  public TradeRequest(Player sender, Player receiver) {
+    this.sender = sender;
+    this.receiver = receiver;
+  }
 
 }

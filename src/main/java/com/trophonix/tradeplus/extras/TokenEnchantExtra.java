@@ -1,31 +1,31 @@
 package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
-import com.trophonix.tradeplus.util.Experience;
 import com.trophonix.tradeplus.util.ItemFactory;
+import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ExperienceExtra extends Extra {
+public class TokenEnchantExtra extends Extra {
 
-  public ExperienceExtra(Player player1, Player player2, TradePlus pl) {
-    super("experience", player1, player2, pl);
+  public TokenEnchantExtra(Player player1, Player player2, TradePlus pl) {
+    super("tokenenchant", player1, player2, pl);
   }
 
   @Override
   public double getMax(Player player) {
-    return Experience.getExp(player);
+    return TokenEnchantAPI.getInstance().getTokens(player);
   }
 
   @Override
   public void onTradeEnd() {
     if (value1 > 0) {
-      Experience.changeExp(player1, (int) (0 - value1));
-      Experience.changeExp(player2, (int) (value1 - ((value1 / 100) * taxPercent)));
+      TokenEnchantAPI.getInstance().removeTokens(player1, value1);
+      TokenEnchantAPI.getInstance().addTokens(player2, value1);
     }
     if (value2 > 0) {
-      Experience.changeExp(player2, (int) (0 - value2));
-      Experience.changeExp(player1, (int) (value2 - ((value2 / 100) * taxPercent)));
+      TokenEnchantAPI.getInstance().removeTokens(player2, value2);
+      TokenEnchantAPI.getInstance().addTokens(player1, value2);
     }
   }
 

@@ -10,45 +10,43 @@ import org.bukkit.event.HandlerList;
  */
 public class TradeRequestEvent extends Event implements Cancellable {
 
-    private static final HandlerList handlers = new HandlerList();
+  private static final HandlerList handlers = new HandlerList();
 
-    private final Player sender;
-    private final Player receiver;
+  private final Player sender;
+  private final Player receiver;
 
-    private boolean cancelled;
+  private boolean cancelled;
 
-    public TradeRequestEvent(Player sender, Player receiver) {
-        this.sender = sender;
-        this.receiver = receiver;
-    }
+  public TradeRequestEvent(Player sender, Player receiver) {
+    this.sender = sender;
+    this.receiver = receiver;
+  }
 
-    public Player getSender() {
-        return sender;
-    }
+  public static HandlerList getHandlerList() {
+    return handlers;
+  }
 
-    public Player getReceiver() {
-        return receiver;
-    }
+  public Player getSender() {
+    return sender;
+  }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
+  public Player getReceiver() {
+    return receiver;
+  }
 
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
+  @Override
+  public boolean isCancelled() {
+    return cancelled;
+  }
 
-    @Override
-    public HandlerList getHandlers()
-    {
-        return handlers;
-    }
+  @Override
+  public void setCancelled(boolean cancelled) {
+    this.cancelled = cancelled;
+  }
 
-    public static HandlerList getHandlerList()
-    {
-        return handlers;
-    }
+  @Override
+  public HandlerList getHandlers() {
+    return handlers;
+  }
 
 }

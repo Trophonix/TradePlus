@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>2.51</version>
+    <version>2.52</version>
 
     <repositories>
         <repository>
             <id>trophonix-repo</id>
-            <url>http://trophonix.com:8080/repository/public</url>
+            <url>http://repo.trophonix.com/repository/public</url>
         </repository>
 
         <repository>
@@ -67,7 +67,14 @@
         <dependency>
             <groupId>com.enjin.mc</groupId>
             <artifactId>enjin-mc-plugin</artifactId>
-            <version>LATEST</version>
+            <version>3.4.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk2gpz.tokenenchant</groupId>
+            <artifactId>api</artifactId>
+            <version>9.5.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

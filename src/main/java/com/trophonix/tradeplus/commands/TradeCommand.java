@@ -40,6 +40,12 @@ public class TradeCommand extends Command {
     final Player player = (Player) sender;
 
     boolean permissionRequired = pl.getConfig().getBoolean("permissions.required", false);
+    
+    String sendPermission = pl.getConfig().getString("permissions.send", "tradeplus.send");
+    if (permissionRequired && !sender.hasPermission(sendPermission)) {
+      MsgUtils.send(player, pl.getLang().getString("nopermssender").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+      return;
+    }
 
     if (args.length == 1) {
       final Player receiver = Bukkit.getPlayer(args[0]);

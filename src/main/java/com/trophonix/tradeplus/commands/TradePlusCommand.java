@@ -20,6 +20,11 @@ public class TradePlusCommand extends Command {
 
   @Override
   public void onCommand(CommandSender sender, String[] args) {
+    if (!sender.hasPermission("tradeplus.admin")) {
+      MsgUtils.send(player, pl.getLang().getString("nopermssenderadmin").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+      return;
+    }
+    
     if (args.length == 1) {
       if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
         pl.reload();

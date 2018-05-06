@@ -15,3 +15,9 @@ out/
 .idea
 .project
 *.iml
+
+.DS_Store
+.classpath
+org.eclipse.*
+*.lst
+pom.properties

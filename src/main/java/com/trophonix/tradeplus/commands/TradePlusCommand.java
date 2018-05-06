@@ -21,7 +21,7 @@ public class TradePlusCommand extends Command {
   @Override
   public void onCommand(CommandSender sender, String[] args) {
     if (!sender.hasPermission("tradeplus.admin")) {
-      MsgUtils.send(player, pl.getLang().getString("nopermssenderadmin").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+      MsgUtils.send(sender, pl.getLang().getString("nopermssenderadmin").split("%NEWLINE%"));
       return;
     }
     

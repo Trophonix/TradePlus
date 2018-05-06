@@ -43,7 +43,7 @@ public class TradeCommand extends Command {
     
     String sendPermission = pl.getConfig().getString("permissions.send", "tradeplus.send");
     if (permissionRequired && !sender.hasPermission(sendPermission)) {
-      MsgUtils.send(player, pl.getLang().getString("nopermssender").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+      MsgUtils.send(player, pl.getLang().getString("nopermssender"));
       return;
     }
 
@@ -120,9 +120,8 @@ public class TradeCommand extends Command {
         new Trade(player, receiver);
         requests.removeIf(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player)));
       } else {
-        String sendPermission = pl.getConfig().getString("permissions.send");
         if (permissionRequired) {
-          if (!player.hasPermission(sendPermission)) {
+          if (!sender.hasPermission(sendPermission)) {
             MsgUtils.send(player, pl.getLang().getString("noperms").split("%NEWLINE%"));
             return;
           }

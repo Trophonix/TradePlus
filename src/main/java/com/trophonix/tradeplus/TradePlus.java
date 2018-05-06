@@ -430,6 +430,12 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.tokenenchant.increment", 1);
         config.set("extras.tokenenchant.taxpercent", 0);
       }
+
+      if (configVersion < 2.53) {
+        lang.set("nopermssender", "&4&l(!) &r&4You do not have permission to send a trade");
+        lang.set("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to accept a trade");
+        lang.set("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command");
+      }
     }
     config.set("configversion", Double.parseDouble(getDescription().getVersion()));
     saveConfig();

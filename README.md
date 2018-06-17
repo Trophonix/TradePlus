@@ -1,4 +1,4 @@
-![header](https://image.ibb.co/i68Xxy/Trade.png)
+<p align="center"><img src="https://image.ibb.co/i68Xxy/Trade.png"></p>
 
 Trade+ is a trading plugin for Spigot servers versions 1.7.10 and up. I've decided to open-source it since I don't have much time to work on it anymore.
 

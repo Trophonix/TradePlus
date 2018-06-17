@@ -69,7 +69,7 @@ public class Experience {
 
     int level = (int) levelAndExp;
     player.setLevel(level);
-    player.setExp((float) (levelAndExp - level));
+    player.setExp(Math.min((float) (levelAndExp - level), 1F));
   }
 
 }

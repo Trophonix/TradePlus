@@ -20,17 +20,10 @@ public class Sounds {
 
   public static void loadSounds() {
     try {
-      if (version < 19) {
-        pling = Sound.valueOf("NOTE_PLING");
-        click = Sound.valueOf("CLICK");
-        levelUp = Sound.valueOf("LEVEL_UP");
-        villagerHit = Sound.valueOf("VILLAGER_HIT");
-      } else {
-        pling = Sound.valueOf("BLOCK_NOTE_PLING");
-        click = Sound.valueOf("UI_BUTTON_CLICK");
-        levelUp = Sound.valueOf("ENTITY_PLAYER_LEVELUP");
-        villagerHit = Sound.valueOf("ENTITY_VILLAGER_HURT");
-      }
+      pling = Sound.BLOCK_NOTE_BLOCK_PLING;
+      click = Sound.UI_BUTTON_CLICK;
+      levelUp = Sound.ENTITY_PLAYER_LEVELUP;
+      villagerHit = Sound.ENTITY_VILLAGER_HURT;
     } catch (IllegalArgumentException | NullPointerException ex) {
       Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "Unable to load sounds! Sound effects will be disabled.");
     }

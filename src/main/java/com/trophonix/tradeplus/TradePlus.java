@@ -8,6 +8,8 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -52,6 +54,16 @@ public class TradePlus extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    Bukkit.getConsoleSender().sendMessage(new String[]{
+            " ",
+            ChatColor.RED + "YOU ARE USING A BETA VERSION OF TRADE+ MADE FOR SPIGOT VERSION 1.13",
+            " ",
+            ChatColor.RED + "This is unadvised, as Spigot 1.13 builds are not final, and any changes might break Trade+, resulting in loss of items.",
+            ChatColor.RED + "If you experience any issues, please report them here:",
+            ChatColor.WHITE + " > https://github.com/Trophonix/TradePlus/issues/",
+            ChatColor.RED + "Make sure to mention you are using 1.13.",
+            " "
+    });
     configFile = new File(getDataFolder(), "config.yml");
     config = YamlConfiguration.loadConfiguration(configFile);
     langFile = new File(getDataFolder(), "lang.yml");

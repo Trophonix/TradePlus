@@ -28,23 +28,14 @@ public class ItemFactory {
     parsable = parsable.toUpperCase().replace(" ", "_");
     if (parsable.contains(":")) {
       String[] split = parsable.split(":");
-      try {
-        this.material = Material.getMaterial(Integer.parseInt(split[0]));
-        material.getData();
-      } catch (Exception ex) {
         this.material = Material.getMaterial(split[0]);
-      }
+        material.getData();
       try {
         this.data = Byte.parseByte(split[1]);
       } catch (Exception ignored) {
       }
     } else {
-      try {
-        this.material = Material.getMaterial(Integer.parseInt(parsable));
-        material.getData();
-      } catch (Exception ex) {
-        this.material = Material.getMaterial(parsable);
-      }
+      this.material = Material.getMaterial(parsable);
     }
     if (this.material == null)
       this.material = fallback;
@@ -55,27 +46,19 @@ public class ItemFactory {
     if (parsable != null) {
       if (parsable.contains(":")) {
         String[] split = parsable.split(":");
-        try {
-          this.material = Material.getMaterial(Integer.parseInt(split[0]));
-        } catch (Exception ex) {
-          this.material = Material.getMaterial(split[0]);
-        }
+        this.material = Material.getMaterial(split[0]);
         try {
           this.data = Byte.parseByte(split[1]);
         } catch (Exception ignored) {
         }
       } else {
-        try {
-          this.material = Material.getMaterial(Integer.parseInt(parsable));
-        } catch (Exception ex) {
-          this.material = Material.getMaterial(parsable);
-        }
+        this.material = Material.getMaterial(parsable);
       }
     }
   }
 
   public static ItemStack getPlayerSkull(String name, String displayName) {
-    ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+    ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
     SkullMeta meta = (SkullMeta) skull.getItemMeta();
     meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
     meta.setOwner(name);
@@ -100,16 +83,6 @@ public class ItemFactory {
     item.setItemMeta(meta);
     return item;
   }
-
-    /*public ItemFactory damage(short damage) {
-        this.damage = damage;
-        return this;
-    }
-
-    public ItemFactory data(byte data) {
-        this.data = data;
-        return this;
-    }*/
 
   public ItemStack build() {
     ItemStack itemStack = new ItemStack(material, amount, damage, data);

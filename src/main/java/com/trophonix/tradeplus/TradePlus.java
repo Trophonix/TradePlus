@@ -371,7 +371,7 @@ public class TradePlus extends JavaPlugin {
         config.set("requestcooldownseconds", 20);
         lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
         lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
-        if (lang.getString("invalidusage").equals("&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>")) {
+        if (lang.getString("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>").equals("&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>")) {
           lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
                   "    &c- /trade <player name>%NEWLINE%" +
                   "    &c- /trade deny");

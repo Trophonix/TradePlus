@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>2.54-1.13-ALPHA</version>
+    <version>2.54</version>
 
     <repositories>
         <repository>

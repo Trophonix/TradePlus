@@ -85,7 +85,7 @@ public class ItemFactory {
   }
 
   public ItemStack build() {
-    ItemStack itemStack = new ItemStack(material, amount, damage, data);
+    ItemStack itemStack = new ItemStack(material, amount, damage);
     ItemMeta itemMeta = itemStack.getItemMeta();
     if (!display.equals(""))
       itemMeta.setDisplayName(display);

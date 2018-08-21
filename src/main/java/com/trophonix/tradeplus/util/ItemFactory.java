@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ItemFactory {
 
-  private final short damage = 0;
+  private short damage = 0;
   private Material material;
   private int amount = 1;
   private byte data = 0;
@@ -101,15 +101,15 @@ public class ItemFactory {
     return item;
   }
 
-    /*public ItemFactory damage(short damage) {
-        this.damage = damage;
-        return this;
-    }
+  public ItemFactory damage(short damage) {
+      this.damage = damage;
+      return this;
+  }
 
-    public ItemFactory data(byte data) {
-        this.data = data;
-        return this;
-    }*/
+  public ItemFactory data(byte data) {
+      this.data = data;
+      return this;
+  }
 
   public ItemStack build() {
     ItemStack itemStack = new ItemStack(material, amount, damage, data);

@@ -3,6 +3,7 @@ version: 2.54
 author: Trophonix
 main: com.trophonix.tradeplus.TradePlus
 softdepend: [Vault,EnjinMinecraftPlugin,GriefPrevention,PlayerPoints]
+api-version: 1.13
 commands:
   trade:
     description: Trade command

@@ -579,7 +579,7 @@ public class Trade implements Listener {
     checks.add(type + ":" + data);
     checks.add(type.replace("_", "") + ":" + data);
     checks.add(type.replace("_", " ") + ":" + data);
-    checks.add(item.getTypeId() + ":" + data);
+    checks.add(item.getType().getId() + ":" + data);
     checks.add(type);
     checks.add(type.replace("_", ""));
     checks.add(type.replace("_", " "));

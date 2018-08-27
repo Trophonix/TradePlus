@@ -539,7 +539,7 @@ public class Trade implements Listener {
             String displayName = item.getItemMeta().getDisplayName();
             if (pattern.matcher(displayName).find()) return true;
           }
-          if (item.getItemMeta().hasLore()) {
+          if (item.getItemMeta().hasLore() && pattern != null) {
             List<String> lore = item.getItemMeta().getLore();
             if (lore.stream().anyMatch(s -> pattern.matcher(s).find())) return true;
           }
@@ -561,7 +561,13 @@ public class Trade implements Listener {
         }
         if (item.getItemMeta().hasLore()) {
           List<String> lore = item.getItemMeta().getLore();
-          if (blockedLore.stream().anyMatch(s -> lore.stream().anyMatch(ln -> ln.contains(s)))) return true;
+          for (String blocked : blockedLore) {
+            for (String line : lore) {
+              if (line.contains(blocked)) {
+                return true;
+              }
+            }
+          }
         }
       }
     }
@@ -577,18 +583,15 @@ public class Trade implements Listener {
     checks.add(type);
     checks.add(type.replace("_", ""));
     checks.add(type.replace("_", " "));
-    checks.add(Integer.toString(item.getType().getId()));
-    boolean isBlocked = false;
+    checks.add(Integer.toString(item.getTypeId()));
     for (String block : blocked) {
       for (String check : checks) {
         if (block.equalsIgnoreCase(check)) {
-          isBlocked = true;
-          break;
+          return true;
         }
       }
-      if (isBlocked) break;
     }
-    return isBlocked;
+    return false;
   }
 
 }

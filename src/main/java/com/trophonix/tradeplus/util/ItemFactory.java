@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ItemFactory {
 
-  private final short damage = 0;
+  private short damage = 0;
   private Material material;
   private int amount = 1;
   private byte data = 0;

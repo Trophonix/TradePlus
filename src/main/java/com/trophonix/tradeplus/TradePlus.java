@@ -226,6 +226,8 @@ public class TradePlus extends JavaPlugin {
       lang.set("forcedtrade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
       lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
       lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
+      lang.set("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
+      lang.set("spectate.hover", "&6&lClick here to spectate this trade");
     } else {
       double configVersion = config.contains("configversion") && config.isDouble("configversion") ? config.getDouble("configversion") : 0;
 
@@ -451,6 +453,11 @@ public class TradePlus extends JavaPlugin {
         lang.set("nopermssender", "&4&l(!) &r&4You do not have permission to send a trade");
         lang.set("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to accept a trade");
         lang.set("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command");
+      }
+
+      if (configVersion < 2.56) {
+        lang.set("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
+        lang.set("spectate.hover", "&6&lClick here to spectate this trade");
       }
     }
 

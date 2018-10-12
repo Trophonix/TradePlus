@@ -17,6 +17,14 @@ public class MsgUtils {
     }
   }
 
+  public static void send(Player player, String onHover, String onClick, String message) {
+    if (message.contains("%NEWLINE%")) {
+      send(player, onHover, onClick, message.split("%NEWLINE%"));
+    } else {
+      send(player, onHover, onClick, new String[]{ message });
+    }
+  }
+
   public static void send(CommandSender sender, String[] messages) {
     for (String message : messages) {
       send(sender, message);

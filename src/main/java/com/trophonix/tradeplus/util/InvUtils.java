@@ -32,7 +32,7 @@ public class InvUtils {
     cancelTrade = new ItemFactory(pl.getConfig().getString("gui.cancelid", "160:13")).display('&', pl.getConfig().getString("gui.cancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
     theyAccepted = new ItemFactory(pl.getConfig().getString("gui.cancelid", "160:13")).display('&', pl.getConfig().getString("gui.theyaccept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
     theyCancelled = new ItemFactory(pl.getConfig().getString("gui.acceptid", "160:14")).display('&', pl.getConfig().getString("gui.theycancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
-    force = new ItemFactory(pl.getConfig().getString("gui.force.type", "watch"), Material.WATCH).display('&', pl.getConfig().getString("gui.force.name"))
+    force = new ItemFactory(pl.getConfig().getString("gui.force.type", "watch"), Material.CLOCK).display('&', pl.getConfig().getString("gui.force.name"))
             .lore('&', pl.getConfig().getStringList("gui.force.lore")).build();
   }
 

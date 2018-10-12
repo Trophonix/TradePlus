@@ -8,6 +8,10 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -15,8 +19,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
@@ -52,6 +58,16 @@ public class TradePlus extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    Bukkit.getConsoleSender().sendMessage(new String[]{
+            " ",
+            ChatColor.RED + "YOU ARE USING A BETA VERSION OF TRADE+ MADE FOR SPIGOT VERSION 1.13",
+            " ",
+            ChatColor.RED + "This is unadvised, as Spigot 1.13 builds are not final, and any changes might break Trade+, resulting in loss of items.",
+            ChatColor.RED + "If you experience any issues, please report them here:",
+            ChatColor.WHITE + " > https://github.com/Trophonix/TradePlus/issues/",
+            ChatColor.RED + "Make sure to mention you are using 1.13.",
+            " "
+    });
     configFile = new File(getDataFolder(), "config.yml");
     config = YamlConfiguration.loadConfiguration(configFile);
     langFile = new File(getDataFolder(), "lang.yml");
@@ -98,16 +114,16 @@ public class TradePlus extends JavaPlugin {
       config.set("gui.showaccept", true);
       config.set("gui.theyaccept", " ");
       config.set("gui.theycancel", " ");
-      config.set("gui.acceptid", "160:14");
-      config.set("gui.cancelid", "160:13");
-      config.set("gui.separatorid", "160:15");
+      config.set("gui.acceptid", "green_stained_glass_pane");
+      config.set("gui.cancelid", "red_stained_glass_pane");
+      config.set("gui.separatorid", "black_stained_glass_pane");
       config.set("gui.force.enabled", true);
-      config.set("gui.force.type", "watch");
+      config.set("gui.force.type", "clock");
       config.set("gui.force.name", "&4&lForce Trade");
       config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
 
       config.set("extras.economy.enabled", true);
-      config.set("extras.economy.material", "266");
+      config.set("extras.economy.material", "gold_ingot");
       config.set("extras.economy.display", "&7Your current money offer is &e%AMOUNT%");
       config.set("extras.economy.theirdisplay", "&7Their current money offer is &e%AMOUNT%");
       config.set("extras.economy.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
@@ -118,7 +134,7 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.economy.taxpercent", 0);
 
       config.set("extras.experience.enabled", true);
-      config.set("extras.experience.material", "exp_bottle");
+      config.set("extras.experience.material", "experience_bottle");
       config.set("extras.experience.display", "&7Your current XP offer is &e%AMOUNT%");
       config.set("extras.experience.theirdisplay", "&7Their current XP offer is &e%AMOUNT%");
       config.set("extras.experience.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
@@ -267,7 +283,7 @@ public class TradePlus extends JavaPlugin {
       }
 
       if (configVersion < 1.3) {
-        config.set("blocked-items", Arrays.asList("bedrock", "97:3"));
+        config.set("blocked-items", Arrays.asList("bedrock"));
       }
 
       if (configVersion < 1.31) {
@@ -281,7 +297,7 @@ public class TradePlus extends JavaPlugin {
 
       if (configVersion < 1.34) {
         config.set("hooks.economy.enabled", config.getBoolean("economy.enabled", true));
-        config.set("hooks.economy.material", "266");
+        config.set("hooks.economy.material", "gold_ingot");
         config.set("hooks.economy.youroffer", config.getString("economy.offer", "&7Your current money offer is &e%MONEYAMOUNT%"));
         config.set("hooks.economy.theiroffer", config.getString("economy.theiroffer", "&7Their current money offer is &e%MONEYAMOUNT%"));
         config.set("hooks.economy.increment", config.getDouble("economy.increment", 10.0));
@@ -290,7 +306,7 @@ public class TradePlus extends JavaPlugin {
 
       if (configVersion < 1.5) {
         config.set("hooks.xp.enabled", true);
-        config.set("hooks.xp.material", "exp_bottle");
+        config.set("hooks.xp.material", "experience_bottle");
         config.set("hooks.xp.youroffer", "&7Your current XP offer is &e%XPAMOUNT%");
         config.set("hooks.xp.theiroffer", "&7Their current XP offer is &e%XPAMOUNT%");
         config.set("hooks.xp.increment", 5);
@@ -359,7 +375,7 @@ public class TradePlus extends JavaPlugin {
         config.set("requestcooldownseconds", 20);
         lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
         lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
-        if (lang.getString("invalidusage").equals("&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>")) {
+        if (lang.getString("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>").equals("&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>")) {
           lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
                   "    &c- /trade <player name>%NEWLINE%" +
                   "    &c- /trade deny");
@@ -370,7 +386,7 @@ public class TradePlus extends JavaPlugin {
         config.set("gui.spectator-title", "%PLAYER1%              %PLAYER2%");
         config.set("gui.force.enabled", config.getBoolean("gui.showadminforce", true));
         config.set("gui.showadminforce", null);
-        config.set("gui.force.type", "watch");
+        config.set("gui.force.type", "clock");
         config.set("gui.force.name", "&4&lForce Trade");
         config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
         config.set("gui.showaccept", true);
@@ -437,6 +453,35 @@ public class TradePlus extends JavaPlugin {
         lang.set("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command");
       }
     }
+
+    // FIX OLD ID SHIT
+    List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
+    for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
+      fixList.add(getConfig().getString("extras." + key + ".material"));
+    }
+    for (String key : fixList) {
+      if (config.contains(key)) {
+        String val = config.getString(key);
+        if (val.contains(":")) {
+          String[] split = val.split(":");
+          String val1 = split[1];
+          try {
+            byte data = Byte.parseByte(val1);
+            String name = DyeColor.getByDyeData(data).name();
+            if (name != null && !name.isEmpty()) {
+              String val2 = split[0];
+              Material material = Material.getMaterial(val2);
+              if (material == null) {
+                getLogger().warning("Unknown material: " + val2 + ". Is it an integer ID? Those are no longer supported in 1.13!");
+                continue;
+              }
+              config.set(key, name + material.name());
+            }
+          } catch (Exception ignored) {}
+        }
+      }
+    }
+
     config.set("configversion", Double.parseDouble(getDescription().getVersion()));
     saveConfig();
     saveLang();

@@ -585,7 +585,7 @@ public class Trade implements Listener {
     checks.add(type);
     checks.add(type.replace("_", ""));
     checks.add(type.replace("_", " "));
-    checks.add(Integer.toString(item.getTypeId()));
+    checks.add(Integer.toString(item.getType().getId()));
     for (String block : blocked) {
       for (String check : checks) {
         if (block.equalsIgnoreCase(check)) {

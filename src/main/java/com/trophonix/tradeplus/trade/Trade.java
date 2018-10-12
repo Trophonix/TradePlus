@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 public class Trade implements Listener {
 
@@ -451,8 +452,9 @@ public class Trade implements Listener {
               if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
                 Sounds.levelUp(player1, 1);
                 Sounds.levelUp(player2, 1);
-                spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p -> {
-                  Sounds.levelUp((Player) p, 1);
+                List<Player> viewers = spectatorInv.getViewers().stream().filter(h -> h instanceof Player).map(h -> (Player) h).collect(Collectors.toList());
+                viewers.forEach(p -> {
+                  Sounds.levelUp(p, 1);
                   p.closeInventory();
                 });
               }

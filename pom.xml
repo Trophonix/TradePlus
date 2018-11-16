@@ -14,7 +14,7 @@
             <url>http://repo.trophonix.com/repository/internal</url>
         </repository>
 
-	<repository>
+	    <repository>
             <id>trophonix-snapshot</id>
             <url>http://repo.trophonix.com/repository/snapshot</url>
         </repository>
@@ -30,13 +30,13 @@
         </repository>
 
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>dakani</id>
+            <url>https://repo.dakanilabs.com/repository/maven-public/</url>
         </repository>
 
         <repository>
-            <id>dakani</id>
-            <url>https://repo.dakanilabs.com/repository/maven-public/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -81,6 +81,12 @@
             <artifactId>api</artifactId>
             <version>10.0.0</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.kicjow</groupId>
+            <artifactId>Crazy-Crates</artifactId>
+            <version>-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

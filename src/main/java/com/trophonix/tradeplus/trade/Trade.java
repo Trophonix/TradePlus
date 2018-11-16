@@ -56,11 +56,9 @@ public class Trade implements Listener {
     this.spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
     Bukkit.getOnlinePlayers().forEach(p -> {
       if (p.hasPermission("tradeplus.admin") && !p.hasPermission("tradeplus.admin.silent")) {
-        MsgUtils.send(p, "&6&lClick here to spectate this trade", "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
-                new String[]{
-                        "&6&l(!) &e" + player1.getName() + " &6and &e" + player2.getName() + " &6have started a trade",
-                        "&6&l(!) &6Type &e/tradeplus spectate " + player1.getName() + " " + player2.getName() + " &6to spectate"
-                });
+        MsgUtils.send(p, pl.getConfig().getString("spectate.hover", "&6&lClick here to spectate this trade"), "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
+                pl.getConfig().getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate")
+                  .replace("%PLAYER1", player1.getName()).replace("%PLAYER2%", player2.getName()));
       }
     });
     player1.openInventory(inv1);

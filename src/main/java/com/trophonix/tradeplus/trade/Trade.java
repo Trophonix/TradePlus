@@ -58,7 +58,7 @@ public class Trade implements Listener {
       if (p.hasPermission("tradeplus.admin") && !p.hasPermission("tradeplus.admin.silent")) {
         MsgUtils.send(p, pl.getConfig().getString("spectate.hover", "&6&lClick here to spectate this trade"), "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
                 pl.getConfig().getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate")
-                  .replace("%PLAYER1", player1.getName()).replace("%PLAYER2%", player2.getName()));
+                  .replace("%PLAYER1", player1.getName()).replace("%PLAYER2%", player2.getName()).split("%NEWLINE%"));
       }
     });
     player1.openInventory(inv1);

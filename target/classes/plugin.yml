@@ -1,5 +1,5 @@
 name: TradePlus
-version: 2.55
+version: 2.56
 author: Trophonix
 main: com.trophonix.tradeplus.TradePlus
 softdepend: [Vault,EnjinMinecraftPlugin,GriefPrevention,PlayerPoints]

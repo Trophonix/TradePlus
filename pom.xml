@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>2.55</version>
+    <version>2.57</version>
 
     <repositories>
         <repository>
@@ -86,7 +86,8 @@
         <dependency>
             <groupId>com.github.kicjow</groupId>
             <artifactId>Crazy-Crates</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>ce74cb8594</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

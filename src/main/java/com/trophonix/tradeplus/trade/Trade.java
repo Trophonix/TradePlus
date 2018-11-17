@@ -13,10 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -288,6 +285,20 @@ public class Trade implements Listener {
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
       if (System.currentTimeMillis() < startTime + 1000) return;
+      event.setCancelled(true);
+    }
+  }
+
+  @EventHandler
+  public void onInventoryPickupEvent(InventoryPickupItemEvent event) {
+    if (accept1 && accept2 && (event.getInventory() == inv1 || event.getInventory() == inv2)) {
+      event.setCancelled(true);
+    }
+  }
+
+  @EventHandler
+  public void onInventoryInteract(InventoryInteractEvent event) {
+    if (accept1 && accept2 && (event.getInventory() == inv1 || event.getInventory() == inv2)) {
       event.setCancelled(true);
     }
   }

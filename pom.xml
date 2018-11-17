@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>2.56</version>
+    <version>3.0</version>
 
     <repositories>
         <repository>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
+            <version>1.13.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -86,7 +86,8 @@
         <dependency>
             <groupId>com.github.kicjow</groupId>
             <artifactId>Crazy-Crates</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>ce74cb8594</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

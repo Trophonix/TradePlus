@@ -58,21 +58,12 @@ public class TradePlus extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    Bukkit.getConsoleSender().sendMessage(new String[]{
-            " ",
-            ChatColor.RED + "YOU ARE USING A BETA VERSION OF TRADE+ MADE FOR SPIGOT VERSION 1.13",
-            " ",
-            ChatColor.RED + "This is unadvised, as Spigot 1.13 builds are not final, and any changes might break Trade+, resulting in loss of items.",
-            ChatColor.RED + "If you experience any issues, please report them here:",
-            ChatColor.WHITE + " > https://github.com/Trophonix/TradePlus/issues/",
-            ChatColor.RED + "Make sure to mention you are using 1.13.",
-            " "
-    });
     configFile = new File(getDataFolder(), "config.yml");
     config = YamlConfiguration.loadConfiguration(configFile);
     langFile = new File(getDataFolder(), "lang.yml");
     lang = YamlConfiguration.loadConfiguration(langFile);
     MsgUtils.initMsgUtils();
+    Sounds.loadSounds();
     if (!getDataFolder().exists()) {
       getDataFolder().mkdirs();
       try {
@@ -89,7 +80,7 @@ public class TradePlus extends JavaPlugin {
       config.set("requestcooldownseconds", 20);
       config.set("allow-trade-in-creative", false);
 
-      config.set("blocked.blacklist", Arrays.asList("bedrock", "97:3"));
+      config.set("blocked.blacklist", Arrays.asList("bedrock", "monster_egg"));
       config.set("blocked.named-items", false);
       config.set("blocked.lore", Collections.singletonList("EXAMPLE_BLOCKED_LORE"));
       config.set("blocked.regex", "");
@@ -114,11 +105,21 @@ public class TradePlus extends JavaPlugin {
       config.set("gui.showaccept", true);
       config.set("gui.theyaccept", " ");
       config.set("gui.theycancel", " ");
-      config.set("gui.acceptid", "green_stained_glass_pane");
-      config.set("gui.cancelid", "red_stained_glass_pane");
-      config.set("gui.separatorid", "black_stained_glass_pane");
+      if (Sounds.version < 113) {
+        config.set("gui.acceptid", "stained_glass_pane:13");
+        config.set("gui.cancelid", "stained_glass_pane:14");
+        config.set("gui.separatorid", "stained_glass_pane:15");
+      } else {
+        config.set("gui.acceptid", "green_stained_glass_pane");
+        config.set("gui.cancelid", "red_stained_glass_pane");
+        config.set("gui.separatorid", "black_stained_glass_pane");
+      }
       config.set("gui.force.enabled", true);
-      config.set("gui.force.type", "clock");
+      if (Sounds.version < 113) {
+        config.set("gui.force.type", "watch");
+      } else {
+        config.set("gui.force.type", "clock");
+      }
       config.set("gui.force.name", "&4&lForce Trade");
       config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
 
@@ -264,14 +265,14 @@ public class TradePlus extends JavaPlugin {
       }
 
       if (configVersion < 1.22) {
-        config.set("gui.separatorId", "160:15");
+        config.set("gui.separatorId", "stained_glass_pane:15");
       }
 
       if (configVersion < 1.23) {
         config.set("gui.separatorid", config.getString("gui.separatorId"));
         config.set("gui.separatorId", null);
-        config.set("gui.acceptid", "160:13");
-        config.set("gui.cancelid", "160:14");
+        config.set("gui.acceptid", "stained_glass_pane:13");
+        config.set("gui.cancelid", "stained_glass_pane:14");
       }
 
       if (configVersion < 1.24) {
@@ -293,8 +294,8 @@ public class TradePlus extends JavaPlugin {
         config.set("economy.increment", config.getDouble("economy.higheramount", 10.0));
         config.set("economy.higheramount", null);
         config.set("economy.loweramount", null);
-        config.set("gui.acceptid", "160:14");
-        config.set("gui.cancelid", "160:13");
+        config.set("gui.acceptid", "stained_glass_pane:14");
+        config.set("gui.cancelid", "stained_glass_pane:13");
       }
 
       if (configVersion < 1.34) {
@@ -469,20 +470,22 @@ public class TradePlus extends JavaPlugin {
     for (String key : fixList) {
       if (config.contains(key)) {
         String val = config.getString(key);
-        if (val.contains(":")) {
+        if (Material.getMaterial(val.toUpperCase()) == null && val.contains(":")) {
           String[] split = val.split(":");
           String val1 = split[1];
+          String val2 = split[0];
+          if (Material.getMaterial(val2.toUpperCase()) != null) continue;
           try {
             byte data = Byte.parseByte(val1);
             String name = DyeColor.getByDyeData(data).name();
-            if (name != null && !name.isEmpty()) {
-              String val2 = split[0];
-              Material material = Material.getMaterial(val2);
+            if (!name.isEmpty()) {
+              name += "_" + val2;
+              Material material = Material.getMaterial(name.toUpperCase());
               if (material == null) {
                 getLogger().warning("Unknown material: " + val2 + ". Is it an integer ID? Those are no longer supported in 1.13!");
                 continue;
               }
-              config.set(key, name + material.name());
+              config.set(key, name);
             }
           } catch (Exception ignored) {}
         }
@@ -493,7 +496,6 @@ public class TradePlus extends JavaPlugin {
     saveConfig();
     saveLang();
     InvUtils.reloadItems(this);
-    Sounds.loadSounds();
     if (Sounds.version > 17)
       getServer().getPluginManager().registerEvents(new InteractListener(this), this);
     commandHandler = new CommandHandler(this);

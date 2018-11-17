@@ -27,12 +27,12 @@ public class InvUtils {
 
   public static void reloadItems(TradePlus pl) {
     InvUtils.pl = pl;
-    placeHolder = new ItemFactory(pl.getConfig().getString("gui.separatorid", "160:15")).display(" ").build();
-    acceptTrade = new ItemFactory(pl.getConfig().getString("gui.acceptid", "160:14")).display('&', pl.getConfig().getString("gui.accept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
-    cancelTrade = new ItemFactory(pl.getConfig().getString("gui.cancelid", "160:13")).display('&', pl.getConfig().getString("gui.cancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
-    theyAccepted = new ItemFactory(pl.getConfig().getString("gui.cancelid", "160:13")).display('&', pl.getConfig().getString("gui.theyaccept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
-    theyCancelled = new ItemFactory(pl.getConfig().getString("gui.acceptid", "160:14")).display('&', pl.getConfig().getString("gui.theycancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
-    force = new ItemFactory(pl.getConfig().getString("gui.force.type", "watch"), Material.CLOCK).display('&', pl.getConfig().getString("gui.force.name"))
+    placeHolder = new ItemFactory(pl.getConfig().getString("gui.separatorid", "stained_glass_pane:15")).display(" ").build();
+    acceptTrade = new ItemFactory(pl.getConfig().getString("gui.acceptid", "stained_glass_pane:14")).display('&', pl.getConfig().getString("gui.accept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
+    cancelTrade = new ItemFactory(pl.getConfig().getString("gui.cancelid", "stained_glass_pane:13")).display('&', pl.getConfig().getString("gui.cancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
+    theyAccepted = new ItemFactory(pl.getConfig().getString("gui.cancelid", "stained_glass_pane:13")).display('&', pl.getConfig().getString("gui.theyaccept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
+    theyCancelled = new ItemFactory(pl.getConfig().getString("gui.acceptid", "stained_glass_pane:14")).display('&', pl.getConfig().getString("gui.theycancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).build();
+    force = new ItemFactory(pl.getConfig().getString("gui.force.type", "watch"), Sounds.version < 113 ? Material.getMaterial("WATCH") : Material.getMaterial("CLOCK")).display('&', pl.getConfig().getString("gui.force.name"))
             .lore('&', pl.getConfig().getStringList("gui.force.lore")).build();
   }
 

@@ -28,8 +28,7 @@ public class ItemFactory {
     parsable = parsable.toUpperCase().replace(" ", "_");
     if (parsable.contains(":")) {
       String[] split = parsable.split(":");
-        this.material = Material.getMaterial(split[0]);
-        material.getData();
+      this.material = Material.getMaterial(split[0]);
       try {
         this.data = Byte.parseByte(split[1]);
       } catch (Exception ignored) {
@@ -42,8 +41,8 @@ public class ItemFactory {
   }
 
   public ItemFactory(String parsable) {
-    parsable = parsable.toUpperCase().replace(" ", "_");
     if (parsable != null) {
+      parsable = parsable.toUpperCase().replace(" ", "_");
       if (parsable.contains(":")) {
         String[] split = parsable.split(":");
         this.material = Material.getMaterial(split[0]);
@@ -54,11 +53,14 @@ public class ItemFactory {
       } else {
         this.material = Material.getMaterial(parsable);
       }
+    } else {
+      throw new IllegalArgumentException("parsable can't be null");
     }
   }
 
   public static ItemStack getPlayerSkull(String name, String displayName) {
-    ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+    ItemStack skull = new ItemStack(Sounds.version < 113 ? Material.getMaterial("SKULL_ITEM") : Material.getMaterial("PLAYER_HEAD"));
+    skull.getData().setData((byte)3);
     SkullMeta meta = (SkullMeta) skull.getItemMeta();
     meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
     meta.setOwner(name);
@@ -85,7 +87,12 @@ public class ItemFactory {
   }
 
   public ItemStack build() {
-    ItemStack itemStack = new ItemStack(material, amount, damage);
+    ItemStack itemStack;
+    if (data != (byte)0) {
+      itemStack = new ItemStack(material, amount, damage, data);
+    } else {
+      itemStack = new ItemStack(material, amount, damage);
+    }
     ItemMeta itemMeta = itemStack.getItemMeta();
     if (!display.equals(""))
       itemMeta.setDisplayName(display);

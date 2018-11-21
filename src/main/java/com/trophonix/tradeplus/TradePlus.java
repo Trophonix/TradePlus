@@ -33,9 +33,19 @@ public class TradePlus extends JavaPlugin {
   private FileConfiguration lang;
   private CommandHandler commandHandler;
 
+  public Trade getTrade(Player player) {
+    for (Trade trade : ongoingTrades) {
+      if (trade.player1.equals(player) || trade.player2.equals(player))
+        return trade;
+    }
+    return null;
+  }
+
   public Trade getTrade(Player player1, Player player2) {
     for (Trade trade : ongoingTrades) {
       if (trade.player1.equals(player1) && trade.player2.equals(player2))
+        return trade;
+      if (trade.player2.equals(player1) && trade.player1.equals(player2))
         return trade;
     }
     return null;
@@ -459,6 +469,16 @@ public class TradePlus extends JavaPlugin {
       if (configVersion < 2.56) {
         lang.set("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
         lang.set("spectate.hover", "&6&lClick here to spectate this trade");
+      }
+
+      if (configVersion < 3.1) {
+        config.set("antiscam.discrepancydetection", true);
+        lang.set("discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
+        lang.set("configsreloaded", "&6&l(!) &6Configs reloaded!");
+        lang.set("invalidplayers", "&4&l(!) &4Invalid players!");
+        lang.set("adminforcedtrade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
+        lang.set("playersonly", "&4&l(!) &4This command is for players only.");
+        lang.set("notrade", "&4&l(!) &4No trade was found with those arguments.");
       }
     }
 

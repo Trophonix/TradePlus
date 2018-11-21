@@ -43,6 +43,7 @@ public class Trade implements Listener {
   private final List<Extra> extras = new ArrayList<>();
   private final long startTime = System.currentTimeMillis();
   private boolean accept1, accept2;
+  private ItemStack[] accepted1, accepted2;
   private boolean forced = false;
   private BukkitTask task = null;
 
@@ -425,12 +426,24 @@ public class Trade implements Listener {
     if (pl.getConfig().getBoolean("gui.showaccept", true)) {
       if (accept1 && accept2) {
         if (task != null) return;
+
+        accepted1 = new ItemStack[InvUtils.leftSlots.size()];
+        for (int i = 0; i < accepted1.length; i++) {
+          accepted1[i] = inv1.getItem(InvUtils.leftSlots.get(i));
+        }
+
+        accepted2 = new ItemStack[InvUtils.leftSlots.size()];
+        for (int i = 0; i < accepted2.length; i++) {
+          accepted2[i] = inv2.getItem(InvUtils.leftSlots.get(i));
+        }
+
         if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onaccept", true)) {
           Sounds.pling(player1, 1);
           Sounds.pling(player2, 1);
           spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
                   Sounds.pling((Player) p, 1));
         }
+
         task = Bukkit.getScheduler().runTaskTimer(pl, () -> {
           int current = inv1.getItem(0).getAmount();
           if (current > 1) {
@@ -447,17 +460,33 @@ public class Trade implements Listener {
             }
           } else {
             if (task != null) {
+              HandlerList.unregisterAll(this);
               pl.ongoingTrades.remove(this);
               task.cancel();
               task = null;
               inv1.setItem(49, null);
               inv2.setItem(49, null);
+              player1.closeInventory();
+              player2.closeInventory();
+
+              if (pl.getConfig().getBoolean("antiscam.discrepancydetection", true)) {
+                for (int i = 0; i < InvUtils.leftSlots.size(); i++) {
+                  int slot = InvUtils.leftSlots.get(i);
+                  if (!(inv1.getItem(slot).isSimilar(accepted1[i]) && inv2.getItem(slot).isSimilar(accepted2[i]))) {
+                    MsgUtils.send(player1, pl.getLang().getString("discrepancydetected"));
+                    MsgUtils.send(player2, pl.getLang().getString("discrepancydetected"));
+                    giveItemsOnLeft(inv1, player1);
+                    giveItemsOnLeft(inv2, player2);
+                    return;
+                  }
+                }
+              }
+
               giveItemsOnLeft(inv1, player2);
               giveItemsOnLeft(inv2, player1);
               for (Extra extra : extras)
                 extra.onTradeEnd();
-              player1.closeInventory();
-              player2.closeInventory();
+
               if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
                 Sounds.levelUp(player1, 1);
                 Sounds.levelUp(player2, 1);
@@ -467,9 +496,9 @@ public class Trade implements Listener {
                   p.closeInventory();
                 });
               }
+
               MsgUtils.send(player1, pl.getLang().getString("tradecomplete"));
               MsgUtils.send(player2, pl.getLang().getString("tradecomplete"));
-              HandlerList.unregisterAll(this);
             } else {
               updateAcceptance();
             }
@@ -493,8 +522,8 @@ public class Trade implements Listener {
   }
 
   private Extra getExtra(int slot) {
+    ItemStack icon = inv1.getItem(slot);
     for (Extra extra : extras) {
-      ItemStack icon = inv1.getItem(slot);
       if (icon != null && icon.getType().equals(extra.icon.getType())) {
         return extra;
       }
@@ -550,12 +579,11 @@ public class Trade implements Listener {
             String displayName = item.getItemMeta().getDisplayName();
             if (pattern.matcher(displayName).find()) return true;
           }
-          if (item.getItemMeta().hasLore() && pattern != null) {
+          if (item.getItemMeta().hasLore()) {
             List<String> lore = item.getItemMeta().getLore();
             if (lore.stream().anyMatch(s -> pattern.matcher(s).find())) return true;
           }
         } catch (PatternSyntaxException ex) {
-          ex.printStackTrace();
           Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Your blocked.regex is invalid!");
         }
       }

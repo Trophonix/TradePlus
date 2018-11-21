@@ -28,7 +28,22 @@ public class TradePlusCommand extends Command {
     if (args.length == 1) {
       if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
         pl.reload();
-        MsgUtils.send(sender, "&6&l(!) &6Configs reloaded!");
+        MsgUtils.send(sender, pl.getLang().getString("configsreloaded", "&6&l(!) &6Configs reloaded!"));
+        return;
+      }
+    } else if (args.length == 2) {
+      if (args[0].equalsIgnoreCase("spectate")) {
+        Player player = Bukkit.getPlayer(args[1]);
+        if (player == null || !player.isOnline()) {
+          MsgUtils.send(sender, pl.getLang().getString("invalidplayers", "&4&l(!) &4Invalid players!"));
+          return;
+        }
+        Trade trade = pl.getTrade(player);
+        if (trade == null) {
+          MsgUtils.send(player, pl.getLang().getString("notrade", "&4&l(!) &4No trade was found with those arguments."));
+        } else {
+          player.openInventory(trade.spectatorInv);
+        }
         return;
       }
     } else if (args.length == 3) {
@@ -36,10 +51,10 @@ public class TradePlusCommand extends Command {
         Player p1 = Bukkit.getPlayer(args[1]);
         Player p2 = Bukkit.getPlayer(args[2]);
         if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
-          MsgUtils.send(sender, "&4&l(!) &4Invalid players!");
+          MsgUtils.send(sender, pl.getLang().getString("invalidplayers", "&4&l(!) &4Invalid players!"));
           return;
         }
-        MsgUtils.send(sender, "&6&l(!) &6You forced a trade between &e" + p1.getName() + " &6and &e" + p2.getName());
+        MsgUtils.send(sender, pl.getLang().getString("adminforcedtrade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%"));
         String message = pl.getLang().getString("forcedtrade", "&6&l(!) &6You've been forced into a trade with &e%PLAYER%");
         MsgUtils.send(p1, message.replace("%PLAYER%", p2.getName()));
         MsgUtils.send(p2, message.replace("%PLAYER%", p1.getName()));
@@ -49,19 +64,19 @@ public class TradePlusCommand extends Command {
         return;
       } else if (args[0].equalsIgnoreCase("spectate")) {
         if (!(sender instanceof Player)) {
-          MsgUtils.send(sender, "&cThis command can only be executed by players!");
+          MsgUtils.send(sender, pl.getLang().getString("playersonly", "&4&l(!) &4This command is for players only."));
           return;
         }
         Player player = (Player) sender;
         Player p1 = Bukkit.getPlayer(args[1]);
         Player p2 = Bukkit.getPlayer(args[2]);
         if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
-          MsgUtils.send(sender, "&4&l(!) &4Invalid players!");
+          MsgUtils.send(sender, pl.getLang().getString("invalidplayers", "&4&l(!) &4Invalid players!"));
           return;
         }
         Trade trade = pl.getTrade(p1, p2);
         if (trade == null) {
-          MsgUtils.send(player, "&4&l(!) &4There is not an ongoing trade between those players!");
+          MsgUtils.send(player, pl.getLang().getString("notrade", "&4&l(!) &4No trade was found with those arguments."));
         } else {
           player.openInventory(trade.spectatorInv);
         }

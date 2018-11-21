@@ -105,6 +105,7 @@ public class TradePlus extends JavaPlugin {
       config.set("antiscam.countdown", 10);
       config.set("antiscam.cancelonchange", true);
       config.set("antiscam.preventchangeonaccept", true);
+      config.set("antiscam.discrepancydetection", true);
 
       config.set("gui.title", "Your Items <|     |> Their Items");
       config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
@@ -239,6 +240,12 @@ public class TradePlus extends JavaPlugin {
       lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
       lang.set("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
       lang.set("spectate.hover", "&6&lClick here to spectate this trade");
+      lang.set("discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
+      lang.set("configsreloaded", "&6&l(!) &6Configs reloaded!");
+      lang.set("invalidplayers", "&4&l(!) &4Invalid players!");
+      lang.set("adminforcedtrade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
+      lang.set("playersonly", "&4&l(!) &4This command is for players only.");
+      lang.set("notrade", "&4&l(!) &4No trade was found with those arguments.");
     } else {
       double configVersion = config.contains("configversion") && config.isDouble("configversion") ? config.getDouble("configversion") : 0;
 
@@ -482,7 +489,6 @@ public class TradePlus extends JavaPlugin {
       }
     }
 
-    // FIX OLD ID SHIT
     List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
     for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
       fixList.add(getConfig().getString("extras." + key + ".material"));

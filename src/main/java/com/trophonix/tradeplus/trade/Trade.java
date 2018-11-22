@@ -14,19 +14,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -91,6 +85,11 @@ public class Trade implements Listener {
     Inventory inv = event.getInventory();
     if (inv == null) return;
     if (inv.equals(inv1) || inv.equals(inv2)) {
+      if (accept1 && accept2) {
+        event.setCancelled(true);
+        return;
+      }
+
       for (int slot : event.getInventorySlots()) {
         if (!InvUtils.leftSlots.contains(slot)) {
           event.setCancelled(true);
@@ -135,6 +134,11 @@ public class Trade implements Listener {
         return;
       }
       if (InvUtils.leftSlots.contains(slot) && getExtra(slot) == null) {
+        if (accept1 && accept2) {
+          event.setCancelled(true);
+          return;
+        }
+
         if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
           event.setCancelled(true);
           event.setResult(InventoryClickEvent.Result.DENY);
@@ -205,6 +209,9 @@ public class Trade implements Listener {
       if (open != null && (open.equals(inv1) || open.equals(inv2))) {
         if (click.equals(ClickType.DOUBLE_CLICK)) {
           event.setCancelled(true);
+          if (accept1 && accept2) {
+            return;
+          }
           ItemStack item = event.getCurrentItem();
           ItemStack cursor = player.getItemOnCursor();
           if ((item == null || item.getType().equals(Material.AIR)) && !(cursor == null || cursor.getType().equals(Material.AIR))) {
@@ -235,7 +242,7 @@ public class Trade implements Listener {
           accept2 = false;
           updateAcceptance();
         }
-        if (click.isShiftClick()) {
+        if (click.isShiftClick() && click != ClickType.DOUBLE_CLICK) {
           event.setCancelled(true);
           ItemStack current = event.getCurrentItem();
           if (current != null) {
@@ -259,8 +266,8 @@ public class Trade implements Listener {
   public void onClose(InventoryCloseEvent event) {
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) return;
-    if (closed.getItem(49) == null) return;
     if (closed.equals(inv1) || closed.equals(inv2)) {
+      if (closed.getItem(49) == null) return;
       pl.ongoingTrades.remove(this);
       if (task != null) {
         task.cancel();
@@ -304,6 +311,14 @@ public class Trade implements Listener {
     }
   }
 
+  @EventHandler
+  public void onDropItem(PlayerDropItemEvent event) {
+    if (player1.equals(event.getPlayer()) || player2.equals(event.getPlayer())) {
+      event.setCancelled(true);
+      giveOnCursor(event.getPlayer());
+    }
+  }
+
   private void giveOnCursor(Player player) {
     if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) {
       player.getInventory().addItem(player.getItemOnCursor()).forEach((i, j) ->
@@ -344,6 +359,7 @@ public class Trade implements Listener {
   }
 
   private void giveItemsOnLeft(Inventory inv, Player player) {
+    System.out.println("Giving [INV " + (inv == inv1 ? "1" : "2") + "] to [PLAYER " + (player == player1 ? "1" : "2") + "]");
     InvUtils.leftSlots.forEach(slot -> {
       if (getExtra(slot) == null) {
         ItemStack item = inv.getItem(slot);
@@ -460,7 +476,6 @@ public class Trade implements Listener {
             }
           } else {
             if (task != null) {
-              HandlerList.unregisterAll(this);
               pl.ongoingTrades.remove(this);
               task.cancel();
               task = null;
@@ -469,12 +484,19 @@ public class Trade implements Listener {
               player1.closeInventory();
               player2.closeInventory();
 
-              if (pl.getConfig().getBoolean("antiscam.discrepancydetection", true)) {
+              HandlerList.unregisterAll(this);
+
+              if (pl.getConfig().getBoolean("antiscam.discrepancy-detection", true)) {
                 for (int i = 0; i < InvUtils.leftSlots.size(); i++) {
                   int slot = InvUtils.leftSlots.get(i);
-                  if (!(inv1.getItem(slot).isSimilar(accepted1[i]) && inv2.getItem(slot).isSimilar(accepted2[i]))) {
-                    MsgUtils.send(player1, pl.getLang().getString("discrepancydetected"));
-                    MsgUtils.send(player2, pl.getLang().getString("discrepancydetected"));
+                  ItemStack item1 = inv1.getItem(slot);
+                  ItemStack item2 = inv2.getItem(slot);
+                  if (!(
+                          ((item1 == null && accepted1[i] == null) || (item1 != null && accepted1[i] != null && item1.isSimilar(accepted1[i])))
+                          && ((item2 == null && accepted2[i] == null) || (item2 != null && accepted2[i] != null && item2.isSimilar(accepted2[i])))
+                  )) {
+                    MsgUtils.send(player1, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player2.getName()).split("%NEWLINE%"));
+                    MsgUtils.send(player2, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player1.getName()).split("%NEWLINE%"));
                     giveItemsOnLeft(inv1, player1);
                     giveItemsOnLeft(inv2, player2);
                     return;
@@ -497,8 +519,8 @@ public class Trade implements Listener {
                 });
               }
 
-              MsgUtils.send(player1, pl.getLang().getString("tradecomplete"));
-              MsgUtils.send(player2, pl.getLang().getString("tradecomplete"));
+              MsgUtils.send(player1, pl.getLang().getString("trade-complete"));
+              MsgUtils.send(player2, pl.getLang().getString("trade-complete"));
             } else {
               updateAcceptance();
             }

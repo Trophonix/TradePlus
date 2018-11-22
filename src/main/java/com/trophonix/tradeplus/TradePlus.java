@@ -105,7 +105,7 @@ public class TradePlus extends JavaPlugin {
       config.set("antiscam.countdown", 10);
       config.set("antiscam.cancelonchange", true);
       config.set("antiscam.preventchangeonaccept", true);
-      config.set("antiscam.discrepancydetection", true);
+      config.set("antiscam.discrepancy-detection", true);
 
       config.set("gui.title", "Your Items <|     |> Their Items");
       config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
@@ -212,40 +212,40 @@ public class TradePlus extends JavaPlugin {
       } catch (IOException ex) {
         ex.printStackTrace();
       }
-      lang.set("sentrequest", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
-      lang.set("receivedrequest", "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
-      lang.set("receivedrequesthover", "&6&lClick here to trade with &e&l%PLAYER%");
-      lang.set("creative", "&4&l(!) &r&4You can't trade in creative mode!");
-      lang.set("creativethem", "&4&l(!) &r&4That player is in creative mode!");
-      lang.set("withinrange", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them");
-      lang.set("withinrangecrossworld", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!");
-      lang.set("nocrossworld", "&4&l(!) &r&4You must be in the same world as a player to trade with them!");
-      lang.set("senderaccept", "&6&l(!) &r&e%PLAYER% &6accepted your trade request");
-      lang.set("receiveraccept", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request");
+      lang.set("request.sent", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
+      lang.set("request.received.text", "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
+      lang.set("request.received.hover", "&6&lClick here to trade with &e&l%PLAYER%");
+      lang.set("errors.creative", "&4&l(!) &r&4You can't trade in creative mode!");
+      lang.set("errors.creative-them", "&4&l(!) &r&4That player is in creative mode!");
+      lang.set("errors.within-range.same-world", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them");
+      lang.set("errors.within-range.cross-world", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!");
+      lang.set("errors.no-cross-world", "&4&l(!) &r&4You must be in the same world as a player to trade with them!");
+      lang.set("accept.sender", "&6&l(!) &r&e%PLAYER% &6accepted your trade request");
+      lang.set("accept.receiver", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request");
       lang.set("cancelled", "&4&l(!) &r&4The trade was cancelled");
       lang.set("expired", "&4&l(!) &r&4Your last trade request expired");
-      lang.set("waitforexpire", "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
-      lang.set("playernotfound", "&4&l(!) &r&4Could not find specified player");
-      lang.set("tradewithself", "&4&l(!) &r&4You cannot trade with yourself");
-      lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
+      lang.set("errors.wait-for-expire", "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
+      lang.set("errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
+      lang.set("errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
+      lang.set("errors.invalid-usage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
               "    &c- /trade <player name>%NEWLINE%" +
               "    &c- /trade deny");
-      lang.set("noperms", "&4&l(!) &r&4You do not have permission to trade");
-      lang.set("nopermssender", "&4&l(!) &r&4You do not have permission to send a trade");
-      lang.set("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to accept a trade");
-      lang.set("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command");
-      lang.set("tradecomplete", "&6&l(!) &r&6The trade was successful!");
-      lang.set("forcedtrade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
-      lang.set("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
-      lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
+      lang.set("errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
+      lang.set("errors.no-perms.send", "&4&l(!) &r&4You do not have permission to send a trade");
+      lang.set("errors.no-perms.receive", "&4&l(!) &r&4That player does not have permission to accept a trade");
+      lang.set("errors.no-perms.admin", "&4&l(!) &r&4You do not have permission to use this command");
+      lang.set("trade-complete", "&6&l(!) &r&6The trade was successful!");
+      lang.set("forced-trade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
+      lang.set("denied.them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
+      lang.set("denied.you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
       lang.set("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
       lang.set("spectate.hover", "&6&lClick here to spectate this trade");
-      lang.set("discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
-      lang.set("configsreloaded", "&6&l(!) &6Configs reloaded!");
-      lang.set("invalidplayers", "&4&l(!) &4Invalid players!");
-      lang.set("adminforcedtrade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
-      lang.set("playersonly", "&4&l(!) &4This command is for players only.");
-      lang.set("notrade", "&4&l(!) &4No trade was found with those arguments.");
+      lang.set("antiscam.discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
+      lang.set("admin.configs-reloaded", "&6&l(!) &6Configs reloaded!");
+      lang.set("admin.invalid-players", "&4&l(!) &4Invalid players!");
+      lang.set("admin.forced-trade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
+      lang.set("admin.players-only", "&4&l(!) &4This command is for players only.");
+      lang.set("admin.no-trade", "&4&l(!) &4No trade was found with those arguments.");
     } else {
       double configVersion = config.contains("configversion") && config.isDouble("configversion") ? config.getDouble("configversion") : 0;
 
@@ -479,13 +479,42 @@ public class TradePlus extends JavaPlugin {
       }
 
       if (configVersion < 3.1) {
-        config.set("antiscam.discrepancydetection", true);
-        lang.set("discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
-        lang.set("configsreloaded", "&6&l(!) &6Configs reloaded!");
-        lang.set("invalidplayers", "&4&l(!) &4Invalid players!");
-        lang.set("adminforcedtrade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
-        lang.set("playersonly", "&4&l(!) &4This command is for players only.");
-        lang.set("notrade", "&4&l(!) &4No trade was found with those arguments.");
+        config.set("antiscam.discrepancy-detection", true);
+
+        lang.set("antiscam.discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
+        lang.set("admin.configs-reloaded", "&6&l(!) &6Configs reloaded!");
+        lang.set("admin.invalid-players", "&4&l(!) &4Invalid players!");
+        lang.set("admin.forced-trade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
+        lang.set("admin.players-only", "&4&l(!) &4This command is for players only.");
+        lang.set("admin.no-trade", "&4&l(!) &4No trade was found with those arguments.");
+
+        // New lang keys
+        lang.set("request.sent", lang.getString("sentrequest", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%"));
+        lang.set("request.received.text", lang.getString("receivedrequest", "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading"));
+        lang.set("request.received.hover", lang.getString("received-request-hover", "&6&lClick here to trade with &e&l%PLAYER%"));
+        lang.set("accept.sender", lang.getString("senderaccept", "&6&l(!) &r&e%PLAYER% &6accepted your trade request"));
+        lang.set("accept.receiver", lang.getString("receiveraccept", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request"));
+        lang.set("forced-trade", lang.getString("forcedtrade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%"));
+        lang.set("trade-complete", lang.getString("tradecomplete", "&6&l(!) &r&6The trade was successful!"));
+        lang.set("errors.creative", lang.getString("creative", "&4&l(!) &r&4You can't trade in creative mode!"));
+        lang.set("errors.creative-them", lang.getString("creativethem", "&4&l(!) &r&4That player is in creative mode!"));
+        lang.set("errors.within-range.same-world", lang.getString("withinrange", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them"));
+        lang.set("errors.within-range.cross-world", lang.getString("withinrangecrossworld", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!"));
+        lang.set("errors.no-cross-world", lang.getString("nocrossworld", "&4&l(!) &r&4You must be in the same world as a player to trade with them!"));
+        lang.set("errors.wait-for-expire", lang.getString("waitforexpire", "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly"));
+        lang.set("errors.player-not-found", lang.getString("playernotfound", "&4&l(!) &r&4Could not find specified player"));
+        lang.set("errors.self-trade", lang.getString("tradewithself", "&4&l(!) &r&4You cannot trade with yourself"));
+        lang.set("errors.invalid-usage", lang.getString("invalidusage",
+                "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
+                "    &c- /trade <player name>%NEWLINE%" +
+                "    &c- /trade deny"));
+        lang.set("errors.no-perms.accept", lang.getString("noperms", "&4&l(!) &r&4You do not have permission to trade"));
+        lang.set("errors.no-perms.send", lang.getString("nopermssender", "&4&l(!) &r&4You do not have permission to send a trade"));
+        lang.set("errors.no-perms.receive", lang.getString("nopermsreceiver", "&4&l(!) &r&4That player does not have permission to accept a trade"));
+        lang.set("errors.no-perms.admin", lang.getString("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command"));
+        lang.set("denied.them", lang.getString("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied"));
+        lang.set("denied.you", lang.getString("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied."));
+
       }
     }
 

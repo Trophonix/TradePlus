@@ -518,31 +518,34 @@ public class TradePlus extends JavaPlugin {
       }
     }
 
-    List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
-    for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
-      fixList.add(getConfig().getString("extras." + key + ".material"));
-    }
-    for (String key : fixList) {
-      if (config.contains(key)) {
-        String val = config.getString(key);
-        if (Material.getMaterial(val.toUpperCase()) == null && val.contains(":")) {
-          String[] split = val.split(":");
-          String val1 = split[1];
-          String val2 = split[0];
-          if (Material.getMaterial(val2.toUpperCase()) != null) continue;
-          try {
-            byte data = Byte.parseByte(val1);
-            String name = DyeColor.getByDyeData(data).name();
-            if (!name.isEmpty()) {
-              name += "_" + val2;
-              Material material = Material.getMaterial(name.toUpperCase());
-              if (material == null) {
-                getLogger().warning("Unknown material: " + val2 + ". Is it an integer ID? Those are no longer supported in 1.13!");
-                continue;
+    if (Sounds.version > 113) {
+      List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
+      for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
+        fixList.add(getConfig().getString("extras." + key + ".material"));
+      }
+      for (String key : fixList) {
+        if (config.contains(key)) {
+          String val = config.getString(key);
+          if (Material.getMaterial(val.toUpperCase()) == null && val.contains(":")) {
+            String[] split = val.split(":");
+            String val1 = split[1];
+            String val2 = split[0];
+            if (Material.getMaterial(val2.toUpperCase()) != null) continue;
+            try {
+              byte data = Byte.parseByte(val1);
+              String name = DyeColor.getByDyeData(data).name();
+              if (!name.isEmpty()) {
+                name += "_" + val2;
+                Material material = Material.getMaterial(name.toUpperCase());
+                if (material == null) {
+                  getLogger().warning("Unknown material: " + val2 + ". Is it an integer ID? Those are no longer supported in 1.13!");
+                  continue;
+                }
+                config.set(key, name);
               }
-              config.set(key, name);
+            } catch (Exception ignored) {
             }
-          } catch (Exception ignored) {}
+          }
         }
       }
     }

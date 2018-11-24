@@ -56,7 +56,7 @@
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.7-spigot</version>
+            <version>1.7-SPIGOT</version>
             <scope>provided</scope>
         </dependency>
 

@@ -518,7 +518,7 @@ public class TradePlus extends JavaPlugin {
       }
     }
 
-    if (Sounds.version > 113) {
+    if (Sounds.version >= 113) {
       List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
       for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
         fixList.add(getConfig().getString("extras." + key + ".material"));

@@ -232,18 +232,9 @@ public class Trade implements Listener {
               }
             }
           }
-        }
-        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
+        } else if (click == ClickType.SHIFT_LEFT) {
           event.setCancelled(true);
-          return;
-        }
-        if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
-          accept1 = false;
-          accept2 = false;
-          updateAcceptance();
-        }
-        if (click.isShiftClick() && click != ClickType.DOUBLE_CLICK) {
-          event.setCancelled(true);
+          if (accept1 && accept2) return;
           ItemStack current = event.getCurrentItem();
           if (current != null) {
             player.getInventory().setItem(event.getSlot(), putOnLeft(player.equals(player1) ? inv1 : inv2, current));
@@ -254,6 +245,15 @@ public class Trade implements Listener {
                       Sounds.click((Player) p, 2));
             }
           }
+        }
+        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
+          event.setCancelled(true);
+          return;
+        }
+        if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+          accept1 = false;
+          accept2 = false;
+          updateAcceptance();
         }
         Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
       }
@@ -315,7 +315,7 @@ public class Trade implements Listener {
   public void onDropItem(PlayerDropItemEvent event) {
     if (player1.equals(event.getPlayer()) || player2.equals(event.getPlayer())) {
       event.setCancelled(true);
-      giveOnCursor(event.getPlayer());
+      if (accept1 && accept2) giveOnCursor(event.getPlayer());
     }
   }
 
@@ -324,14 +324,6 @@ public class Trade implements Listener {
       player.getInventory().addItem(player.getItemOnCursor()).forEach((i, j) ->
               player.getWorld().dropItemNaturally(player.getLocation(), j));
       player.setItemOnCursor(null);
-    }
-  }
-
-  @EventHandler
-  public void onCommand(PlayerCommandPreprocessEvent event) {
-    if (event.getMessage().replace("/", "").equalsIgnoreCase("tradeplus spectate " + player1.getName() + " " + player2.getName())) {
-      event.getPlayer().openInventory(spectatorInv);
-      event.setCancelled(true);
     }
   }
 
@@ -442,6 +434,9 @@ public class Trade implements Listener {
     if (pl.getConfig().getBoolean("gui.showaccept", true)) {
       if (accept1 && accept2) {
         if (task != null) return;
+
+        giveOnCursor(player1);
+        giveOnCursor(player2);
 
         accepted1 = new ItemStack[InvUtils.leftSlots.size()];
         for (int i = 0; i < accepted1.length; i++) {

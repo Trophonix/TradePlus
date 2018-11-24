@@ -88,7 +88,7 @@ public class TradePlusCommand extends Command {
             "&e/trade <player> &fSend a trade request",
             "&e/tradeplus reload &fReload config files",
             "&e/tradeplus force <player1> <player2> &fForce 2 players to trade",
-            "&e/tradeplus spectate <player1> <player2> &fSpectate an ongoing trade"
+            "&e/tradeplus spectate <player(s)> &fSpectate an ongoing trade"
     });
   }
 

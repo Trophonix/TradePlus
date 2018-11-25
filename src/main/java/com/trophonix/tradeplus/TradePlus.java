@@ -514,7 +514,6 @@ public class TradePlus extends JavaPlugin {
         lang.set("errors.no-perms.admin", lang.getString("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command"));
         lang.set("denied.them", lang.getString("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied"));
         lang.set("denied.you", lang.getString("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied."));
-
       }
     }
 
@@ -526,22 +525,9 @@ public class TradePlus extends JavaPlugin {
       if (config.contains(key)) {
         String val = config.getString(key);
         if (Material.getMaterial(val.toUpperCase()) == null) {
-          String[] split = val.split(":");
-          if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
-
-          Material material;
-          try {
-            byte data = Byte.parseByte(split[1]);
-            String name = DyeColor.getByDyeData(data).name();
-            if (!name.isEmpty()) {
-              name += "_" + split[0];
-              material = Material.getMaterial(name.toUpperCase());
-              if (material != null) {
-                config.set(key, name);
-                continue;
-              }
-            }
-          } catch (Exception ignored) {
+          if (val.contains(":")) {
+            String[] split = val.split(":");
+            if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
           }
 
           Mapping mapping = IdMappings.getById(val);
@@ -552,12 +538,9 @@ public class TradePlus extends JavaPlugin {
             continue;
           }
 
-          if (Sounds.version >= 113) material = Material.getMaterial(mapping.getFlatteningType().toUpperCase());
-          else material = Material.getMaterial(mapping.getLegacyType());
-
-          if (material != null) {
-            config.set(key, material.name() + (Sounds.version < 113 ? mapping.getData() > 0 ? ":" + mapping.getData() : "" : ""));
-          }
+          String name = Sounds.version < 113 ? mapping.getLegacyType() + (mapping.getData() > 0 ? ":" + mapping.getData() : "") : mapping.getFlatteningType();
+          config.set(key, name);
+          getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
         }
       }
     }

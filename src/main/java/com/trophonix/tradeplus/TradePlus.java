@@ -527,16 +527,14 @@ public class TradePlus extends JavaPlugin {
         String val = config.getString(key);
         if (Material.getMaterial(val.toUpperCase()) == null && val.contains(":")) {
           String[] split = val.split(":");
-          String val1 = split[1];
-          String val2 = split[0];
-          if (Material.getMaterial(val2.toUpperCase()) != null) continue;
+          if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
 
           Material material;
           try {
-            byte data = Byte.parseByte(val1);
+            byte data = Byte.parseByte(split[1]);
             String name = DyeColor.getByDyeData(data).name();
             if (!name.isEmpty()) {
-              name += "_" + val2;
+              name += "_" + split[0];
               material = Material.getMaterial(name.toUpperCase());
               if (material != null) {
                 config.set(key, name);
@@ -547,7 +545,7 @@ public class TradePlus extends JavaPlugin {
           }
 
           Mapping mapping = IdMappings.getById(val);
-          if (mapping == null) mapping = IdMappings.getByLegacyType(val.contains(":")?val1:val);
+          if (mapping == null) mapping = IdMappings.getByLegacyType(val);
           if (mapping == null) mapping = IdMappings.getByFlatteningType(val);
           if (mapping == null) {
             continue;
@@ -557,7 +555,7 @@ public class TradePlus extends JavaPlugin {
           else material = Material.getMaterial(mapping.getLegacyType());
 
           if (material != null) {
-            config.set(key, material.name() + (Sounds.version < 113 ? val.contains(":") ? ":" + val2 : "" : ""));
+            config.set(key, material.name() + (Sounds.version < 113 ? mapping.getData() > 0 ? ":" + mapping.getData() : "" : ""));
           }
         }
       }

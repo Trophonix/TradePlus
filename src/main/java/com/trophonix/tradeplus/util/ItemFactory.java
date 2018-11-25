@@ -1,5 +1,6 @@
 package com.trophonix.tradeplus.util;
 
+import com.trophonix.tradeplus.TradePlus;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -36,8 +37,10 @@ public class ItemFactory {
     } else {
       this.material = Material.getMaterial(parsable);
     }
-    if (this.material == null)
+    if (this.material == null) {
       this.material = fallback;
+      TradePlus.getPlugin(TradePlus.class).getLogger().warning("Unknown material [" + parsable + "]." + (Sounds.version >= 113 ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: " + fallback.name() : ""));
+    }
   }
 
   public ItemFactory(String parsable) {
@@ -52,6 +55,10 @@ public class ItemFactory {
         }
       } else {
         this.material = Material.getMaterial(parsable);
+        if (material == null) {
+          material = Material.GLASS_PANE;
+          TradePlus.getPlugin(TradePlus.class).getLogger().warning("Unknown material [" + parsable + "]." + (Sounds.version >= 113 ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: glass_pane" : ""));
+        }
       }
     } else {
       throw new IllegalArgumentException("parsable can't be null");

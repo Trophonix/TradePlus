@@ -198,7 +198,7 @@ public class Trade implements Listener {
             if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
               Sounds.click(player1, 2);
               Sounds.click(player2, 2);
-              spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+              spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
                       Sounds.click((Player) p, 2));
             }
           }
@@ -241,7 +241,7 @@ public class Trade implements Listener {
             if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
               Sounds.click(player1, 2);
               Sounds.click(player2, 2);
-              spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+              spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
                       Sounds.click((Player) p, 2));
             }
           }
@@ -451,7 +451,7 @@ public class Trade implements Listener {
         if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onaccept", true)) {
           Sounds.pling(player1, 1);
           Sounds.pling(player2, 1);
-          spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+          spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
                   Sounds.pling((Player) p, 1));
         }
 
@@ -466,7 +466,7 @@ public class Trade implements Listener {
             if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncountdown")) {
               Sounds.click(player1, 2);
               Sounds.click(player2, 2);
-              spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+              spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
                       Sounds.click((Player) p, 2));
             }
           } else {
@@ -507,7 +507,7 @@ public class Trade implements Listener {
               if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
                 Sounds.levelUp(player1, 1);
                 Sounds.levelUp(player2, 1);
-                List<Player> viewers = spectatorInv.getViewers().stream().filter(h -> h instanceof Player).map(h -> (Player) h).collect(Collectors.toList());
+                List<Player> viewers = spectatorInv.getViewers().stream().filter(Player.class::isInstance).map(Player.class::cast).collect(Collectors.toList());
                 viewers.forEach(p -> {
                   Sounds.levelUp(p, 1);
                   p.closeInventory();
@@ -530,7 +530,7 @@ public class Trade implements Listener {
           if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
             Sounds.click(player1, 2);
             Sounds.click(player2, 2);
-            spectatorInv.getViewers().stream().filter(h -> h instanceof Player).forEach(p ->
+            spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
                     Sounds.click((Player) p, 2));
           }
         }

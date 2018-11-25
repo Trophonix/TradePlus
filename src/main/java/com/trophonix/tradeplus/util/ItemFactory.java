@@ -3,7 +3,6 @@ package com.trophonix.tradeplus.util;
 import com.trophonix.tradeplus.TradePlus;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;

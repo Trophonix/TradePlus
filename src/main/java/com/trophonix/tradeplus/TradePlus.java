@@ -9,10 +9,7 @@ import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import de.themoep.idconverter.IdMappings;
-import de.themoep.idconverter.IdMappings.IdType;
 import de.themoep.idconverter.IdMappings.Mapping;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -306,7 +303,7 @@ public class TradePlus extends JavaPlugin {
       }
 
       if (configVersion < 1.3) {
-        config.set("blocked-items", Arrays.asList("bedrock"));
+        config.set("blocked-items", Collections.singletonList("bedrock"));
       }
 
       if (configVersion < 1.31) {

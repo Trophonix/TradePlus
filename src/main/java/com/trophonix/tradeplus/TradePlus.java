@@ -146,7 +146,7 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.economy.taxpercent", 0);
 
       config.set("extras.experience.enabled", true);
-      config.set("extras.experience.material", "experience_bottle");
+      config.set("extras.experience.material", "exp_bottle");
       config.set("extras.experience.display", "&7Your current XP offer is &e%AMOUNT%");
       config.set("extras.experience.theirdisplay", "&7Their current XP offer is &e%AMOUNT%");
       config.set("extras.experience.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
@@ -326,7 +326,7 @@ public class TradePlus extends JavaPlugin {
 
       if (configVersion < 1.5) {
         config.set("hooks.xp.enabled", true);
-        config.set("hooks.xp.material", "experience_bottle");
+        config.set("hooks.xp.material", "exp_bottle");
         config.set("hooks.xp.youroffer", "&7Your current XP offer is &e%XPAMOUNT%");
         config.set("hooks.xp.theiroffer", "&7Their current XP offer is &e%XPAMOUNT%");
         config.set("hooks.xp.increment", 5);

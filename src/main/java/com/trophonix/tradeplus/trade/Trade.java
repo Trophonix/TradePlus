@@ -267,6 +267,7 @@ public class Trade implements Listener {
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) return;
     if (closed.equals(inv1) || closed.equals(inv2)) {
+      HandlerList.unregisterAll(this);
       if (closed.getItem(49) == null) return;
       pl.ongoingTrades.remove(this);
       if (task != null) {
@@ -281,10 +282,9 @@ public class Trade implements Listener {
       giveOnCursor(player2);
       player1.closeInventory();
       player2.closeInventory();
-      MsgUtils.send(player1, pl.getLang().getString("cancelled"));
-      MsgUtils.send(player2, pl.getLang().getString("cancelled"));
+      MsgUtils.send(player1, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player2.getName()));
+      MsgUtils.send(player2, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player1.getName()));
       spectatorInv.getViewers().forEach(HumanEntity::closeInventory);
-      HandlerList.unregisterAll(this);
     }
   }
 

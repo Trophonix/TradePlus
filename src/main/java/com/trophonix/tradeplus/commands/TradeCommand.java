@@ -137,7 +137,7 @@ public class TradeCommand extends Command {
         Bukkit.getScheduler().runTaskLater(pl, () -> {
           boolean was = requests.remove(request);
           if (player.isOnline() && was) {
-            MsgUtils.send(player, pl.getLang().getString("expired").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+            MsgUtils.send(player, pl.getLang().getString("expired", "&4&l(!) &r&4Your last trade request expired").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
           }
         }, 20 * pl.getConfig().getInt("requestcooldownseconds", 15));
       }

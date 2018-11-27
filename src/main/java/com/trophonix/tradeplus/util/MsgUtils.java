@@ -35,14 +35,6 @@ public class MsgUtils {
     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
   }
 
-  private static String center(String string) {
-    StringBuilder result = new StringBuilder(string);
-    while (result.length() < 48) {
-      result = new StringBuilder(" " + result + " ");
-    }
-    return result.toString();
-  }
-
   public static void initMsgUtils() {
     String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
     version = Integer.parseInt(split[0].replace("v", "") + split[1]);

@@ -55,7 +55,7 @@ public class ItemFactory {
       } else {
         this.material = Material.getMaterial(parsable);
         if (material == null) {
-          material = Material.GLASS_PANE;
+          material = Material.getMaterial(Sounds.version < 113 ? "thin_glass" : "glass_pane");
           TradePlus.getPlugin(TradePlus.class).getLogger().warning("Unknown material [" + parsable + "]." + (Sounds.version >= 113 ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: glass_pane" : ""));
         }
       }

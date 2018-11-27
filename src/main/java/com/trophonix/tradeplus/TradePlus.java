@@ -523,8 +523,8 @@ public class TradePlus extends JavaPlugin {
     }
     for (String key : fixList) {
       if (config.contains(key)) {
-        String val = config.getString(key);
-        if (Material.getMaterial(val.toUpperCase()) == null) {
+        String val = config.getString(key).toUpperCase();
+        if (Material.getMaterial(val) == null) {
           if (val.contains(":")) {
             String[] split = val.split(":");
             if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
@@ -534,7 +534,8 @@ public class TradePlus extends JavaPlugin {
           if (mapping == null) mapping = IdMappings.getByLegacyType(val);
           if (mapping == null) mapping = IdMappings.getByFlatteningType(val);
           if (mapping == null) {
-            System.out.println("Couldn't find mapping for " + val);
+            getLogger().warning("Couldn't find mapping for " + val + ". This could cause a crash.");
+            getLogger().warning("Make sure this is a valid material before reporting this as a bug.");
             continue;
           }
 

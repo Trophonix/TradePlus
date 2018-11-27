@@ -351,7 +351,6 @@ public class Trade implements Listener {
   }
 
   private void giveItemsOnLeft(Inventory inv, Player player) {
-    System.out.println("Giving [INV " + (inv == inv1 ? "1" : "2") + "] to [PLAYER " + (player == player1 ? "1" : "2") + "]");
     InvUtils.leftSlots.forEach(slot -> {
       if (getExtra(slot) == null) {
         ItemStack item = inv.getItem(slot);

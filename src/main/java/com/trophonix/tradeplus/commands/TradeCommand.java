@@ -116,7 +116,7 @@ public class TradeCommand extends Command {
       if (accept) {
         Bukkit.getPluginManager().callEvent(new TradeAcceptEvent(receiver, player));
         MsgUtils.send(receiver, pl.getLang().getString("accept.sender").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
-        MsgUtils.send(player, pl.getLang().getString("accept.receiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+          MsgUtils.send(player, pl.getLang().getString("accept.receiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
         new Trade(player, receiver);
         requests.removeIf(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player)));
       } else {

@@ -15,16 +15,15 @@ public class Db {
 
     connection.createStatement().execute("CREATE TABLE IF NOT EXISTS playerData (" +
             "`uuid` VARCHAR(36) UNIQUE NOT NULL," +
-            "`allowsTrades` BIT DEFAULT 0," +
+            "`allowsTrades` BIT," +
             "PRIMARY KEY (`uuid`));");
 
   }
 
   public void init(Player player) throws SQLException {
-    PreparedStatement ps = connection.prepareStatement("INSERT INTO playerData (uuid, allowsTrades) VALUES (" +
-            "'" + player.getUniqueId().toString() + "', " +
-            "1" +
-            ");");
+    PreparedStatement ps = connection.prepareStatement("INSERT IGNORE INTO playerData (uuid, allowsTrades) VALUES (?, ?);");
+    ps.setString(1, player.getUniqueId().toString());
+    ps.setBoolean(2, true);
     ps.execute();
     ps.close();
   }

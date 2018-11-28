@@ -3,6 +3,9 @@ package com.trophonix.tradeplus;
 import com.trophonix.tradeplus.commands.CommandHandler;
 import com.trophonix.tradeplus.commands.TradeCommand;
 import com.trophonix.tradeplus.commands.TradePlusCommand;
+import com.trophonix.tradeplus.data.Db;
+import com.trophonix.tradeplus.data.MysqlDb;
+import com.trophonix.tradeplus.data.SqliteDb;
 import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
@@ -10,28 +13,34 @@ import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import de.themoep.idconverter.IdMappings;
 import de.themoep.idconverter.IdMappings.Mapping;
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class TradePlus extends JavaPlugin {
+public class TradePlus extends JavaPlugin implements Listener {
   public ConcurrentLinkedQueue<Trade> ongoingTrades;
   private File configFile;
   private FileConfiguration config;
   private File langFile;
   private FileConfiguration lang;
   private CommandHandler commandHandler;
+  private Db db;
 
   public Trade getTrade(Player player) {
     for (Trade trade : ongoingTrades) {
@@ -68,6 +77,7 @@ public class TradePlus extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    getServer().getPluginManager().registerEvents(this, this);
     configFile = new File(getDataFolder(), "config.yml");
     config = YamlConfiguration.loadConfiguration(configFile);
     langFile = new File(getDataFolder(), "lang.yml");
@@ -515,6 +525,41 @@ public class TradePlus extends JavaPlugin {
         lang.set("denied.them", lang.getString("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied"));
         lang.set("denied.you", lang.getString("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied."));
       }
+
+      if (configVersion < 3.2) {
+        config.set("db.enabled", true);
+        config.set("db.canDenyTrades", true);
+        config.set("db.type", "sqlite");
+        config.set("db.url", "data.db");
+      }
+    }
+
+    if (config.getBoolean("db.enabled", true) && config.getBoolean("db.denyTradesOption", true)) {
+      String typeString = config.getString("db.type", "sqlite");
+      Db.Type type = Db.Type.getType(typeString);
+      if (type == null) {
+        getLogger().warning("Invalid db type: " + typeString);
+      } else {
+        String url = config.getString("db.url", "data.db");
+        try {
+          if (type == Db.Type.SQLITE) {
+            File file = new File(getDataFolder(), url);
+            if (!file.exists()) {
+              try {
+                file.createNewFile();
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            }
+            this.db = new SqliteDb(getDataFolder(), url);
+          } else {
+            this.db = new MysqlDb(url);
+          }
+        } catch (SQLException ex) {
+          getLogger().warning("Failed to load database. For MySQL your url needs to contain host, username, password.");
+          ex.printStackTrace();
+        }
+      }
     }
 
     List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
@@ -558,6 +603,18 @@ public class TradePlus extends JavaPlugin {
     ongoingTrades = new ConcurrentLinkedQueue<>();
   }
 
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    if (this.isDb()) Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+      try {
+        this.db.init(event.getPlayer());
+      } catch (SQLException ex) {
+        getLogger().warning("Failed to load " + event.getPlayer().getName() + " from db.");
+        ex.printStackTrace();
+      }
+    });
+  }
+
   public void reload() {
     config = YamlConfiguration.loadConfiguration(configFile);
     lang = YamlConfiguration.loadConfiguration(langFile);
@@ -575,6 +632,18 @@ public class TradePlus extends JavaPlugin {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+  }
+
+  public Db db() {
+    return db;
+  }
+
+  public boolean isDb() {
+    return db != null;
+  }
+
+  public boolean canDenyTrades() {
+    return config.getBoolean("db.canDenyTrades", true);
   }
 
 }

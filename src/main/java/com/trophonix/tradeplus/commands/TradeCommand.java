@@ -132,8 +132,17 @@ public class TradeCommand extends Command {
         final TradeRequest request = new TradeRequest(player, receiver);
         requests.add(request);
         MsgUtils.send(player, pl.getLang().getString("request.sent").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
-        MsgUtils.send(receiver, pl.getLang().getString("request.received.hover").replace("%PLAYER%", player.getName()), "/trade " + player.getName(),
-                pl.getLang().getString("request.received.text").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
+        if (pl.isDb() && pl.canDenyTrades()) {
+          Bukkit.getScheduler().runTaskAsynchronously(pl, () -> {
+            if (pl.db().allowsTrades(receiver)) {
+              MsgUtils.send(receiver, pl.getLang().getString("request.received.hover").replace("%PLAYER%", player.getName()), "/trade " + player.getName(),
+                      pl.getLang().getString("request.received.text").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
+            }
+          });
+        } else {
+          MsgUtils.send(receiver, pl.getLang().getString("request.received.hover").replace("%PLAYER%", player.getName()), "/trade " + player.getName(),
+                  pl.getLang().getString("request.received.text").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
+        }
         Bukkit.getScheduler().runTaskLater(pl, () -> {
           boolean was = requests.remove(request);
           if (player.isOnline() && was) {

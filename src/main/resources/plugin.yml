@@ -16,3 +16,6 @@ permissions:
     default: op
     children:
       tradeplus.trade: true
+  tradeplus.admin.silent:
+    description: Silence admin trade notifications
+    default: false

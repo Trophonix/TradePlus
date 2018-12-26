@@ -200,6 +200,17 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.tokenenchant.increment", 1);
       config.set("extras.tokenenchant.taxpercent", 0);
 
+      config.set("extras.tokenmanager.enabled", true);
+      config.set("extras.tokenmanager.material", "emerald");
+      config.set("extras.tokenmanager.display", "&7Your current TokenManager tokens offer is &b%AMOUNT%");
+      config.set("extras.tokenmanager.theirdisplay", "&7Their current TokenManager tokens offer is &b%AMOUNT%");
+      config.set("extras.tokenmanager.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.tokenmanager.increment", 1);
+      config.set("extras.tokenmanager.taxpercent", 0);
+
       config.set("soundeffects.enabled", true);
       config.set("soundeffects.onchange", true);
       config.set("soundeffects.onaccept", true);
@@ -514,6 +525,19 @@ public class TradePlus extends JavaPlugin {
         lang.set("errors.no-perms.admin", lang.getString("nopermssenderadmin", "&4&l(!) &r&4You do not have permission to use this command"));
         lang.set("denied.them", lang.getString("denied-them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied"));
         lang.set("denied.you", lang.getString("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied."));
+      }
+
+      if (configVersion < 3.15) {
+        config.set("extras.tokenmanager.enabled", true);
+        config.set("extras.tokenmanager.material", "emerald");
+        config.set("extras.tokenmanager.display", "&7Your current TokenManager tokens offer is &b%AMOUNT%");
+        config.set("extras.tokenmanager.theirdisplay", "&7Their current TokenManager tokens offer is &b%AMOUNT%");
+        config.set("extras.tokenmanager.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
+                "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+                "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+                "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+        config.set("extras.tokenmanager.increment", 1);
+        config.set("extras.tokenmanager.taxpercent", 0);
       }
     }
 

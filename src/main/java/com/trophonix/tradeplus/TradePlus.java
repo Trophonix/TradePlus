@@ -550,8 +550,9 @@ public class TradePlus extends JavaPlugin {
     saveConfig();
     saveLang();
     InvUtils.reloadItems(this);
-    if (Sounds.version > 17)
+    if (Sounds.version > 17) {
       getServer().getPluginManager().registerEvents(new InteractListener(this), this);
+    }
     commandHandler = new CommandHandler(this);
     commandHandler.add(new TradeCommand(this));
     commandHandler.add(new TradePlusCommand(this));

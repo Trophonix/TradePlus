@@ -25,7 +25,7 @@ public class TokenManagerExtra extends Extra {
     }
     if (value2 > 0) {
       TokenManagerPlugin.getInstance().removeTokens(player2.getUniqueId().toString(), (long)value2);
-      TokenManagerPlugin.getInstance().addTokens(player1.getUniqueId().toString(), (long)value1);
+      TokenManagerPlugin.getInstance().addTokens(player1.getUniqueId().toString(), (long)value2);
     }
   }
 

@@ -10,7 +10,6 @@ import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import de.themoep.idconverter.IdMappings;
 import de.themoep.idconverter.IdMappings.Mapping;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

@@ -78,15 +78,13 @@ public class ItemFactory {
     item = item.clone();
     ItemMeta meta = item.getItemMeta();
     for (int i = 0; i < replace.length; i += 2) {
-      if (replace.length > i) {
-        String toReplace = replace[i];
-        String replaceWith = replace[i + 1];
-        meta.setDisplayName(meta.getDisplayName().replace(toReplace, replaceWith));
-        List<String> lore = meta.hasLore() ? meta.getLore() : Collections.emptyList();
-        for (int j = 0; j < lore.size(); j++)
-          lore.set(j, lore.get(j).replace(toReplace, replaceWith));
-        meta.setLore(lore);
-      }
+      String toReplace = replace[i];
+      String replaceWith = replace[i + 1];
+      meta.setDisplayName(meta.getDisplayName().replace(toReplace, replaceWith));
+      List<String> lore = meta.hasLore() ? meta.getLore() : Collections.emptyList();
+      for (int j = 0; j < lore.size(); j++)
+        lore.set(j, lore.get(j).replace(toReplace, replaceWith));
+      meta.setLore(lore);
     }
     item.setItemMeta(meta);
     return item;

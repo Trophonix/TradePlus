@@ -4,11 +4,11 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public abstract class Command {
+abstract class Command {
 
   private List<String> aliases;
 
-  public Command(List<String> aliases) {
+  Command(List<String> aliases) {
     this.aliases = aliases;
   }
 

@@ -11,16 +11,16 @@ import org.bukkit.inventory.ItemStack;
 public abstract class Extra {
 
   public final ItemStack icon;
-  final String name;
+  private final String name;
   final Player player1;
   final Player player2;
   final double increment;
   final ItemStack theirIcon;
   final double taxPercent;
   public double value1 = 0, value2 = 0;
-  double max1;
-  double max2;
-  long lastUpdatedMax = System.currentTimeMillis();
+  private double max1;
+  private double max2;
+  private long lastUpdatedMax = System.currentTimeMillis();
   double increment1;
   double increment2;
 
@@ -96,7 +96,7 @@ public abstract class Extra {
     if (value2 > max2) value2 = max2;
   }
 
-  public abstract double getMax(Player player);
+  protected abstract double getMax(Player player);
 
   public abstract void onTradeEnd();
 

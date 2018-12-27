@@ -2,34 +2,30 @@ package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.util.ItemFactory;
-import me.realized.tokenmanager.api.TokenManager;
-import org.bukkit.Bukkit;
+import me.realized.tokenmanager.TokenManagerPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class TokenManagerExtra extends Extra {
-
-  private TokenManager tokenManager;
-
+  
   public TokenManagerExtra(Player player1, Player player2, TradePlus pl) {
     super("tokenmanager", player1, player2, pl);
-    tokenManager = (TokenManager) Bukkit.getPluginManager().getPlugin("TokenManager");
   }
 
   @Override
   public double getMax(Player player) {
-    return tokenManager.getTokens(player).orElse(0);
+    return TokenManagerPlugin.getInstance().getTokens(player).orElse(0);
   }
 
   @Override
   public void onTradeEnd() {
     if (value1 > 0) {
-      tokenManager.removeTokens(player1.getUniqueId().toString(), (long)value1);
-      tokenManager.addTokens(player2.getUniqueId().toString(), (long)value1);
+      TokenManagerPlugin.getInstance().removeTokens(player1.getUniqueId().toString(), (long)value1);
+      TokenManagerPlugin.getInstance().addTokens(player2.getUniqueId().toString(), (long)value1);
     }
     if (value2 > 0) {
-      tokenManager.removeTokens(player2.getUniqueId().toString(), (long)value2);
-      tokenManager.addTokens(player1.getUniqueId().toString(), (long)value1);
+      TokenManagerPlugin.getInstance().removeTokens(player2.getUniqueId().toString(), (long)value2);
+      TokenManagerPlugin.getInstance().addTokens(player1.getUniqueId().toString(), (long)value1);
     }
   }
 

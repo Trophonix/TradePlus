@@ -17,6 +17,7 @@ public abstract class Extra {
   final ItemStack theirIcon;
   final double taxPercent;
   public double value1 = 0, value2 = 0;
+  double min;
   double max1;
   double max2;
   long lastUpdatedMax = System.currentTimeMillis();
@@ -27,7 +28,10 @@ public abstract class Extra {
     ConfigurationSection section = pl.getConfig().getConfigurationSection("extras." + name);
     this.player1 = player1;
     this.player2 = player2;
-    this.increment = section.getDouble("increment");
+    this.increment = section.getDouble("increment", 1D);
+    this.min = section.getDouble("minimum", 1D);
+    this.max1 = getMax(player1);
+    this.max2 = getMax(player2);
     this.increment1 = increment;
     this.increment2 = increment;
     ItemFactory factory = new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)

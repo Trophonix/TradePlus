@@ -11,13 +11,13 @@ import org.bukkit.inventory.ItemStack;
 public abstract class Extra {
 
   public final ItemStack icon;
+  final String name;
   final Player player1;
   final Player player2;
   final double increment;
   final ItemStack theirIcon;
   final double taxPercent;
   public double value1 = 0, value2 = 0;
-  double min;
   double max1;
   double max2;
   long lastUpdatedMax = System.currentTimeMillis();
@@ -25,13 +25,12 @@ public abstract class Extra {
   double increment2;
 
   Extra(String name, Player player1, Player player2, TradePlus pl) {
+    pl.getLogger().info("Initializing " + name + " extra...");
+    this.name = name;
     ConfigurationSection section = pl.getConfig().getConfigurationSection("extras." + name);
     this.player1 = player1;
     this.player2 = player2;
     this.increment = section.getDouble("increment", 1D);
-    this.min = section.getDouble("minimum", 1D);
-    this.max1 = getMax(player1);
-    this.max2 = getMax(player2);
     this.increment1 = increment;
     this.increment2 = increment;
     ItemFactory factory = new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
@@ -42,6 +41,11 @@ public abstract class Extra {
     this.theirIcon = new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
             .display('&', section.getString("theirdisplay", "&4ERROR")).build();
     this.taxPercent = section.getDouble("taxpercent", 0);
+  }
+
+  public void init() {
+    this.max1 = getMax(player1);
+    this.max2 = getMax(player2);
   }
 
   @SuppressWarnings("Duplicates")
@@ -99,5 +103,9 @@ public abstract class Extra {
   public abstract ItemStack getIcon(Player player);
 
   public abstract ItemStack getTheirIcon(Player player);
+
+  public String getName() {
+    return name;
+  }
 
 }

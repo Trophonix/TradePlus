@@ -75,6 +75,9 @@ public class Trade implements Listener {
       extras.add(new TokenEnchantExtra(player1, player2, pl));
     if (pl.getConfig().getBoolean("extras.tokenmanager.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenManager"))
       extras.add(new TokenManagerExtra(player1, player2, pl));
+    for (Extra extra : extras) {
+      extra.init();
+    }
     updateExtras();
     pl.getServer().getPluginManager().registerEvents(this, pl);
     pl.ongoingTrades.add(this);

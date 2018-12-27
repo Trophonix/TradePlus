@@ -145,7 +145,7 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.economy.taxpercent", 0);
 
       config.set("extras.experience.enabled", true);
-      config.set("extras.experience.material", "exp_bottle");
+      config.set("extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
       config.set("extras.experience.display", "&7Your current XP offer is &e%AMOUNT%");
       config.set("extras.experience.theirdisplay", "&7Their current XP offer is &e%AMOUNT%");
       config.set("extras.experience.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",

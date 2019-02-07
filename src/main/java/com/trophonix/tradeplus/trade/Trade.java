@@ -571,27 +571,27 @@ public class Trade implements Listener {
     return 54;
   }
 
-  private ItemStack putOnLeft(Inventory inv, ItemStack item, int amount) {
+  private ItemStack putOnLeft(Inventory inventory, ItemStack toMove, int amountToMove) {
     int moved = 0;
     for (int slot : InvUtils.leftSlots) {
-      ItemStack i = inv.getItem(slot);
-      if (i != null && i.isSimilar(item) && i.getAmount() < i.getType().getMaxStackSize()) {
-        while (i.getAmount() < i.getType().getMaxStackSize() && item.getAmount() > 0 && moved < amount) {
-          i.setAmount(i.getAmount() + 1);
-          item.setAmount(item.getAmount() - 1);
+      ItemStack inInventory = inventory.getItem(slot);
+      if (inInventory != null && inInventory.isSimilar(toMove) && inInventory.getAmount() < inInventory.getType().getMaxStackSize()) {
+        while (inInventory.getAmount() < inInventory.getType().getMaxStackSize() && toMove.getAmount() > 0 && moved < amountToMove) {
+          inInventory.setAmount(inInventory.getAmount() + 1);
+          toMove.setAmount(toMove.getAmount() - 1);
         }
-        if (item.getAmount() <= 0 || moved == amount) {
+        if (toMove.getAmount() <= 0 || moved == amountToMove) {
           return null;
         }
       }
     }
     for (int slot : InvUtils.leftSlots) {
-      ItemStack i = inv.getItem(slot);
+      ItemStack i = inventory.getItem(slot);
       if (!(i == null || i.getType().equals(Material.AIR))) continue;
-      inv.setItem(slot, item);
-      item = null;
+      inventory.setItem(slot, toMove);
+      toMove = null;
     }
-    return item;
+    return toMove;
   }
 
   private boolean isBlocked(ItemStack item) {

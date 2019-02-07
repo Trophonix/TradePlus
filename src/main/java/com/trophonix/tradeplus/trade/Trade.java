@@ -237,12 +237,18 @@ public class Trade implements Listener {
               }
             }
           }
-        } else if (click == ClickType.SHIFT_LEFT) {
+        } else if (click.name().contains("SHIFT")) {
           event.setCancelled(true);
           if (accept1 && accept2) return;
+          if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+            accept1 = false;
+            accept2 = false;
+            updateAcceptance();
+          }
           ItemStack current = event.getCurrentItem();
+          int amount = click.name().contains("LEFT") ? current.getMaxStackSize() : 1;
           if (current != null) {
-            player.getInventory().setItem(event.getSlot(), putOnLeft(player.equals(player1) ? inv1 : inv2, current));
+            player.getInventory().setItem(event.getSlot(), putOnLeft(player.equals(player1) ? inv1 : inv2, current, amount));
             if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
               Sounds.click(player1, 2);
               Sounds.click(player2, 2);
@@ -565,15 +571,16 @@ public class Trade implements Listener {
     return 54;
   }
 
-  private ItemStack putOnLeft(Inventory inv, ItemStack item) {
+  private ItemStack putOnLeft(Inventory inv, ItemStack item, int amount) {
+    int moved = 0;
     for (int slot : InvUtils.leftSlots) {
       ItemStack i = inv.getItem(slot);
       if (i != null && i.isSimilar(item) && i.getAmount() < i.getType().getMaxStackSize()) {
-        while (i.getAmount() < i.getType().getMaxStackSize() && item.getAmount() > 0) {
+        while (i.getAmount() < i.getType().getMaxStackSize() && item.getAmount() > 0 && moved < amount) {
           i.setAmount(i.getAmount() + 1);
           item.setAmount(item.getAmount() - 1);
         }
-        if (item.getAmount() <= 0) {
+        if (item.getAmount() <= 0 || moved == amount) {
           return null;
         }
       }

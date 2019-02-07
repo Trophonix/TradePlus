@@ -224,15 +224,15 @@ public class Trade implements Listener {
               ItemStack i = open.getItem(j);
               if (i != null && i.isSimilar(cursor)) {
                 int amount = cursor.getAmount() + i.getAmount();
-                if (amount <= 64) {
+                if (amount <= cursor.getMaxStackSize()) {
                   open.setItem(j, null);
                   cursor.setAmount(amount);
                 } else {
-                  int buffer = 64 - cursor.getAmount();
+                  int buffer = cursor.getMaxStackSize() - cursor.getAmount();
                   i.setAmount(i.getAmount() - buffer);
-                  cursor.setAmount(64);
+                  cursor.setAmount(cursor.getMaxStackSize());
                 }
-                if (cursor.getAmount() >= 64)
+                if (cursor.getAmount() >= cursor.getMaxStackSize())
                   break;
               }
             }

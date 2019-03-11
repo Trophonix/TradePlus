@@ -8,6 +8,10 @@
     <artifactId>TradePlus</artifactId>
     <version>3.20</version>
 
+    <properties>
+        <res>${project.basedir}/res/</res>
+    </properties>
+
     <repositories>
         <repository>
             <id>trophonix-internal</id>
@@ -64,21 +68,24 @@
             <groupId>com.github.TechFortress</groupId>
             <artifactId>GriefPrevention</artifactId>
             <version>16.7.1</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${res}/GriefPrevention.jar</systemPath>
         </dependency>
 
         <dependency>
             <groupId>org.black_ixx</groupId>
             <artifactId>PlayerPoints</artifactId>
             <version>2.1.4</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${res}/PlayerPoints.jar</systemPath>
         </dependency>
 
         <dependency>
             <groupId>com.enjin.mc</groupId>
             <artifactId>enjin-mc-plugin</artifactId>
             <version>3.4.3</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${res}/EnjinMinecraftPlugin.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -99,7 +106,8 @@
             <groupId>com.github.Realizedd</groupId>
             <artifactId>TokenManager</artifactId>
             <version>c0acc20b16</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${res}/TokenManager.jar</systemPath>
         </dependency>
 
         <dependency>

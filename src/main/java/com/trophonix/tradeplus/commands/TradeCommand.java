@@ -114,7 +114,9 @@ public class TradeCommand extends Command {
           accept = true;
       }
       if (accept) {
-        Bukkit.getPluginManager().callEvent(new TradeAcceptEvent(receiver, player));
+        TradeAcceptEvent tradeAcceptEvent = new TradeAcceptEvent(receiver, player);
+        Bukkit.getPluginManager().callEvent(tradeAcceptEvent);
+        if (tradeAcceptEvent.isCancelled()) return;
         MsgUtils.send(receiver, pl.getLang().getString("accept.sender").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
         MsgUtils.send(player, pl.getLang().getString("accept.receiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
         new Trade(player, receiver);

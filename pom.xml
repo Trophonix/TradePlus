@@ -14,18 +14,13 @@
 
     <repositories>
         <repository>
-            <id>trophonix-internal</id>
-            <url>http://repo.trophonix.com/repository/internal</url>
-        </repository>
-
-	    <repository>
-            <id>trophonix-snapshot</id>
-            <url>http://repo.trophonix.com/repository/snapshot</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
 
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
 
         <repository>
@@ -53,7 +48,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.13.1-R0.1-SNAPSHOT</version>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -92,14 +87,16 @@
             <groupId>com.vk2gpz.tokenenchant</groupId>
             <artifactId>api</artifactId>
             <version>10.0.0</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${res}/TokenEnchantAPI.jar</systemPath>
         </dependency>
 
         <dependency>
             <groupId>com.github.kicjow</groupId>
             <artifactId>Crazy-Crates</artifactId>
-            <version>ce74cb8594</version>
-            <scope>provided</scope>
+            <version>v1.8.5</version>
+            <scope>system</scope>
+            <systemPath>${res}/CrazyCrates.jar</systemPath>
         </dependency>
 
         <dependency>

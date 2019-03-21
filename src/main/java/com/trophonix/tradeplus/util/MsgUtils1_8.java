@@ -1,5 +1,6 @@
 package com.trophonix.tradeplus.util;
 
+
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;

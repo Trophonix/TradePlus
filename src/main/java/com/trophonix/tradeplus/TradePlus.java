@@ -32,6 +32,8 @@ public class TradePlus extends JavaPlugin {
   private FileConfiguration lang;
   private CommandHandler commandHandler;
 
+  private boolean debugMode;
+
   public Trade getTrade(Player player) {
     for (Trade trade : ongoingTrades) {
       if (trade.player1.equals(player) || trade.player2.equals(player))
@@ -215,6 +217,8 @@ public class TradePlus extends JavaPlugin {
       config.set("soundeffects.onaccept", true);
       config.set("soundeffects.oncomplete", true);
       config.set("soundeffects.oncountdown", true);
+
+      config.set("debug-mode", false);
 
       config.set("configversion", Double.parseDouble(getDescription().getVersion()));
       try {
@@ -538,6 +542,10 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.tokenmanager.increment", 1);
         config.set("extras.tokenmanager.taxpercent", 0);
       }
+
+      if (configVersion < 3.23) {
+        config.set("debug-mode", false);
+      }
     }
 
     List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
@@ -584,6 +592,7 @@ public class TradePlus extends JavaPlugin {
 
   public void reload() {
     config = YamlConfiguration.loadConfiguration(configFile);
+    debugMode = config.getBoolean("debug-mode", false);
     lang = YamlConfiguration.loadConfiguration(langFile);
     InvUtils.reloadItems(this);
     commandHandler.clear();
@@ -598,6 +607,12 @@ public class TradePlus extends JavaPlugin {
       lang.save(langFile);
     } catch (IOException ex) {
       ex.printStackTrace();
+    }
+  }
+
+  public void log(String message) {
+    if (debugMode) {
+      getLogger().info(message);
     }
   }
 

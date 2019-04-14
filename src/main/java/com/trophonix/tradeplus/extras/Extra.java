@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class Extra {
 
+  private TradePlus pl;
   public final ItemStack icon;
   private final String name;
   final Player player1;
@@ -25,7 +26,7 @@ public abstract class Extra {
   double increment2;
 
   Extra(String name, Player player1, Player player2, TradePlus pl) {
-    pl.getLogger().info("Initializing " + name + " extra...");
+    this.pl = pl;
     this.name = name;
     ConfigurationSection section = pl.getConfig().getConfigurationSection("extras." + name);
     this.player1 = player1;
@@ -46,6 +47,7 @@ public abstract class Extra {
   public void init() {
     this.max1 = getMax(player1);
     this.max2 = getMax(player2);
+    this.pl.log("'" + name + "' extra initialized. Balances: [" + max1 + ", " + max2 + "]");
   }
 
   @SuppressWarnings("Duplicates")

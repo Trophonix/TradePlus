@@ -129,7 +129,8 @@ public class Trade implements Listener {
             (event.getCursor() == null || event.getCursor().getType().equals(Material.AIR)))) return;
     int slot = event.getSlot();
     if (inv.equals(inv1) || inv.equals(inv2)) {
-      if (inv.getItem(49) == null || inv.getItem(49).getType().equals(Material.AIR)) {
+      ItemStack item49 = inv.getItem(49);
+      if (item49 == null || item49.getType().equals(Material.AIR)) {
         event.setCancelled(true);
         event.setResult(InventoryClickEvent.Result.DENY);
         return;
@@ -164,47 +165,50 @@ public class Trade implements Listener {
       } else {
         event.setCancelled(true);
         event.setResult(InventoryClickEvent.Result.DENY);
-        if (inv.getItem(slot) != null && (inv.getItem(slot).isSimilar(InvUtils.acceptTrade)
-                || inv.getItem(slot).isSimilar(InvUtils.cancelTrade))) {
-          if (!forced) {
-            if (player.equals(player1)) {
-              accept1 = !accept1;
-            } else {
-              accept2 = !accept2;
-            }
-            updateAcceptance();
-            checkAcceptance();
-          }
-        } else if (slot == 49) {
-          if (inv.getItem(slot).isSimilar(InvUtils.force)) {
-            if (forced) {
-              forced = false;
-              accept1 = false;
-              accept2 = false;
-              updateAcceptance();
-              checkAcceptance();
-            } else {
-              forced = true;
-              accept1 = true;
-              accept2 = true;
+        ItemStack item = inv.getItem(slot);
+        if (item != null) {
+          if (item.isSimilar(InvUtils.acceptTrade)
+                  || item.isSimilar(InvUtils.cancelTrade)) {
+            if (!forced) {
+              if (player.equals(player1)) {
+                accept1 = !accept1;
+              } else {
+                accept2 = !accept2;
+              }
               updateAcceptance();
               checkAcceptance();
             }
-          }
-        } else {
-          Extra extra = getExtra(slot);
-          if (extra != null) {
-            if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept", true) && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2)))
-              return;
-            if (task != null)
-              return;
-            extra.onClick(player, event.getClick());
-            updateExtras();
-            if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-              Sounds.click(player1, 2);
-              Sounds.click(player2, 2);
-              spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
-                      Sounds.click((Player) p, 2));
+          } else if (slot == 49) {
+            if (item.isSimilar(InvUtils.force)) {
+              if (forced) {
+                forced = false;
+                accept1 = false;
+                accept2 = false;
+                updateAcceptance();
+                checkAcceptance();
+              } else {
+                forced = true;
+                accept1 = true;
+                accept2 = true;
+                updateAcceptance();
+                checkAcceptance();
+              }
+            }
+          } else {
+            Extra extra = getExtra(slot);
+            if (extra != null) {
+              if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept", true) && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2)))
+                return;
+              if (task != null)
+                return;
+              extra.onClick(player, event.getClick());
+              updateExtras();
+              if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+                Sounds.click(player1, 2);
+                Sounds.click(player2, 2);
+                spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
+                                                                                                Sounds.click((Player) p, 2));
+              }
             }
           }
         }
@@ -496,10 +500,11 @@ public class Trade implements Listener {
                   int slot = InvUtils.leftSlots.get(i);
                   ItemStack item1 = inv1.getItem(slot);
                   ItemStack item2 = inv2.getItem(slot);
-                  if (!(
-                          ((item1 == null && accepted1[i] == null) || (item1 != null && accepted1[i] != null && item1.isSimilar(accepted1[i])))
-                          && ((item2 == null && accepted2[i] == null) || (item2 != null && accepted2[i] != null && item2.isSimilar(accepted2[i])))
-                  )) {
+                  boolean similar1 = similar(item1, accepted1[i]);
+                  boolean similar2 = similar(item2, accepted2[i]);
+                  if (!(similar1 && similar2)) {
+                    pl.log("Found discrepancy in trade between " + player1.getName() + " and " + player2.getName());
+                    pl.log(" [slot " + i + "] '" + (similar1 ? item1 : item2).getType().name() + "' vs '" + (similar1 ? accepted1[i] : accepted2[i]).getType().name() + "'");
                     MsgUtils.send(player1, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player2.getName()).split("%NEWLINE%"));
                     MsgUtils.send(player2, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player1.getName()).split("%NEWLINE%"));
                     giveItemsOnLeft(inv1, player1);
@@ -509,8 +514,12 @@ public class Trade implements Listener {
                 }
               }
 
+              pl.log("Giving " + player2.getName() + " items from " + player1.getName());
               giveItemsOnLeft(inv1, player2);
+
+              pl.log("Giving " + player1.getName() + " items from " + player2.getName());
               giveItemsOnLeft(inv2, player1);
+
               for (Extra extra : extras)
                 extra.onTradeEnd();
 
@@ -659,6 +668,10 @@ public class Trade implements Listener {
       }
     }
     return false;
+  }
+
+  private boolean similar(ItemStack item1, ItemStack item2) {
+    return item1 == item2 || (item1 != null && item2 != null && item1.isSimilar(item2));
   }
 
 }

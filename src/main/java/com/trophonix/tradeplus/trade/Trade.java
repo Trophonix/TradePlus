@@ -295,7 +295,7 @@ public class Trade implements Listener {
       player2.closeInventory();
       MsgUtils.send(player1, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player2.getName()));
       MsgUtils.send(player2, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player1.getName()));
-      spectatorInv.getViewers().forEach(HumanEntity::closeInventory);
+      new ArrayList<>(spectatorInv.getViewers()).forEach(HumanEntity::closeInventory);
     }
   }
 

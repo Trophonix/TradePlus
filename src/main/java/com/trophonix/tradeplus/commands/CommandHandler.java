@@ -2,6 +2,7 @@ package com.trophonix.tradeplus.commands;
 
 import com.trophonix.tradeplus.TradePlus;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
@@ -24,7 +25,7 @@ public class CommandHandler implements Listener {
     commands.clear();
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onCommand(PlayerCommandPreprocessEvent event) {
     String[] cmd = event.getMessage().substring(1).split("\\s+");
     String[] args = new String[cmd.length - 1];

@@ -1,19 +1,26 @@
 package com.trophonix.tradeplus.util;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class MsgUtils {
 
-  private static int version;
+  private static boolean clickableMessages;
+
+  static {
+    try {
+      clickableMessages = Class.forName("net.md_5.bungee.api.chat.TextComponent") != null;
+    } catch (ClassNotFoundException ignored) {
+      clickableMessages = false;
+    }
+  }
 
   public static void send(Player player, String onHover, String onClick, String[] messages) {
-    if (version < 18) {
-      send(player, messages);
-    } else {
+    if (clickableMessages) {
       MsgUtils1_8.send(player, onHover, onClick, messages);
+    } else {
+      send(player, messages);
     }
   }
 
@@ -33,11 +40,6 @@ public class MsgUtils {
 
   public static void send(CommandSender sender, String message) {
     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-  }
-
-  public static void initMsgUtils() {
-    String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
-    version = Integer.parseInt(split[0].replace("v", "") + split[1]);
   }
 
 }

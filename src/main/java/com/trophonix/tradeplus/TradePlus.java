@@ -73,7 +73,6 @@ public class TradePlus extends JavaPlugin {
     config = YamlConfiguration.loadConfiguration(configFile);
     langFile = new File(getDataFolder(), "lang.yml");
     lang = YamlConfiguration.loadConfiguration(langFile);
-    MsgUtils.initMsgUtils();
     Sounds.loadSounds();
     if (!getDataFolder().exists()) {
       getDataFolder().mkdirs();

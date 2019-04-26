@@ -605,7 +605,7 @@ public class Trade implements Listener {
 
   private boolean isBlocked(ItemStack item) {
     if (item == null || item.getType() == null || item.getType().equals(Material.AIR)) return false;
-    if (pl.getConfig().getBoolean("blocked.named-items") && item.hasItemMeta() && item.getItemMeta().hasDisplayName())
+    if (pl.getConfig().getBoolean("blocked.named-items", false) && item.hasItemMeta() && item.getItemMeta().hasDisplayName())
       return true;
     if (item.hasItemMeta()) {
       String regex = ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("blocked.regex", ""));
@@ -625,7 +625,7 @@ public class Trade implements Listener {
         }
       }
       List<String> blockedLore = pl.getConfig().getStringList("blocked.lore");
-      if (blockedLore != null) {
+      if (blockedLore != null || !blockedLore.isEmpty()) {
         for (int i = 0; i < blockedLore.size(); i++) {
           String line = ChatColor.translateAlternateColorCodes('&', blockedLore.get(i));
           if (line.length() > 2) line = line.substring(1, line.length() - 1);
@@ -648,7 +648,7 @@ public class Trade implements Listener {
       }
     }
     List<String> blocked = pl.getConfig().getStringList("blocked.blacklist");
-    if (blocked == null) return false;
+    if (blocked == null || blocked.isEmpty()) return false;
     List<String> checks = new ArrayList<>();
     String type = item.getType().toString();
     byte data = item.getData().getData();

@@ -78,18 +78,22 @@ public class ItemFactory {
     item = item.clone();
     if (!item.hasItemMeta()) return item;
     ItemMeta meta = item.getItemMeta();
-    for (int i = 0; i < replace.length; i += 2) {
-      String toReplace = replace[i];
-      String replaceWith = replace[i + 1];
-      if (item.getItemMeta().hasDisplayName()) {
-        meta.setDisplayName(meta.getDisplayName().replace(toReplace, replaceWith));
-      }
-      if (meta.hasLore()) {
-        List<String> lore = meta.getLore();
-        for (int j = 0; j < lore.size(); j++)
-          lore.set(j, lore.get(j).replace(toReplace, replaceWith));
-        meta.setLore(lore);
-      }
+    if (meta != null) {
+      try {
+        for (int i = 0; i < replace.length; i += 2) {
+          String toReplace = replace[i];
+          String replaceWith = replace[i + 1];
+          if (meta.hasDisplayName()) {
+            meta.setDisplayName(meta.getDisplayName().replace(toReplace, replaceWith));
+          }
+          if (meta.hasLore()) {
+            List<String> lore = meta.getLore();
+            for (int j = 0; j < lore.size(); j++)
+              lore.set(j, lore.get(j).replace(toReplace, replaceWith));
+            meta.setLore(lore);
+          }
+        }
+      } catch (Exception ignored) { }
     }
     item.setItemMeta(meta);
     return item;

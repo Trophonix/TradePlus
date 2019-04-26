@@ -552,6 +552,7 @@ public class TradePlus extends JavaPlugin {
       fixList.add(getConfig().getString("extras." + key + ".material"));
     }
     for (String key : fixList) {
+      if (key == null || key.equals("")) continue;
       if (config.contains(key)) {
         String val = config.getString(key).toUpperCase();
         if (Material.getMaterial(val) == null) {

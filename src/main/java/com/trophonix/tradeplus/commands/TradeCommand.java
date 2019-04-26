@@ -65,7 +65,7 @@ public class TradeCommand extends Command {
         MsgUtils.send(player, pl.getLang().getString("errors.player-not-found").replace("%PLAYER%", args[0]).split("%NEWLINE%"));
         return;
       }
-      if (pl.getConfig().getBoolean("allow-trade-in-creative", true)) {
+      if (!pl.getConfig().getBoolean("allow-trade-in-creative", true)) {
         if (player.getGameMode().equals(GameMode.CREATIVE)) {
           MsgUtils.send(player, pl.getLang().getString("errors.creative").split("%NEWLINE%"));
           return;

@@ -8,8 +8,7 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
-import de.themoep.idconverter.IdMappings;
-import de.themoep.idconverter.IdMappings.Mapping;
+import com.trophonix.tradeplus.util.UMaterial;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -554,23 +553,21 @@ public class TradePlus extends JavaPlugin {
     for (String key : fixList) {
       if (key == null || key.equals("")) continue;
       if (config.contains(key)) {
-        String val = config.getString(key).toUpperCase();
+        String val = config.getString(key).replace(" ", "_").toUpperCase();
         if (Material.getMaterial(val) == null) {
           if (val.contains(":")) {
             String[] split = val.split(":");
             if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
           }
 
-          Mapping mapping = IdMappings.getById(val);
-          if (mapping == null) mapping = IdMappings.getByLegacyType(val);
-          if (mapping == null) mapping = IdMappings.getByFlatteningType(val);
-          if (mapping == null) {
-            getLogger().warning("Couldn't find mapping for " + val + ". This could cause a crash.");
+          UMaterial uMat = UMaterial.match(val);
+          if (uMat == null) {
+            getLogger().warning("Couldn't find material for " + val + ". This could cause a crash.");
             getLogger().warning("Make sure this is a valid material before reporting this as a bug.");
             continue;
           }
 
-          String name = Sounds.version < 113 ? mapping.getLegacyType() + (mapping.getData() > 0 ? ":" + mapping.getData() : "") : mapping.getFlatteningType();
+          String name = uMat.getMaterial().name() + (uMat.getData() > 0 ? ":" + uMat.getData() : "");
           config.set(key, name);
           getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
         }

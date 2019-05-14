@@ -604,7 +604,7 @@ public class Trade implements Listener {
   }
 
   private boolean isBlocked(ItemStack item) {
-    if (item == null || item.getType() == null || item.getType().equals(Material.AIR)) return false;
+    if (item == null || item.getType().equals(Material.AIR)) return false;
     if (pl.getConfig().getBoolean("blocked.named-items", false) && item.hasItemMeta() && item.getItemMeta().hasDisplayName())
       return true;
     if (item.hasItemMeta()) {
@@ -655,11 +655,13 @@ public class Trade implements Listener {
     checks.add(type + ":" + data);
     checks.add(type.replace("_", "") + ":" + data);
     checks.add(type.replace("_", " ") + ":" + data);
-    checks.add(item.getType().getId() + ":" + data);
+    try { // Throws exception for materials added after the flattening
+      checks.add(item.getType().getId() + ":" + data);
+      checks.add(Integer.toString(item.getType().getId()));
+    } catch (IllegalArgumentException ignored) {}
     checks.add(type);
     checks.add(type.replace("_", ""));
     checks.add(type.replace("_", " "));
-    checks.add(Integer.toString(item.getType().getId()));
     for (String block : blocked) {
       for (String check : checks) {
         if (block.equalsIgnoreCase(check)) {

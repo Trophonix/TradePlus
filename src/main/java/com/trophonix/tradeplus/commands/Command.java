@@ -2,6 +2,7 @@ package com.trophonix.tradeplus.commands;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
 
 abstract class Command {
@@ -17,5 +18,9 @@ abstract class Command {
   }
 
   public abstract void onCommand(CommandSender sender, String[] args);
+
+  public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
+    return Collections.emptyList();
+  }
 
 }

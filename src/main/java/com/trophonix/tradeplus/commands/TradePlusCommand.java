@@ -7,7 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TradePlusCommand extends Command {
 
@@ -96,4 +99,18 @@ public class TradePlusCommand extends Command {
     });
   }
 
+  List<String> arg0 = Arrays.asList("reload", "rl", "force", "spectate");
+
+  @Override public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
+    if (args.length == 0) {
+      return arg0;
+    } else if (args.length == 1 && !full.endsWith(" ")) {
+      return arg0.stream().filter(name -> !name.equalsIgnoreCase(args[0]) && name.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+    } else if (args.length > 1 && !full.endsWith(" ") && (args[0].equalsIgnoreCase("force") || args[0].equalsIgnoreCase("spectate"))) {
+      return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(
+          name -> !name.equalsIgnoreCase(args[args.length - 1])  && name.toLowerCase().startsWith(
+              args[args.length - 1])).collect(Collectors.toList());
+    }
+    return super.onTabComplete(sender, args, full);
+  }
 }

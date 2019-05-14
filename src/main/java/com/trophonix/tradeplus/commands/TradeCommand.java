@@ -13,7 +13,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class TradeCommand extends Command {
 
@@ -146,6 +150,19 @@ public class TradeCommand extends Command {
       return;
     }
     MsgUtils.send(player, pl.getLang().getString("errors.invalid-usage").split("%NEWLINE%"));
+  }
+
+  @Override public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
+    List<String> args0 = new ArrayList<>();
+    args0.add("deny");
+    args0.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+    if (args.length == 0) {
+      return args0;
+    } else if (args.length == 1) {
+      return args0.stream().filter(name -> !name.equalsIgnoreCase(args[0]) && name.toLowerCase(
+      ).startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+    }
+    return super.onTabComplete(sender, args, full);
   }
 
 }

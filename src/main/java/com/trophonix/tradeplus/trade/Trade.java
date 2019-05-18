@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -28,12 +29,17 @@ import java.util.stream.Collectors;
 public class Trade implements Listener {
 
   private static final List<Integer> extraSlots = new LinkedList<>(Arrays.asList(45, 46, 47, 48, 39, 38, 37, 36, 27, 28, 29, 30));
+
+  private final TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
+
+  private boolean cancelOnClose1 = true, cancelOnClose2 = true;
+
   public final Player player1;
   public final Player player2;
+
   public final Inventory spectatorInv;
-  private final TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
-  private final Inventory inv1;
-  private final Inventory inv2;
+  public final Inventory inv1;
+  public final Inventory inv2;
   private final List<Extra> extras = new ArrayList<>();
   private final long startTime = System.currentTimeMillis();
   private boolean accept1, accept2;
@@ -59,22 +65,22 @@ public class Trade implements Listener {
     if (pl.getConfig().getBoolean("extras.economy.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("Vault")) {
       try {
         if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null)
-          extras.add(new EconomyExtra(player1, player2, pl));
+          extras.add(new EconomyExtra(player1, player2, pl, this));
       } catch (Exception ignored) {
       }
     }
     if (pl.getConfig().getBoolean("extras.experience.enabled", true))
-      extras.add(new ExperienceExtra(player1, player2, pl));
+      extras.add(new ExperienceExtra(player1, player2, pl, this));
     if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints"))
-      extras.add(new PlayerPointsExtra(player1, player2, pl));
+      extras.add(new PlayerPointsExtra(player1, player2, pl, this));
     if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention"))
-      extras.add(new GriefPreventionExtra(player1, player2, pl));
+      extras.add(new GriefPreventionExtra(player1, player2, pl, this));
     if (pl.getConfig().getBoolean("extras.enjinpoints.enabled", false) && pl.getServer().getPluginManager().isPluginEnabled("EnjinMinecraftPlugin"))
-      extras.add(new EnjinPointsExtra(player1, player2, pl));
+      extras.add(new EnjinPointsExtra(player1, player2, pl, this));
     if (pl.getConfig().getBoolean("extras.tokenenchant.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenEnchant"))
-      extras.add(new TokenEnchantExtra(player1, player2, pl));
+      extras.add(new TokenEnchantExtra(player1, player2, pl, this));
     if (pl.getConfig().getBoolean("extras.tokenmanager.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenManager"))
-      extras.add(new TokenManagerExtra(player1, player2, pl));
+      extras.add(new TokenManagerExtra(player1, player2, pl, this));
     for (Extra extra : extras) {
       extra.init();
     }
@@ -88,8 +94,7 @@ public class Trade implements Listener {
     if (!(event.getWhoClicked() instanceof Player)) return;
     Player player = (Player) event.getWhoClicked();
     Inventory inv = event.getInventory();
-    if (inv == null) return;
-    if (inv.equals(inv1) || inv.equals(inv2)) {
+    if (inv1.getViewers().contains(player) || inv2.getViewers().contains(player)) {
       if (accept1 && accept2) {
         event.setCancelled(true);
         return;
@@ -128,7 +133,7 @@ public class Trade implements Listener {
     if (inv == null || ((event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) &&
             (event.getCursor() == null || event.getCursor().getType().equals(Material.AIR)))) return;
     int slot = event.getSlot();
-    if (inv.equals(inv1) || inv.equals(inv2)) {
+    if (event.getRawSlot() < event.getView().getTopInventory().getSize() && (inv1.getViewers().contains(player) || inv2.getViewers().contains(player))) {
       ItemStack item49 = inv.getItem(49);
       if (item49 == null || item49.getType().equals(Material.AIR)) {
         event.setCancelled(true);
@@ -215,7 +220,7 @@ public class Trade implements Listener {
       }
     } else if (inv.equals(player.getInventory())) {
       Inventory open = player.getOpenInventory().getTopInventory();
-      if (open != null && (open.equals(inv1) || open.equals(inv2))) {
+      if (inv1.getViewers().contains(player) || inv2.getViewers().contains(player)) {
         if (click.equals(ClickType.DOUBLE_CLICK)) {
           event.setCancelled(true);
           if (accept1 && accept2) {
@@ -281,7 +286,9 @@ public class Trade implements Listener {
   public void onClose(InventoryCloseEvent event) {
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) return;
-    if (closed.equals(inv1) || closed.equals(inv2)) {
+    if (closed.equals(inv1) || closed.equals(inv2) || inv1.getViewers().contains(event.getPlayer()) || inv2.getViewers().contains(event.getPlayer())) {
+      if ( (event.getPlayer().equals(player1) && !cancelOnClose1) ||
+            event.getPlayer().equals(player2) && !cancelOnClose2 ) return;
       HandlerList.unregisterAll(this);
       if (closed.getItem(49) == null) return;
       pl.ongoingTrades.remove(this);
@@ -358,8 +365,9 @@ public class Trade implements Listener {
   }
 
   @EventHandler
-  public void onPickup(final PlayerPickupItemEvent event) {
-    Player player = event.getPlayer();
+  public void onPickup(EntityPickupItemEvent event) {
+    if (!(event.getEntity() instanceof Player)) return;
+    Player player = (Player) event.getEntity();
     if (player.equals(this.player1) || player.equals(this.player2)) {
       event.setCancelled(true);
     }
@@ -405,7 +413,7 @@ public class Trade implements Listener {
     player2.updateInventory();
   }
 
-  private void updateExtras() {
+  public void updateExtras() {
     int slot1 = 0, slot2a = 0, slot2b = 0;
     for (int i = 0; i < extraSlots.size(); i++) {
       if (i >= extras.size()) break;
@@ -585,7 +593,7 @@ public class Trade implements Listener {
     for (int slot : InvUtils.leftSlots) {
       ItemStack inInventory = inventory.getItem(slot);
       if (inInventory != null && inInventory.isSimilar(toMove) && inInventory.getAmount() < inInventory.getType().getMaxStackSize()) {
-        while (inInventory.getAmount() < inInventory.getType().getMaxStackSize() && toMove.getAmount() > 0 && moved < amountToMove) {
+        while (inInventory.getAmount() < inInventory.getType().getMaxStackSize() && toMove.getAmount() > 0 && moved++ < amountToMove) {
           inInventory.setAmount(inInventory.getAmount() + 1);
           toMove.setAmount(toMove.getAmount() - 1);
         }
@@ -674,6 +682,16 @@ public class Trade implements Listener {
 
   private boolean similar(ItemStack item1, ItemStack item2) {
     return item1 == item2 || (item1 != null && item2 != null && item1.isSimilar(item2));
+  }
+
+  public void setCancelOnClose(Player player, boolean cancelOnClose) {
+    if (player1.equals(player)) {
+      System.out.println("Cancel on close for player 1 " + cancelOnClose);
+      cancelOnClose1 = cancelOnClose;
+    } else if (player2.equals(player)) {
+      System.out.println("Cancel on close for player 2 " + cancelOnClose);
+      cancelOnClose2 = cancelOnClose;
+    }
   }
 
 }

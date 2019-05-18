@@ -1,6 +1,7 @@
 package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import me.realized.tokenmanager.TokenManagerPlugin;
 import org.bukkit.entity.Player;
@@ -8,8 +9,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class TokenManagerExtra extends Extra {
   
-  public TokenManagerExtra(Player player1, Player player2, TradePlus pl) {
-    super("tokenmanager", player1, player2, pl);
+  public TokenManagerExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
+    super("tokenmanager", player1, player2, pl, trade);
   }
 
   @Override

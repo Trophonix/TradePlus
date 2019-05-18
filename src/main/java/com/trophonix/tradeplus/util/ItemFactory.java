@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.trophonix.tradeplus.TradePlus;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemFactory {
 
@@ -20,10 +22,11 @@ public class ItemFactory {
   private byte data = 0;
   private String display = "";
   private List<String> lore = new ArrayList<>();
+  private List<ItemFlag> flags = new ArrayList<>();
 
-    /*public ItemFactory(Material material) {
+  public ItemFactory(Material material) {
         this.material = material;
-    }*/
+    }
 
   public ItemFactory(String parsable, Material fallback) {
     Preconditions.checkNotNull(parsable, "Material cannot be null.");
@@ -64,7 +67,7 @@ public class ItemFactory {
     ItemMeta meta = item.getItemMeta();
     if (meta != null) {
       try {
-        for (int i = 0; i < replace.length; i += 2) {
+        for (int i = 0; i < replace.length - 1; i += 2) {
           String toReplace = replace[i];
           String replaceWith = replace[i + 1];
           if (meta.hasDisplayName()) {
@@ -72,6 +75,7 @@ public class ItemFactory {
           }
           if (meta.hasLore()) {
             List<String> lore = meta.getLore();
+            assert lore != null;
             for (int j = 0; j < lore.size(); j++)
               lore.set(j, lore.get(j).replace(toReplace, replaceWith));
             meta.setLore(lore);
@@ -81,6 +85,17 @@ public class ItemFactory {
     }
     item.setItemMeta(meta);
     return item;
+  }
+
+  public ItemFactory replace(String... replace) {
+    for (int i = 0; i < replace.length - 1; i += 2) {
+      this.display = this.display.replace(replace[i], replace[i + 1]);
+      if (this.lore != null) {
+        int n = i;
+        this.lore = this.lore.stream().map(str -> str.replace(replace[n], replace[n + 1])).collect(Collectors.toList());
+      }
+    }
+    return this;
   }
 
   public ItemStack build() {
@@ -95,8 +110,19 @@ public class ItemFactory {
       itemMeta.setDisplayName(display);
     if (!lore.isEmpty())
       itemMeta.setLore(lore);
+    itemMeta.addItemFlags(this.flags.toArray(new ItemFlag[0]));
     itemStack.setItemMeta(itemMeta);
     return itemStack;
+  }
+
+  public ItemFactory copy() {
+    ItemFactory copy = new ItemFactory(this.material);
+    copy.damage = damage;
+    copy.amount = amount;
+    copy.data = data;
+    copy.display = display;
+    copy.lore = lore;
+    return copy;
   }
 
   public ItemFactory amount(int amount) {
@@ -120,9 +146,15 @@ public class ItemFactory {
   }
 
   public ItemFactory lore(char colorChar, List<String> lore) {
+    if (lore == null) return this.lore(lore);
     for (int i = 0; i < lore.size(); i++)
       lore.set(i, ChatColor.translateAlternateColorCodes(colorChar, lore.get(i)));
     this.lore = lore;
+    return this;
+  }
+
+  public ItemFactory flag(ItemFlag flag) {
+    this.flags.add(flag);
     return this;
   }
 

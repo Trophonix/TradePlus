@@ -5,10 +5,8 @@ import com.trophonix.tradeplus.commands.TradeCommand;
 import com.trophonix.tradeplus.commands.TradePlusCommand;
 import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.trade.Trade;
-import com.trophonix.tradeplus.util.InvUtils;
-import com.trophonix.tradeplus.util.MsgUtils;
-import com.trophonix.tradeplus.util.Sounds;
-import com.trophonix.tradeplus.util.UMaterial;
+import com.trophonix.tradeplus.util.*;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,6 +30,8 @@ public class TradePlus extends JavaPlugin {
   private CommandHandler commandHandler;
 
   private boolean debugMode;
+
+  private String typeEmpty, typeValid, typeInvalid, typeMaximum;
 
   public Trade getTrade(Player player) {
     for (Trade trade : ongoingTrades) {
@@ -133,82 +133,74 @@ public class TradePlus extends JavaPlugin {
       config.set("gui.force.name", "&4&lForce Trade");
       config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
 
+      config.set("extras.type.material", "paper");
+      config.set("extras.type.empty", "&eEnter a new amount to offer.");
+      config.set("extras.type.valid", "&aClick output slot to submit offer.");
+      config.set("extras.type.invalid", "&cInvalid amount entered!");
+      config.set("extras.type.maximum", "&cYour balance is %BALANCE%");
+
       config.set("extras.economy.enabled", true);
       config.set("extras.economy.material", "gold_ingot");
-      config.set("extras.economy.display", "&7Your current money offer is &e%AMOUNT%");
-      config.set("extras.economy.theirdisplay", "&7Their current money offer is &e%AMOUNT%");
-      config.set("extras.economy.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.economy.display", "&eYour current money offer is &6%AMOUNT%");
+      config.set("extras.economy.theirdisplay", "&eTheir current money offer is &6%AMOUNT%");
+      config.set("extras.economy.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.economy.increment", 10.0);
       config.set("extras.economy.taxpercent", 0);
+      config.set("extras.economy.mode", "type");
 
       config.set("extras.experience.enabled", true);
       config.set("extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
-      config.set("extras.experience.display", "&7Your current XP offer is &e%AMOUNT%");
-      config.set("extras.experience.theirdisplay", "&7Their current XP offer is &e%AMOUNT%");
-      config.set("extras.experience.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.experience.increment", 5);
       config.set("extras.experience.taxpercent", 0);
+      config.set("extras.experience.mode", "type");
 
       config.set("extras.playerpoints.enabled", true);
       config.set("extras.playerpoints.material", "diamond");
-      config.set("extras.playerpoints.display", "&7Your current PlayerPoints offer is &b%AMOUNT%");
-      config.set("extras.playerpoints.theirdisplay", "&7Their current PlayerPoints offer is &b%AMOUNT%");
-      config.set("extras.playerpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.playerpoints.display", "&bYour current PlayerPoints offer is &3%AMOUNT%");
+      config.set("extras.playerpoints.theirdisplay", "&bTheir current PlayerPoints offer is &3%AMOUNT%");
+      config.set("extras.playerpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.playerpoints.increment", 5);
       config.set("extras.playerpoints.taxpercent", 0);
+      config.set("extras.playerpoints.mode", "type");
 
       config.set("extras.griefprevention.enabled", true);
       config.set("extras.griefprevention.material", "diamond_pickaxe");
-      config.set("extras.griefprevention.display", "&7Your current GriefPrevention offer is &b%AMOUNT%");
-      config.set("extras.griefprevention.theirdisplay", "&7Their current GriefPrevention offer is &b%AMOUNT%");
-      config.set("extras.griefprevention.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.griefprevention.display", "&eYour current GriefPrevention offer is &6%AMOUNT%");
+      config.set("extras.griefprevention.theirdisplay", "&eTheir current GriefPrevention offer is &6%AMOUNT%");
+      config.set("extras.griefprevention.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.griefprevention.increment", 1);
       config.set("extras.griefprevention.taxperecent", 0);
+      config.set("extras.griefprevention.mode", "type");
 
       config.set("extras.enjinpoints.enabled", false);
       config.set("extras.enjinpoints.material", "emerald");
-      config.set("extras.enjinpoints.display", "&7Your current EnjinPoints offer is &b%AMOUNT%");
-      config.set("extras.enjinpoints.theirdisplay", "&7Their current EnjinPoints offer is &b%AMOUNT%");
-      config.set("extras.enjinpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.enjinpoints.display", "&eYour current EnjinPoints offer is &6%AMOUNT%");
+      config.set("extras.enjinpoints.theirdisplay", "&eTheir current EnjinPoints offer is &6%AMOUNT%");
+      config.set("extras.enjinpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.enjinpoints.increment", 1);
       config.set("extras.enjinpoints.taxpercent", 0);
+      config.set("extras.enjinpoints.mode", "type");
 
       config.set("extras.tokenenchant.enabled", true);
       config.set("extras.tokenenchant.material", "enchanted_book");
-      config.set("extras.tokenenchant.display", "&7Your current TokenEnchant tokens offer is &b%AMOUNT%");
-      config.set("extras.tokenenchant.theirdisplay", "Their current TokenEnchants tokens offer is &b%AMOUNT%");
-      config.set("extras.tokenenchant.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.tokenenchant.display", "&eYour current TokenEnchant tokens offer is &6%AMOUNT%");
+      config.set("extras.tokenenchant.theirdisplay", "&eTheir current TokenEnchants tokens offer is &6%AMOUNT%");
+      config.set("extras.tokenenchant.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenenchant.increment", 1);
       config.set("extras.tokenenchant.taxpercent", 0);
+      config.set("extras.tokenenchant.mode", "type");
 
       config.set("extras.tokenmanager.enabled", true);
       config.set("extras.tokenmanager.material", "emerald");
-      config.set("extras.tokenmanager.display", "&7Your current TokenManager tokens offer is &b%AMOUNT%");
-      config.set("extras.tokenmanager.theirdisplay", "&7Their current TokenManager tokens offer is &b%AMOUNT%");
-      config.set("extras.tokenmanager.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+      config.set("extras.tokenmanager.display", "&eYour current TokenManager tokens offer is &6%AMOUNT%");
+      config.set("extras.tokenmanager.theirdisplay", "&eTheir current TokenManager tokens offer is &6%AMOUNT%");
+      config.set("extras.tokenmanager.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenmanager.increment", 1);
       config.set("extras.tokenmanager.taxpercent", 0);
+      config.set("extras.tokenmanager.mode", "type");
 
       config.set("soundeffects.enabled", true);
       config.set("soundeffects.onchange", true);
@@ -544,6 +536,17 @@ public class TradePlus extends JavaPlugin {
       if (configVersion < 3.23) {
         config.set("debug-mode", false);
       }
+
+      if (configVersion < 3.30) {
+        for (String extra : config.getConfigurationSection("extras").getKeys(false)) {
+          config.set("extras." + extra + ".mode", "increment");
+        }
+        config.set("extras.type.material", "paper");
+        config.set("extras.type.empty", "&eEnter a new amount to offer.");
+        config.set("extras.type.valid", "&aClick output slot to submit offer.");
+        config.set("extras.type.invalid", "&cInvalid amount entered!");
+        config.set("extras.type.maximum", "&cYour balance is %BALANCE%");
+      }
     }
 
     List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
@@ -578,6 +581,15 @@ public class TradePlus extends JavaPlugin {
     saveConfig();
     saveLang();
     InvUtils.reloadItems(this);
+    String typeMaterial = config.getString("extras.type.material");
+    typeEmpty = ChatColor.translateAlternateColorCodes('&',
+        config.getString("extras.type.empty"));
+    typeValid = ChatColor.translateAlternateColorCodes('&',
+        config.getString("extras.type.valid"));
+    typeInvalid = ChatColor.translateAlternateColorCodes('&',
+        config.getString("extras.type.invalid"));
+    typeMaximum = ChatColor.translateAlternateColorCodes('&',
+        config.getString("extras.type.maximum"));
     if (Sounds.version > 17) {
       getServer().getPluginManager().registerEvents(new InteractListener(this), this);
     }
@@ -611,6 +623,22 @@ public class TradePlus extends JavaPlugin {
     if (debugMode) {
       getLogger().info(message);
     }
+  }
+
+  public String getTypeEmpty() {
+    return typeEmpty;
+  }
+
+  public String getTypeValid() {
+    return typeValid;
+  }
+
+  public String getTypeInvalid() {
+    return typeInvalid;
+  }
+
+  public String getTypeMaximum() {
+    return typeMaximum;
   }
 
 }

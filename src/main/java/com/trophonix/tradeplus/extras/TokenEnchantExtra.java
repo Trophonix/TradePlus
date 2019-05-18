@@ -1,6 +1,7 @@
 package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 import org.bukkit.entity.Player;
@@ -8,8 +9,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class TokenEnchantExtra extends Extra {
 
-  public TokenEnchantExtra(Player player1, Player player2, TradePlus pl) {
-    super("tokenenchant", player1, player2, pl);
+  public TokenEnchantExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
+    super("tokenenchant", player1, player2, pl, trade);
   }
 
   @Override
@@ -31,14 +32,14 @@ public class TokenEnchantExtra extends Extra {
 
   @Override
   public ItemStack getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", Double.toString(player.equals(player1) ? value1 : value2),
-            "%INCREMENT%", Double.toString(increment),
-            "%PLAYERINCREMENT%", Double.toString(player.equals(player1) ? increment1 : increment2));
+    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
+            "%INCREMENT%", decimalFormat.format(increment),
+            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", Double.toString(player.equals(player1) ? value1 : value2));
+    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
   }
 
 }

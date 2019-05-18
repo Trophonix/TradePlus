@@ -1,14 +1,29 @@
 package com.trophonix.tradeplus.extras;
 
+import com.google.common.base.Preconditions;
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
+import com.trophonix.tradeplus.util.Sounds;
+import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.*;
+import org.bukkit.inventory.AnvilInventory;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+import java.text.DecimalFormat;
+
 public abstract class Extra {
+
+  static final DecimalFormat decimalFormat = new DecimalFormat("###,##0.##");
 
   private TradePlus pl;
   public final ItemStack icon;
@@ -24,11 +39,13 @@ public abstract class Extra {
   private long lastUpdatedMax = System.currentTimeMillis();
   double increment1;
   double increment2;
+  private boolean typeMode;
+  private Trade trade;
 
-  Extra(String name, Player player1, Player player2, TradePlus pl) {
+  Extra(String name, Player player1, Player player2, TradePlus pl, Trade trade) {
     this.pl = pl;
     this.name = name;
-    ConfigurationSection section = pl.getConfig().getConfigurationSection("extras." + name);
+    ConfigurationSection section = Preconditions.checkNotNull(pl.getConfig().getConfigurationSection("extras." + name));
     this.player1 = player1;
     this.player2 = player2;
     this.increment = section.getDouble("increment", 1D);
@@ -38,10 +55,12 @@ public abstract class Extra {
             .display('&', section.getString("display", "&4ERROR"));
     if (section.contains("lore"))
       factory.lore('&', section.getStringList("lore"));
-    this.icon = factory.build();
+    this.icon = factory.flag(ItemFlag.HIDE_ATTRIBUTES).build();
     this.theirIcon = new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
             .display('&', section.getString("theirdisplay", "&4ERROR")).build();
     this.taxPercent = section.getDouble("taxpercent", 0);
+    this.typeMode = section.getString("mode", "increment").equalsIgnoreCase("type");
+    this.trade = trade;
   }
 
   public void init() {
@@ -50,52 +69,89 @@ public abstract class Extra {
     this.pl.log("'" + name + "' extra initialized. Balances: [" + max1 + ", " + max2 + "]");
   }
 
-  @SuppressWarnings("Duplicates")
+  private AnvilGUI gui;
+
   public void onClick(Player player, ClickType click) {
-    if (click.isLeftClick()) {
-      if (click.isShiftClick()) {
-        if (player.equals(player1)) {
-          increment1 -= increment;
-        } else if (player.equals(player2)) {
-          increment2 -= increment;
+    if (typeMode) {
+      double bal = getMax(player);
+      trade.setCancelOnClose(player, false);
+      player.closeInventory();
+      double offer = player1.equals(player) ? value1 : value2;
+      gui = new AnvilGUI(pl, player, decimalFormat.format(offer), (p, input) -> {
+        if (input == null || input.isEmpty())
+          return pl.getTypeEmpty();
+        try {
+          double value = Double.parseDouble(input.replace(",", ""));
+          if (value > getMax(p)) return pl.getTypeMaximum().replace("%BALANCE%", decimalFormat.format(bal))
+                                     .replace("%AMOUNT%", decimalFormat.format(value));
+          if (player1.equals(p)) value1 = value;
+          else if (player2.equals(p)) value2 = value;
+          trade.updateExtras();
+          return null;
+        } catch (NumberFormatException ignored) {
+          return pl.getTypeInvalid().replace("%BALANCE%", decimalFormat.format(bal)).replace("%AMOUNT%", input);
         }
-      } else {
-        if (player.equals(player1)) {
-          value1 -= increment1;
-        } else if (player.equals(player2)) {
-          value2 -= increment2;
+      }) {
+        @Override public void closeInventory() {
+          super.closeInventory();
+          Bukkit.getScheduler().runTaskLater(pl, () -> {
+            if (player1.equals(player)) player.openInventory(trade.inv1);
+            else player.openInventory(trade.inv2);
+            trade.setCancelOnClose(player, true);
+            if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+              Sounds.click(player1, 2);
+              Sounds.click(player2, 2);
+              trade.spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p -> Sounds.click((Player) p, 2));
+            }
+          }, 1L);
+        }
+      };
+    } else {
+      if (click.isLeftClick()) {
+        if (click.isShiftClick()) {
+          if (player.equals(player1)) {
+            increment1 -= increment;
+          } else if (player.equals(player2)) {
+            increment2 -= increment;
+          }
+        } else {
+          if (player.equals(player1)) {
+            value1 -= increment1;
+          } else if (player.equals(player2)) {
+            value2 -= increment2;
+          }
+        }
+      } else if (click.isRightClick()) {
+        if (click.isShiftClick()) {
+          if (player.equals(player1)) {
+            increment1 += increment;
+          } else if (player.equals(player2)) {
+            increment2 += increment;
+          }
+        } else {
+          if (player.equals(player1)) {
+            value1 += increment1;
+          } else if (player.equals(player2)) {
+            value2 += increment2;
+          }
         }
       }
-    } else if (click.isRightClick()) {
-      if (click.isShiftClick()) {
-        if (player.equals(player1)) {
-          increment1 += increment;
-        } else if (player.equals(player2)) {
-          increment2 += increment;
-        }
-      } else {
-        if (player.equals(player1)) {
-          value1 += increment1;
-        } else if (player.equals(player2)) {
-          value2 += increment2;
-        }
+
+      if (increment1 < 0) increment1 = 0;
+      if (increment2 < 0) increment2 = 0;
+
+      if (value1 < 0) value1 = 0;
+      if (value2 < 0) value2 = 0;
+
+      long now = System.currentTimeMillis();
+      if (now > lastUpdatedMax + 5000) {
+        max1 = getMax(player1);
+        max2 = getMax(player2);
+        lastUpdatedMax = now;
       }
+      if (value1 > max1) value1 = max1;
+      if (value2 > max2) value2 = max2;
     }
-
-    if (increment1 < 0) increment1 = 0;
-    if (increment2 < 0) increment2 = 0;
-
-    if (value1 < 0) value1 = 0;
-    if (value2 < 0) value2 = 0;
-
-    long now = System.currentTimeMillis();
-    if (now > lastUpdatedMax + 5000) {
-      max1 = getMax(player1);
-      max2 = getMax(player2);
-      lastUpdatedMax = now;
-    }
-    if (value1 > max1) value1 = max1;
-    if (value2 > max2) value2 = max2;
   }
 
   protected abstract double getMax(Player player);
@@ -105,9 +161,5 @@ public abstract class Extra {
   public abstract ItemStack getIcon(Player player);
 
   public abstract ItemStack getTheirIcon(Player player);
-
-  public String getName() {
-    return name;
-  }
 
 }

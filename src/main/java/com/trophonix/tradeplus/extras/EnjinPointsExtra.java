@@ -4,6 +4,7 @@ import com.enjin.core.EnjinServices;
 import com.enjin.rpc.mappings.mappings.general.RPCData;
 import com.enjin.rpc.mappings.services.PointService;
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +13,8 @@ public class EnjinPointsExtra extends Extra {
 
   private TradePlus pl;
 
-  public EnjinPointsExtra(Player player1, Player player2, TradePlus pl) {
-    super("enjinpoints", player1, player2, pl);
+  public EnjinPointsExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
+    super("enjinpoints", player1, player2, pl, trade);
     this.pl = pl;
   }
 
@@ -39,15 +40,15 @@ public class EnjinPointsExtra extends Extra {
 
   @Override
   public ItemStack getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", Double.toString(player.equals(player1) ? value1 : value2),
+    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
             "%CURRENCY%", "Enjin points",
-            "%INCREMENT%", Double.toString(increment),
-            "%PLAYERINCREMENT%", Double.toString(player.equals(player1) ? increment1 : increment2));
+            "%INCREMENT%", decimalFormat.format(increment),
+            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", Double.toString(player.equals(player1) ? value1 : value2),
+    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
             "%CURRENCY%", "Enjin points");
   }
 

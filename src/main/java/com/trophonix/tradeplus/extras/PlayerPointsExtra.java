@@ -1,6 +1,7 @@
 package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -11,8 +12,8 @@ public class PlayerPointsExtra extends Extra {
 
   private final PlayerPointsAPI playerPointsAPI;
 
-  public PlayerPointsExtra(Player player1, Player player2, TradePlus pl) {
-    super("playerpoints", player1, player2, pl);
+  public PlayerPointsExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
+    super("playerpoints", player1, player2, pl, trade);
     this.playerPointsAPI = new PlayerPointsAPI((PlayerPoints) pl.getServer().getPluginManager().getPlugin("PlayerPoints"));
   }
 
@@ -35,14 +36,14 @@ public class PlayerPointsExtra extends Extra {
 
   @Override
   public ItemStack getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", Double.toString(player.equals(player1) ? value1 : value2),
-            "%INCREMENT%", Double.toString(increment),
-            "%PLAYERINCREMENT%", Double.toString(player.equals(player1) ? increment1 : increment2));
+    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
+            "%INCREMENT%", decimalFormat.format(increment),
+            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", Double.toString(player.equals(player1) ? value1 : value2));
+    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
   }
 
 }

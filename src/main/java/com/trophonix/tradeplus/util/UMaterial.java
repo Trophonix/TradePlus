@@ -364,9 +364,9 @@ public enum UMaterial {
     ENCHANTED_BOOK_CHANNELING("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("CHANNELING") != null ? "CHANNELING" : "PROTECTION_EXPLOSIONS"), 1),
     ENCHANTED_BOOK_CURSE_OF_BINDING("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("BINDING_CURSE") != null ? "BINDING_CURSE" : "PROTECTION_EXPLOSIONS"), 1),
     ENCHANTED_BOOK_CURSE_OF_VANISHING("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("VANISHING_CURSE") != null ? "VANISHING_CURSE" : "PROTECTION_EXPLOSIONS"), 1),
-    ENCHANTED_BOOK_DEPTH_STRIDER_1("ENCHANTED_BOOK", Enchantment.DEPTH_STRIDER, 1),
-    ENCHANTED_BOOK_DEPTH_STRIDER_2("ENCHANTED_BOOK", Enchantment.DEPTH_STRIDER, 2),
-    ENCHANTED_BOOK_DEPTH_STRIDER_3("ENCHANTED_BOOK", Enchantment.DEPTH_STRIDER, 3),
+    ENCHANTED_BOOK_DEPTH_STRIDER_1("ENCHANTED_BOOK", Enchantment.getByName("DEPTH_STRIDER"), 1),
+    ENCHANTED_BOOK_DEPTH_STRIDER_2("ENCHANTED_BOOK", Enchantment.getByName("DEPTH_STRIDER"), 2),
+    ENCHANTED_BOOK_DEPTH_STRIDER_3("ENCHANTED_BOOK", Enchantment.getByName("DEPTH_STRIDER"), 3),
     ENCHANTED_BOOK_EFFICIENCY_1("ENCHANTED_BOOK", Enchantment.DIG_SPEED, 1),
     ENCHANTED_BOOK_EFFICIENCY_2("ENCHANTED_BOOK", Enchantment.DIG_SPEED, 2),
     ENCHANTED_BOOK_EFFICIENCY_3("ENCHANTED_BOOK", Enchantment.DIG_SPEED, 3),
@@ -1405,7 +1405,7 @@ public enum UMaterial {
     }*/
     private void doEnchantmentBook(ItemStack m, Enchantment enchant, int level) {
         final EnchantmentStorageMeta sm = (EnchantmentStorageMeta) m.getItemMeta();
-        sm.addStoredEnchant(enchant, level, true);
+        sm.addStoredEnchant(enchant == null ? Enchantment.DAMAGE_ALL : enchant, level, true);
         m.setItemMeta(sm);
         this.is = m;
     }

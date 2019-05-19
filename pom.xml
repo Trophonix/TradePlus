@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.30</version>
+    <version>3.31</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>com.github.Realizedd</groupId>
             <artifactId>TokenManager</artifactId>
-            <version>c0acc20b16</version>
+            <version>3.2.2</version>
             <scope>system</scope>
             <systemPath>${res}/TokenManager.jar</systemPath>
         </dependency>

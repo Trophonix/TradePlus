@@ -26,7 +26,7 @@ public class CommandHandler implements Listener {
               .filter(c -> c.isAlias(cmd))
               .findFirst().orElse(null);
           return command != null ? command.onTabComplete(sender, args, buffer)
-                     : Collections.emptyList();
+                     : null;
         }
       }, pl);
     } catch (ClassNotFoundException ignored) { }
@@ -63,7 +63,8 @@ public class CommandHandler implements Listener {
       if (cmd.length > 0) {
         String[] args = new String[cmd.length - 1];
         System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
-        event.setCompletions(getCompletions(event.getSender(), cmd[0], args, event.getBuffer()));
+        List<String> completions = getCompletions(event.getSender(), cmd[0], args, event.getBuffer());
+        if (completions != null) event.setCompletions(completions);
       }
     }
 

@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Trade implements Listener {
 
@@ -53,6 +52,7 @@ public class Trade implements Listener {
   public Trade(Player player1, Player player2) {
     this.player1 = player1;
     this.player2 = player2;
+    pl.getServer().getPluginManager().registerEvents(this, pl);
     inv1 = InvUtils.getTradeInventory(player1, player2);
     inv2 = InvUtils.getTradeInventory(player2, player1);
     spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
@@ -95,7 +95,6 @@ public class Trade implements Listener {
       extra.init();
     }
     updateExtras();
-    pl.getServer().getPluginManager().registerEvents(this, pl);
     pl.ongoingTrades.add(this);
   }
 
@@ -229,8 +228,7 @@ public class Trade implements Listener {
               if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
                 Sounds.click(player1, 2);
                 Sounds.click(player2, 2);
-                spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
-                                                                                                Sounds.click((Player) p, 2));
+                spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p -> Sounds.click((Player) p, 2));
               }
             }
           }
@@ -396,11 +394,8 @@ public class Trade implements Listener {
   }
 
   @EventHandler
-  public void onPickup(EntityPickupItemEvent event) {
-    if (!(event.getEntity() instanceof Player)) {
-      return;
-    }
-    Player player = (Player) event.getEntity();
+  public void onPickup(PlayerPickupItemEvent event) {
+    Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
       event.setCancelled(true);
     }
@@ -775,10 +770,8 @@ public class Trade implements Listener {
 
   public void setCancelOnClose(Player player, boolean cancelOnClose) {
     if (player1.equals(player)) {
-      System.out.println("Cancel on close for player 1 " + cancelOnClose);
       cancelOnClose1 = cancelOnClose;
     } else if (player2.equals(player)) {
-      System.out.println("Cancel on close for player 2 " + cancelOnClose);
       cancelOnClose2 = cancelOnClose;
     }
   }

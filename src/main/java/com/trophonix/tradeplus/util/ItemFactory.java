@@ -2,6 +2,7 @@ package com.trophonix.tradeplus.util;
 
 import com.google.common.base.Preconditions;
 import com.trophonix.tradeplus.TradePlus;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -9,20 +10,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemFactory {
+public class ItemFactory implements Serializable {
 
   private short damage = 0;
   private Material material;
-  private int amount = 1;
+  @Getter private int amount = 1;
   private byte data = 0;
-  private String display = "";
-  private List<String> lore = new ArrayList<>();
-  private List<ItemFlag> flags = new ArrayList<>();
+  private String display;
+  private List<String> lore;
+  private List<ItemFlag> flags;
 
   public ItemFactory(Material material) {
         this.material = material;
@@ -33,11 +34,11 @@ public class ItemFactory {
     parsable = parsable.toUpperCase().replace(" ", "_");
     UMaterial uMat = UMaterial.match(parsable);
     if (uMat == null) {
-      this.material = fallback;
+      material = fallback;
       TradePlus.getPlugin(TradePlus.class).getLogger().warning("Unknown material [" + parsable + "]." + (Sounds.version >= 113 ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: " + fallback.name() : ""));
     } else {
-      this.material = uMat.getMaterial();
-      this.data = uMat.getData();
+      material = uMat.getMaterial();
+      data = uMat.getData();
     }
   }
 
@@ -46,8 +47,25 @@ public class ItemFactory {
     UMaterial uMat = UMaterial.match(parsable);
     Preconditions.checkNotNull(uMat, "Unknown material [%s]", parsable);
     Preconditions.checkArgument(uMat.getMaterial() != null, "Unknown material [%s]. Make sure item exists in your version!", parsable);
-    this.material = uMat.getMaterial();
-    this.data = uMat.getData();
+    material = uMat.getMaterial();
+    data = uMat.getData();
+  }
+
+  public ItemFactory(ItemStack stack) {
+    damage = stack.getDurability();
+    material = stack.getType();
+    amount = stack.getAmount();
+    data = stack.getData().getData();
+    if (stack.hasItemMeta()) {
+      ItemMeta meta = stack.getItemMeta();
+      if (meta.hasDisplayName()) {
+        display = meta.getDisplayName();
+      }
+      if (meta.hasLore()) {
+        lore = meta.getLore();
+      }
+      flags = new ArrayList<>(meta.getItemFlags());
+    }
   }
 
   static ItemStack getPlayerSkull(String name, String displayName) {
@@ -63,7 +81,9 @@ public class ItemFactory {
 
   public static ItemStack replaceInMeta(ItemStack item, String... replace) {
     item = item.clone();
-    if (!item.hasItemMeta()) return item;
+    if (!item.hasItemMeta()) {
+      return item;
+    }
     ItemMeta meta = item.getItemMeta();
     if (meta != null) {
       try {
@@ -76,8 +96,9 @@ public class ItemFactory {
           if (meta.hasLore()) {
             List<String> lore = meta.getLore();
             assert lore != null;
-            for (int j = 0; j < lore.size(); j++)
+            for (int j = 0; j < lore.size(); j++) {
               lore.set(j, lore.get(j).replace(toReplace, replaceWith));
+            }
             meta.setLore(lore);
           }
         }
@@ -89,10 +110,10 @@ public class ItemFactory {
 
   public ItemFactory replace(String... replace) {
     for (int i = 0; i < replace.length - 1; i += 2) {
-      this.display = this.display.replace(replace[i], replace[i + 1]);
-      if (this.lore != null) {
+      display = display.replace(replace[i], replace[i + 1]);
+      if (lore != null) {
         int n = i;
-        this.lore = this.lore.stream().map(str -> str.replace(replace[n], replace[n + 1])).collect(Collectors.toList());
+        lore = lore.stream().map(str -> str.replace(replace[n], replace[n + 1])).collect(Collectors.toList());
       }
     }
     return this;
@@ -106,22 +127,23 @@ public class ItemFactory {
       itemStack = new ItemStack(material, amount, damage);
     }
     ItemMeta itemMeta = itemStack.getItemMeta();
-    if (!display.equals(""))
+    if (display != null) {
       itemMeta.setDisplayName(display);
-    if (!lore.isEmpty())
-      itemMeta.setLore(lore);
-    itemMeta.addItemFlags(this.flags.toArray(new ItemFlag[0]));
+    }
+    itemMeta.setLore(lore);
+    if (flags != null) itemMeta.addItemFlags(flags.toArray(new ItemFlag[0]));
     itemStack.setItemMeta(itemMeta);
     return itemStack;
   }
 
   public ItemFactory copy() {
-    ItemFactory copy = new ItemFactory(this.material);
+    ItemFactory copy = new ItemFactory(material);
     copy.damage = damage;
     copy.amount = amount;
     copy.data = data;
     copy.display = display;
     copy.lore = lore;
+    copy.flags = flags;
     return copy;
   }
 
@@ -146,15 +168,19 @@ public class ItemFactory {
   }
 
   public ItemFactory lore(char colorChar, List<String> lore) {
-    if (lore == null) return this.lore(lore);
-    for (int i = 0; i < lore.size(); i++)
+    if (lore == null) {
+      return lore(null);
+    }
+    for (int i = 0; i < lore.size(); i++) {
       lore.set(i, ChatColor.translateAlternateColorCodes(colorChar, lore.get(i)));
+    }
     this.lore = lore;
     return this;
   }
 
   public ItemFactory flag(ItemFlag flag) {
-    this.flags.add(flag);
+    if (flags == null) flags = new ArrayList<>();
+    flags.add(flag);
     return this;
   }
 

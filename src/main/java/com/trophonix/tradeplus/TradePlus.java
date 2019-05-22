@@ -3,6 +3,7 @@ package com.trophonix.tradeplus;
 import com.trophonix.tradeplus.commands.CommandHandler;
 import com.trophonix.tradeplus.commands.TradeCommand;
 import com.trophonix.tradeplus.commands.TradePlusCommand;
+import com.trophonix.tradeplus.logging.Logs;
 import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.*;
@@ -15,10 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
@@ -32,6 +30,8 @@ public class TradePlus extends JavaPlugin {
   private boolean debugMode;
 
   private String typeEmpty, typeValid, typeInvalid, typeMaximum;
+
+  private Logs logs;
 
   public Trade getTrade(Player player) {
     for (Trade trade : ongoingTrades) {
@@ -73,6 +73,7 @@ public class TradePlus extends JavaPlugin {
     langFile = new File(getDataFolder(), "lang.yml");
     lang = YamlConfiguration.loadConfiguration(langFile);
     Sounds.loadSounds();
+
     if (!getDataFolder().exists()) {
       getDataFolder().mkdirs();
       try {
@@ -81,6 +82,7 @@ public class TradePlus extends JavaPlugin {
         ex.printStackTrace();
       }
       config.set("aliases", Collections.singletonList("trade+"));
+      config.set("trade-logs", false);
 
       config.set("permissions.required", config.getBoolean("permissionrequired", false));
       config.set("permissions.send", config.getString("permissionnode", "tradeplus.send"));
@@ -133,7 +135,6 @@ public class TradePlus extends JavaPlugin {
       config.set("gui.force.name", "&4&lForce Trade");
       config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
 
-      config.set("extras.type.material", "paper");
       config.set("extras.type.empty", "&eEnter a new amount to offer.");
       config.set("extras.type.valid", "&aClick output slot to submit offer.");
       config.set("extras.type.invalid", "&cInvalid amount entered!");
@@ -541,11 +542,23 @@ public class TradePlus extends JavaPlugin {
         for (String extra : config.getConfigurationSection("extras").getKeys(false)) {
           config.set("extras." + extra + ".mode", "increment");
         }
-        config.set("extras.type.material", "paper");
         config.set("extras.type.empty", "&eEnter a new amount to offer.");
         config.set("extras.type.valid", "&aClick output slot to submit offer.");
         config.set("extras.type.invalid", "&cInvalid amount entered!");
         config.set("extras.type.maximum", "&cYour balance is %BALANCE%");
+      }
+
+      if (configVersion < 3.40) {
+        config.set("trade-logs", false);
+      }
+    }
+
+    if (config.getBoolean("trade-logs", false)) {
+      try {
+        logs = new Logs(new File(getDataFolder(), "logs"));
+        log("Initialized trade logger.");
+      } catch (IOException ex) {
+        log("Failed to load trade logger. " + ex.getMessage());
       }
     }
 
@@ -581,7 +594,6 @@ public class TradePlus extends JavaPlugin {
     saveConfig();
     saveLang();
     InvUtils.reloadItems(this);
-    String typeMaterial = config.getString("extras.type.material");
     typeEmpty = ChatColor.translateAlternateColorCodes('&',
         config.getString("extras.type.empty"));
     typeValid = ChatColor.translateAlternateColorCodes('&',
@@ -597,6 +609,16 @@ public class TradePlus extends JavaPlugin {
     commandHandler.add(new TradeCommand(this));
     commandHandler.add(new TradePlusCommand(this));
     ongoingTrades = new ConcurrentLinkedQueue<>();
+  }
+
+  @Override public void onDisable() {
+    if (logs != null) {
+      try {
+        logs.save();
+      } catch (IOException ex) {
+        getLogger().warning("Failed to save trade log files.");
+      }
+    }
   }
 
   public void reload() {
@@ -623,6 +645,10 @@ public class TradePlus extends JavaPlugin {
     if (debugMode) {
       getLogger().info(message);
     }
+  }
+
+  public Logs getLogs() {
+    return logs;
   }
 
   public String getTypeEmpty() {

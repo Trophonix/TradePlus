@@ -1,6 +1,6 @@
 package com.trophonix.tradeplus.events;
 
-import com.trophonix.tradeplus.trade.Trade;
+import com.trophonix.tradeplus.logging.TradeLog;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,13 +12,13 @@ class TradeCompleteEvent extends Event {
 
   private static final HandlerList handlers = new HandlerList();
 
-  private final Trade trade;
+  private final TradeLog trade;
   private final Player playerOne;
   private final Player playerTwo;
   private final Set<ItemStack> playerOneTrades;
   private final Set<ItemStack> playerTwoTrades;
 
-  public TradeCompleteEvent(Trade trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
+  public TradeCompleteEvent(TradeLog trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
     this.trade = trade;
     this.playerOne = playerOne;
     this.playerTwo = playerTwo;
@@ -30,7 +30,7 @@ class TradeCompleteEvent extends Event {
     return handlers;
   }
 
-  public Trade getTrade() { return trade; }
+  public TradeLog getTrade() { return trade; }
 
   public Player getPlayerOne() { return playerOne; }
 

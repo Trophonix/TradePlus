@@ -2,7 +2,9 @@ package com.trophonix.tradeplus.trade;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.extras.*;
+import com.trophonix.tradeplus.logging.TradeLog;
 import com.trophonix.tradeplus.util.InvUtils;
+import com.trophonix.tradeplus.util.ItemFactory;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import org.bukkit.Bukkit;
@@ -25,6 +27,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Trade implements Listener {
 
@@ -50,9 +53,9 @@ public class Trade implements Listener {
   public Trade(Player player1, Player player2) {
     this.player1 = player1;
     this.player2 = player2;
-    this.inv1 = InvUtils.getTradeInventory(player1, player2);
-    this.inv2 = InvUtils.getTradeInventory(player2, player1);
-    this.spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
+    inv1 = InvUtils.getTradeInventory(player1, player2);
+    inv2 = InvUtils.getTradeInventory(player2, player1);
+    spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
     Bukkit.getOnlinePlayers().forEach(p -> {
       if (p.hasPermission("tradeplus.admin") && !p.hasPermission("tradeplus.admin.silent")) {
         MsgUtils.send(p, pl.getLang().getString("spectate.hover", "&6&lClick here to spectate this trade"), "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
@@ -64,23 +67,30 @@ public class Trade implements Listener {
     player2.openInventory(inv2);
     if (pl.getConfig().getBoolean("extras.economy.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("Vault")) {
       try {
-        if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null)
+        if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null) {
           extras.add(new EconomyExtra(player1, player2, pl, this));
+        }
       } catch (Exception ignored) {
       }
     }
-    if (pl.getConfig().getBoolean("extras.experience.enabled", true))
+    if (pl.getConfig().getBoolean("extras.experience.enabled", true)) {
       extras.add(new ExperienceExtra(player1, player2, pl, this));
-    if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints"))
+    }
+    if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints")) {
       extras.add(new PlayerPointsExtra(player1, player2, pl, this));
-    if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention"))
+    }
+    if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention")) {
       extras.add(new GriefPreventionExtra(player1, player2, pl, this));
-    if (pl.getConfig().getBoolean("extras.enjinpoints.enabled", false) && pl.getServer().getPluginManager().isPluginEnabled("EnjinMinecraftPlugin"))
+    }
+    if (pl.getConfig().getBoolean("extras.enjinpoints.enabled", false) && pl.getServer().getPluginManager().isPluginEnabled("EnjinMinecraftPlugin")) {
       extras.add(new EnjinPointsExtra(player1, player2, pl, this));
-    if (pl.getConfig().getBoolean("extras.tokenenchant.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenEnchant"))
+    }
+    if (pl.getConfig().getBoolean("extras.tokenenchant.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenEnchant")) {
       extras.add(new TokenEnchantExtra(player1, player2, pl, this));
-    if (pl.getConfig().getBoolean("extras.tokenmanager.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenManager"))
+    }
+    if (pl.getConfig().getBoolean("extras.tokenmanager.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenManager")) {
       extras.add(new TokenManagerExtra(player1, player2, pl, this));
+    }
     for (Extra extra : extras) {
       extra.init();
     }
@@ -91,7 +101,9 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onDrag(InventoryDragEvent event) {
-    if (!(event.getWhoClicked() instanceof Player)) return;
+    if (!(event.getWhoClicked() instanceof Player)) {
+      return;
+    }
     Player player = (Player) event.getWhoClicked();
     Inventory inv = event.getInventory();
     if (inv1.getViewers().contains(player) || inv2.getViewers().contains(player)) {
@@ -126,12 +138,16 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onClick(InventoryClickEvent event) {
-    if (!(event.getWhoClicked() instanceof Player)) return;
+    if (!(event.getWhoClicked() instanceof Player)) {
+      return;
+    }
     Player player = (Player) event.getWhoClicked();
     Inventory inv = event.getClickedInventory();
     ClickType click = event.getClick();
     if (inv == null || ((event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) &&
-            (event.getCursor() == null || event.getCursor().getType().equals(Material.AIR)))) return;
+            (event.getCursor() == null || event.getCursor().getType().equals(Material.AIR)))) {
+      return;
+    }
     int slot = event.getSlot();
     if (event.getRawSlot() < event.getView().getTopInventory().getSize() && (inv1.getViewers().contains(player) || inv2.getViewers().contains(player))) {
       ItemStack item49 = inv.getItem(49);
@@ -202,10 +218,12 @@ public class Trade implements Listener {
           } else {
             Extra extra = getExtra(slot);
             if (extra != null) {
-              if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept", true) && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2)))
+              if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept", true) && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
                 return;
-              if (task != null)
+              }
+              if (task != null) {
                 return;
+              }
               extra.onClick(player, event.getClick());
               updateExtras();
               if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
@@ -241,14 +259,17 @@ public class Trade implements Listener {
                   i.setAmount(i.getAmount() - buffer);
                   cursor.setAmount(cursor.getMaxStackSize());
                 }
-                if (cursor.getAmount() >= cursor.getMaxStackSize())
+                if (cursor.getAmount() >= cursor.getMaxStackSize()) {
                   break;
+                }
               }
             }
           }
         } else if (click.name().contains("SHIFT")) {
           event.setCancelled(true);
-          if (accept1 && accept2) return;
+          if (accept1 && accept2) {
+            return;
+          }
           if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
             accept1 = false;
             accept2 = false;
@@ -285,12 +306,18 @@ public class Trade implements Listener {
   @EventHandler
   public void onClose(InventoryCloseEvent event) {
     Inventory closed = event.getInventory();
-    if (closed == null || closed.getSize() < 54) return;
+    if (closed == null || closed.getSize() < 54) {
+      return;
+    }
     if (closed.equals(inv1) || closed.equals(inv2) || inv1.getViewers().contains(event.getPlayer()) || inv2.getViewers().contains(event.getPlayer())) {
       if ( (event.getPlayer().equals(player1) && !cancelOnClose1) ||
-            event.getPlayer().equals(player2) && !cancelOnClose2 ) return;
+            event.getPlayer().equals(player2) && !cancelOnClose2 ) {
+        return;
+      }
       HandlerList.unregisterAll(this);
-      if (closed.getItem(49) == null) return;
+      if (closed.getItem(49) == null) {
+        return;
+      }
       pl.ongoingTrades.remove(this);
       if (task != null) {
         task.cancel();
@@ -314,7 +341,9 @@ public class Trade implements Listener {
   public void onMove(PlayerMoveEvent event) {
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
-      if (System.currentTimeMillis() < startTime + 1000) return;
+      if (System.currentTimeMillis() < startTime + 1000) {
+        return;
+      }
       event.setCancelled(true);
     }
   }
@@ -337,7 +366,9 @@ public class Trade implements Listener {
   public void onDropItem(PlayerDropItemEvent event) {
     if (player1.equals(event.getPlayer()) || player2.equals(event.getPlayer())) {
       event.setCancelled(true);
-      if (accept1 && accept2) giveOnCursor(event.getPlayer());
+      if (accept1 && accept2) {
+        giveOnCursor(event.getPlayer());
+      }
     }
   }
 
@@ -366,22 +397,32 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onPickup(EntityPickupItemEvent event) {
-    if (!(event.getEntity() instanceof Player)) return;
+    if (!(event.getEntity() instanceof Player)) {
+      return;
+    }
     Player player = (Player) event.getEntity();
-    if (player.equals(this.player1) || player.equals(this.player2)) {
+    if (player.equals(player1) || player.equals(player2)) {
       event.setCancelled(true);
     }
   }
 
   private void giveItemsOnLeft(Inventory inv, Player player) {
+    getItemsOnLeft(inv).forEach(item -> player.getInventory().addItem(
+        item).values().stream().findFirst().ifPresent(
+          i -> player.getWorld().dropItemNaturally(player.getLocation(), i)));
+  }
+
+  private List<ItemStack> getItemsOnLeft(Inventory inv) {
+    List<ItemStack> items = new ArrayList<>();
     InvUtils.leftSlots.forEach(slot -> {
       if (getExtra(slot) == null) {
         ItemStack item = inv.getItem(slot);
-        if (item != null)
-          player.getInventory().addItem(item).values().stream().findFirst().ifPresent(i ->
-                  player.getWorld().dropItemNaturally(player.getLocation(), i));
+        if (item != null) {
+          items.add(item);
+        }
       }
     });
+    return items;
   }
 
   private void updateInventories() {
@@ -416,7 +457,9 @@ public class Trade implements Listener {
   public void updateExtras() {
     int slot1 = 0, slot2a = 0, slot2b = 0;
     for (int i = 0; i < extraSlots.size(); i++) {
-      if (i >= extras.size()) break;
+      if (i >= extras.size()) {
+        break;
+      }
       int slot = extraSlots.get(i);
       inv1.setItem(slot, InvUtils.placeHolder);
       inv1.setItem(getRight(slot), InvUtils.placeHolder);
@@ -455,20 +498,16 @@ public class Trade implements Listener {
   private void checkAcceptance() {
     if (pl.getConfig().getBoolean("gui.showaccept", true)) {
       if (accept1 && accept2) {
-        if (task != null) return;
+        if (task != null) {
+          return;
+        }
 
         giveOnCursor(player1);
         giveOnCursor(player2);
 
-        accepted1 = new ItemStack[InvUtils.leftSlots.size()];
-        for (int i = 0; i < accepted1.length; i++) {
-          accepted1[i] = inv1.getItem(InvUtils.leftSlots.get(i));
-        }
+        accepted1 = getItemsOnLeft(inv1).toArray(new ItemStack[0]);
 
-        accepted2 = new ItemStack[InvUtils.leftSlots.size()];
-        for (int i = 0; i < accepted2.length; i++) {
-          accepted2[i] = inv2.getItem(InvUtils.leftSlots.get(i));
-        }
+        accepted2 = getItemsOnLeft(inv2).toArray(new ItemStack[0]);
 
         if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onaccept", true)) {
           Sounds.pling(player1, 1);
@@ -504,21 +543,33 @@ public class Trade implements Listener {
               HandlerList.unregisterAll(this);
 
               if (pl.getConfig().getBoolean("antiscam.discrepancy-detection", true)) {
-                for (int i = 0; i < InvUtils.leftSlots.size(); i++) {
-                  int slot = InvUtils.leftSlots.get(i);
-                  ItemStack item1 = inv1.getItem(slot);
-                  ItemStack item2 = inv2.getItem(slot);
-                  boolean similar1 = similar(item1, accepted1[i]);
-                  boolean similar2 = similar(item2, accepted2[i]);
-                  if (!(similar1 && similar2)) {
-                    pl.log("Found discrepancy in trade between " + player1.getName() + " and " + player2.getName());
-                    pl.log(" [slot " + i + "] '" + (similar1 ? item1 : item2).getType().name() + "' vs '" + (similar1 ? accepted1[i] : accepted2[i]).getType().name() + "'");
-                    MsgUtils.send(player1, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player2.getName()).split("%NEWLINE%"));
-                    MsgUtils.send(player2, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player1.getName()).split("%NEWLINE%"));
-                    giveItemsOnLeft(inv1, player1);
-                    giveItemsOnLeft(inv2, player2);
-                    return;
+                boolean discrepancy = false;
+                int i = 0;
+                for (ItemStack item : getItemsOnLeft(inv1)) {
+                  if (item == null) continue;
+                  if (accepted1.length <= i || !item.isSimilar(accepted1[i++])) {
+                    discrepancy = true;
+                    break;
                   }
+                }
+
+                if (!discrepancy) {
+                  i = 0;
+                  for (ItemStack item : getItemsOnLeft(inv2)) {
+                    if (item == null) continue;
+                    if (accepted2.length <= i || !item.isSimilar(accepted2[i++])) {
+                      discrepancy = true;
+                    }
+                  }
+                }
+
+                if (discrepancy) {
+                  pl.log("Found discrepancy in trade between " + player1.getName() + " and " + player2.getName());
+                  MsgUtils.send(player1, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player2.getName()).split("%NEWLINE%"));
+                  MsgUtils.send(player2, pl.getLang().getString("antiscam.discrepancy").replace("%PLAYER%", player1.getName()).split("%NEWLINE%"));
+                  giveItemsOnLeft(inv1, player1);
+                  giveItemsOnLeft(inv2, player2);
+                  return;
                 }
               }
 
@@ -528,8 +579,9 @@ public class Trade implements Listener {
               pl.log("Giving " + player1.getName() + " items from " + player2.getName());
               giveItemsOnLeft(inv2, player1);
 
-              for (Extra extra : extras)
+              for (Extra extra : extras) {
                 extra.onTradeEnd();
+              }
 
               if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
                 Sounds.levelUp(player1, 1);
@@ -543,6 +595,18 @@ public class Trade implements Listener {
 
               MsgUtils.send(player1, pl.getLang().getString("trade-complete"));
               MsgUtils.send(player2, pl.getLang().getString("trade-complete"));
+
+              if (pl.getLogs() != null) {
+                try {
+                  pl.getLogs().log(new TradeLog(player1, player2,
+                      combine(accepted1).stream().map(ItemFactory::new).collect(Collectors.toList()),
+                      combine(accepted2).stream().map(ItemFactory::new).collect(Collectors.toList()),
+                      extras.stream().filter(e -> e.value1 > 0).map(e -> new TradeLog.ExtraOffer(e.name, e.value1)).collect(Collectors.toList()),
+                      extras.stream().filter(e -> e.value2 > 0).map(e -> new TradeLog.ExtraOffer(e.name, e.value2)).collect(Collectors.toList())));
+                } catch (Exception ex) {
+                  pl.log("Failed to save trade log. " + ex.getMessage());
+                }
+              }
             } else {
               updateAcceptance();
             }
@@ -580,11 +644,21 @@ public class Trade implements Listener {
   }
 
   private int roundUpToNine(int slot) {
-    if (slot < 9) return 9;
-    if (slot < 18) return 18;
-    if (slot < 27) return 27;
-    if (slot < 36) return 36;
-    if (slot < 45) return 45;
+    if (slot < 9) {
+      return 9;
+    }
+    if (slot < 18) {
+      return 18;
+    }
+    if (slot < 27) {
+      return 27;
+    }
+    if (slot < 36) {
+      return 36;
+    }
+    if (slot < 45) {
+      return 45;
+    }
     return 54;
   }
 
@@ -604,7 +678,9 @@ public class Trade implements Listener {
     }
     for (int slot : InvUtils.leftSlots) {
       ItemStack i = inventory.getItem(slot);
-      if (!(i == null || i.getType().equals(Material.AIR))) continue;
+      if (!(i == null || i.getType().equals(Material.AIR))) {
+        continue;
+      }
       inventory.setItem(slot, toMove);
       toMove = null;
     }
@@ -612,9 +688,12 @@ public class Trade implements Listener {
   }
 
   private boolean isBlocked(ItemStack item) {
-    if (item == null || item.getType().equals(Material.AIR)) return false;
-    if (pl.getConfig().getBoolean("blocked.named-items", false) && item.hasItemMeta() && item.getItemMeta().hasDisplayName())
+    if (item == null || item.getType().equals(Material.AIR)) {
+      return false;
+    }
+    if (pl.getConfig().getBoolean("blocked.named-items", false) && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
       return true;
+    }
     if (item.hasItemMeta()) {
       String regex = ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("blocked.regex", ""));
       if (!regex.isEmpty()) {
@@ -622,26 +701,34 @@ public class Trade implements Listener {
           Pattern pattern = Pattern.compile(regex);
           if (item.getItemMeta().hasDisplayName()) {
             String displayName = item.getItemMeta().getDisplayName();
-            if (pattern.matcher(displayName).find()) return true;
+            if (pattern.matcher(displayName).find()) {
+              return true;
+            }
           }
           if (item.getItemMeta().hasLore()) {
             List<String> lore = item.getItemMeta().getLore();
-            if (lore.stream().anyMatch(s -> pattern.matcher(s).find())) return true;
+            if (lore.stream().anyMatch(s -> pattern.matcher(s).find())) {
+              return true;
+            }
           }
         } catch (PatternSyntaxException ex) {
           Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Your blocked.regex is invalid!");
         }
       }
       List<String> blockedLore = pl.getConfig().getStringList("blocked.lore");
-      if (blockedLore != null || !blockedLore.isEmpty()) {
+      if (!blockedLore.isEmpty()) {
         for (int i = 0; i < blockedLore.size(); i++) {
           String line = ChatColor.translateAlternateColorCodes('&', blockedLore.get(i));
-          if (line.length() > 2) line = line.substring(1, line.length() - 1);
+          if (line.length() > 2) {
+            line = line.substring(1, line.length() - 1);
+          }
           blockedLore.set(i, line);
         }
         if (item.getItemMeta().hasDisplayName()) {
           String displayName = item.getItemMeta().getDisplayName();
-          if (blockedLore.stream().anyMatch(displayName::contains)) return true;
+          if (blockedLore.stream().anyMatch(displayName::contains)) {
+            return true;
+          }
         }
         if (item.getItemMeta().hasLore()) {
           List<String> lore = item.getItemMeta().getLore();
@@ -656,7 +743,9 @@ public class Trade implements Listener {
       }
     }
     List<String> blocked = pl.getConfig().getStringList("blocked.blacklist");
-    if (blocked == null || blocked.isEmpty()) return false;
+    if (blocked.isEmpty()) {
+      return false;
+    }
     List<String> checks = new ArrayList<>();
     String type = item.getType().toString();
     byte data = item.getData().getData();
@@ -692,6 +781,24 @@ public class Trade implements Listener {
       System.out.println("Cancel on close for player 2 " + cancelOnClose);
       cancelOnClose2 = cancelOnClose;
     }
+  }
+
+  private static List<ItemStack> combine(ItemStack[] items) {
+    List<ItemStack> result = new ArrayList<>();
+    for (int i = 0; i < items.length; i++) {
+      ItemStack item = items[i];
+      if (item == null) continue;
+      item = item.clone();
+      for (int j = i + 1; j < items.length; j++) {
+        ItemStack dupe = items[j];
+        if (item.isSimilar(dupe)) {
+          item.setAmount(item.getAmount() + dupe.getAmount());
+          items[j] = null;
+        }
+      }
+      result.add(item);
+    }
+    return result;
   }
 
 }

@@ -27,7 +27,7 @@ public abstract class Extra {
 
   private TradePlus pl;
   public final ItemStack icon;
-  private final String name;
+  public final String name;
   final Player player1;
   final Player player2;
   final double increment;

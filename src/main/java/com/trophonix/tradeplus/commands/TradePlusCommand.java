@@ -34,9 +34,6 @@ public class TradePlusCommand extends Command {
           pl.reload();
           MsgUtils.send(sender, pl.getLang().getString("admin.configs-reloaded", "&6&l(!) &6Configs reloaded!"));
           return;
-        } else if (args[0].equalsIgnoreCase("logs")) {
-          pl.getLogs().forEach(log -> sender.sendMessage(log.getPlayer1() + " - " + log.getPlayer2()));
-          return;
         }
         break;
       case 2:

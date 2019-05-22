@@ -3,7 +3,6 @@ package com.trophonix.tradeplus.extras;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
-import me.realized.tokenmanager.TokenManagerPlugin;
 import me.realized.tokenmanager.api.TokenManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

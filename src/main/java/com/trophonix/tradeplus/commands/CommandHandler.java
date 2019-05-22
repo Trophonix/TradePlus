@@ -67,7 +67,7 @@ public class CommandHandler implements Listener {
       }
     }
 
-    public abstract List<String> getCompletions(CommandSender sender, String command, String[] args, String buffer);
+    protected abstract List<String> getCompletions(CommandSender sender, String command, String[] args, String buffer);
 
   }
 

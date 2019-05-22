@@ -4,7 +4,7 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
-public class NullZeroNumberAdapter implements JsonSerializer<Number>, JsonDeserializer<Number> {
+class NullZeroNumberAdapter implements JsonSerializer<Number>, JsonDeserializer<Number> {
 
   @Override public JsonElement serialize(Number number, Type type, JsonSerializationContext context) {
     return number.doubleValue() != 0 ? new JsonPrimitive(number) : null;

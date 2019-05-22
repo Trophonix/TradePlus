@@ -99,7 +99,7 @@ public class TradePlusCommand extends Command {
     });
   }
 
-  List<String> arg0 = Arrays.asList("reload", "rl", "force", "spectate");
+  private List<String> arg0 = Arrays.asList("reload", "rl", "force", "spectate");
 
   @Override public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
     if (args.length == 0) {

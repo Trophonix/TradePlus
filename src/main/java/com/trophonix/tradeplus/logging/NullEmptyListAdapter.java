@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NullEmptyListAdapter implements JsonSerializer<List<?>>, JsonDeserializer<List<?>> {
+class NullEmptyListAdapter implements JsonSerializer<List<?>>, JsonDeserializer<List<?>> {
 
   @Override
   public JsonElement serialize(List<?> src, Type type, JsonSerializationContext context) {

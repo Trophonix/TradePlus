@@ -127,6 +127,7 @@ public class Logs implements List<TradeLog> {
   }
 
   @Override public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
     return logs.equals(o);
   }
 

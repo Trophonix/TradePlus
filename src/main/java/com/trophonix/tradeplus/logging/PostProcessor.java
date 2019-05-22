@@ -1,6 +1,6 @@
 package com.trophonix.tradeplus.logging;
 
-public interface PostProcessor {
+interface PostProcessor {
 
   void doPostProcessing();
 

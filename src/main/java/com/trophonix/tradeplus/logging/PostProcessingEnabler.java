@@ -9,7 +9,7 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 
-public class PostProcessingEnabler implements TypeAdapterFactory {
+class PostProcessingEnabler implements TypeAdapterFactory {
 
   @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
     TypeAdapter<T> delegate = gson.getDelegateAdapter(this, type);

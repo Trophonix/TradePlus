@@ -3,10 +3,13 @@ package com.trophonix.tradeplus.commands;
 import com.trophonix.tradeplus.TradePlus;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.server.RemoteServerCommandEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,16 +43,26 @@ public class CommandHandler implements Listener {
     commands.clear();
   }
 
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+  @EventHandler(ignoreCancelled = true)
   public void onCommand(PlayerCommandPreprocessEvent event) {
     String[] cmd = event.getMessage().substring(1).split("\\s+");
+    testAndRun(event, event.getPlayer(), cmd);
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onServerCommand(ServerCommandEvent event) {
+    String[] cmd = event.getCommand().split("\\s+");
+    testAndRun(event, event.getSender(), cmd);
+  }
+
+  private void testAndRun(Cancellable event, CommandSender sender, String[] cmd) {
     if (cmd.length > 0) {
       String[] args = new String[cmd.length - 1];
       System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
       commands.stream()
-              .filter(command -> command.isAlias(cmd[0]))
-              .findFirst().ifPresent(command -> {
-        command.onCommand(event.getPlayer(), args);
+          .filter(command -> command.isAlias(cmd[0]))
+          .findFirst().ifPresent(command -> {
+        command.onCommand(sender, args);
         event.setCancelled(true);
       });
     }

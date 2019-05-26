@@ -42,12 +42,6 @@ public class TradeCommand extends Command {
     final Player player = (Player) sender;
 
     boolean permissionRequired = pl.getConfig().getBoolean("permissions.required", false);
-    
-    String sendPermission = pl.getConfig().getString("permissions.send", "tradeplus.send");
-    if (permissionRequired && !sender.hasPermission(sendPermission)) {
-      MsgUtils.send(player, pl.getLang().getString("errors.no-perms.send"));
-      return;
-    }
 
     if (args.length == 1) {
       final Player receiver = Bukkit.getPlayer(args[0]);
@@ -80,11 +74,7 @@ public class TradeCommand extends Command {
         MsgUtils.send(player, pl.getLang().getString("errors.self-trade").split("%NEWLINE%"));
         return;
       }
-      String acceptPermission = pl.getConfig().getString("permissions.accept", "tradeplus.accept");
-      if (permissionRequired && !receiver.hasPermission(acceptPermission)) {
-        MsgUtils.send(player, pl.getLang().getString("errors.no-perms.receive").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
-        return;
-      }
+
       if (player.getWorld().equals(receiver.getWorld())) {
         double amount = pl.getConfig().getDouble("ranges.sameworld");
         if (amount != 0.0 && player.getLocation().distance(receiver.getLocation()) > amount) {
@@ -124,12 +114,20 @@ public class TradeCommand extends Command {
         new Trade(player, receiver);
         requests.removeIf(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player)));
       } else {
+        String sendPermission = pl.getConfig().getString("permissions.send", "tradeplus.send");
         if (permissionRequired) {
           if (!sender.hasPermission(sendPermission)) {
             MsgUtils.send(player, pl.getLang().getString("errors.no-perms.accept").split("%NEWLINE%"));
             return;
           }
         }
+
+        String acceptPermission = pl.getConfig().getString("permissions.accept", "tradeplus.accept");
+        if (permissionRequired && !receiver.hasPermission(acceptPermission)) {
+          MsgUtils.send(player, pl.getLang().getString("errors.no-perms.receive").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
+          return;
+        }
+
         TradeRequestEvent event = new TradeRequestEvent(player, receiver);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return;

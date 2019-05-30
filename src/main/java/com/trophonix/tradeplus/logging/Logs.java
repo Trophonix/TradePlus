@@ -70,7 +70,7 @@ public class Logs implements List<TradeLog> {
               new File(folder, fileNameFormat.format(log.getTime())
                                    .replace("{player1}", log.getPlayer1().getLastKnownName())
                                    .replace("{player2}", log.getPlayer2().getLastKnownName())));
-          gson.toJson(iter, TradeLog.class, writer);
+          gson.toJson(log, TradeLog.class, writer);
           writer.close();
         } catch (IOException ex) {
           System.out.println("Failed to save trade log for trade between " + log.getPlayer1().getLastKnownName() + " and " + log.getPlayer2().getLastKnownName());

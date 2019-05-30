@@ -303,7 +303,6 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onClose(InventoryCloseEvent event) {
-    System.out.println("Close " + event.getPlayer().getName());
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) {
       return;

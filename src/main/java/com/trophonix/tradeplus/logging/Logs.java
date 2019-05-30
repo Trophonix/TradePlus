@@ -57,7 +57,7 @@ public class Logs implements List<TradeLog> {
   }
 
   public void log(TradeLog log) {
-
+    logs.add(log);
   }
 
   public void save() {

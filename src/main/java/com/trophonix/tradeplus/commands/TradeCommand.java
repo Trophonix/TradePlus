@@ -3,6 +3,7 @@ package com.trophonix.tradeplus.commands;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.events.TradeAcceptEvent;
 import com.trophonix.tradeplus.events.TradeRequestEvent;
+import com.trophonix.tradeplus.hooks.FactionsHook;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.trade.TradeRequest;
 import com.trophonix.tradeplus.util.MsgUtils;
@@ -12,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -61,6 +63,21 @@ public class TradeCommand extends Command {
         MsgUtils.send(player, pl.getLang().getString("errors.player-not-found").replace("%PLAYER%", args[0]).split("%NEWLINE%"));
         return;
       }
+
+      if (player == receiver) {
+        MsgUtils.send(player, pl.getLang().getString("errors.self-trade").split("%NEWLINE%"));
+        return;
+      }
+
+      if (!pl.getConfig().getBoolean("allow-same-ip-trade", true)) {
+        InetSocketAddress address = player.getAddress();
+        InetSocketAddress receiverAddress = receiver.getAddress();
+        if (address != null && receiverAddress != null && address.getHostName().equals(receiverAddress.getHostName())) {
+          MsgUtils.send(player, pl.getLang().getString("errors.same-ip").split("%NEWLINE%"));
+          return;
+        }
+      }
+
       if (!pl.getConfig().getBoolean("allow-trade-in-creative", true)) {
         if (player.getGameMode().equals(GameMode.CREATIVE)) {
           MsgUtils.send(player, pl.getLang().getString("errors.creative").split("%NEWLINE%"));
@@ -70,21 +87,19 @@ public class TradeCommand extends Command {
           return;
         }
       }
-      if (player == receiver) {
-        MsgUtils.send(player, pl.getLang().getString("errors.self-trade").split("%NEWLINE%"));
-        return;
-      }
 
       if (player.getWorld().equals(receiver.getWorld())) {
-        double amount = pl.getConfig().getDouble("ranges.sameworld");
-        if (amount != 0.0 && player.getLocation().distance(receiver.getLocation()) > amount) {
+        double amount = Math.pow(pl.getConfig().getDouble("ranges.sameworld"), 2);
+        if (amount != 0.0 && player.getLocation().distanceSquared(receiver.getLocation()) > amount) {
           MsgUtils.send(player, pl.getLang().getString("errors.within-range.same-world").replace("%PLAYER%", receiver.getName()).replace("%AMOUNT%", amount + "").split("%NEWLINE%"));
           return;
         }
       } else {
         if (pl.getConfig().getBoolean("ranges.allowcrossworld")) {
-          double amount = pl.getConfig().getDouble("ranges.crossworld");
-          if (amount != 0.0 && player.getLocation().distance(new Location(player.getWorld(), receiver.getLocation().getX(), receiver.getLocation().getY(), receiver.getLocation().getZ())) > amount) {
+          double amount = Math.pow(pl.getConfig().getDouble("ranges.crossworld"), 2);
+          Location test = receiver.getLocation().clone();
+          test.setWorld(player.getWorld());
+          if (amount != 0.0 && player.getLocation().distanceSquared(test) > amount) {
             MsgUtils.send(player, pl.getLang().getString("errors.within-range.cross-world").replace("%PLAYER%", receiver.getName()).replace("%AMOUNT%", amount + "").split("%NEWLINE%"));
             return;
           }
@@ -93,6 +108,16 @@ public class TradeCommand extends Command {
           return;
         }
       }
+
+      try {
+        if (!pl.getConfig().getBoolean("hooks.factions.allow-trades-in-enemy-territory", false)) {
+          if (FactionsHook.isPlayerInEnemyTerritory(player)) {
+            MsgUtils.send(player, pl.getConfig().getString("hooks.factions.enemy-territory").split("%NEWLINE%"));
+            return;
+          }
+        }
+      } catch (Exception ignored) { }
+
       for (TradeRequest req : requests) {
         if (req.sender == player) {
           MsgUtils.send(player, pl.getLang().getString("errors.wait-for-expire").split("%NEWLINE%"));

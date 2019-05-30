@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.45</version>
+    <version>3.46</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
@@ -44,8 +44,8 @@
         </repository>
 
         <repository>
-            <id>wesjd-repo</id>
-            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
+            <id>savagefactions-repo</id>
+            <url>https://cdn.jsdelivr.net/gh/ProSavage/SavageFactions@1.6.x/</url>
         </repository>
     </repositories>
 
@@ -124,6 +124,13 @@
             <version>3.2.2</version>
             <scope>system</scope>
             <systemPath>${res}/TokenManager.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ProSavage</groupId>
+            <artifactId>SavageFactions</artifactId>
+            <version>1.6.9.5-0.1.21-gbdd5473-400</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

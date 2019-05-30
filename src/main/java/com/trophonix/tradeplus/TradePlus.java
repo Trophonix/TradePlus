@@ -83,6 +83,7 @@ public class TradePlus extends JavaPlugin {
       }
       config.set("aliases", Collections.singletonList("trade+"));
       config.set("trade-logs", false);
+      config.set("allow-same-ip-trade", true);
 
       config.set("permissions.required", config.getBoolean("permissionrequired", false));
       config.set("permissions.send", config.getString("permissionnode", "tradeplus.send"));
@@ -203,6 +204,8 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.tokenmanager.taxpercent", 0);
       config.set("extras.tokenmanager.mode", "type");
 
+      config.set("hooks.factions.allow-trades-in-enemy-territory", false);
+
       config.set("soundeffects.enabled", true);
       config.set("soundeffects.onchange", true);
       config.set("soundeffects.onaccept", true);
@@ -251,6 +254,7 @@ public class TradePlus extends JavaPlugin {
       lang.set("admin.forced-trade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
       lang.set("admin.players-only", "&4&l(!) &4This command is for players only.");
       lang.set("admin.no-trade", "&4&l(!) &4No trade was found with those arguments.");
+      lang.set("hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
     } else {
       double configVersion = config.contains("configversion") && config.isDouble("configversion") ? config.getDouble("configversion") : 0;
 
@@ -550,6 +554,13 @@ public class TradePlus extends JavaPlugin {
 
       if (configVersion < 3.40) {
         config.set("trade-logs", false);
+      }
+
+      if (configVersion < 3.46) {
+        config.set("allow-same-ip-trade", true);
+        config.set("hooks.factions.allow-trades-in-enemy-territory", false);
+        lang.set("errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
+        lang.set("hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
       }
     }
 

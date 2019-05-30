@@ -5,10 +5,12 @@ import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import com.trophonix.tradeplus.util.Sounds;
-import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.ConversationFactory;
+import org.bukkit.conversations.NumericPrompt;
+import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.ItemFlag;
@@ -64,15 +66,54 @@ public abstract class Extra {
     this.pl.log("'" + name + "' extra initialized. Balances: [" + max1 + ", " + max2 + "]");
   }
 
-  private AnvilGUI gui;
-
   public void onClick(Player player, ClickType click) {
     if (typeMode) {
-      double bal = getMax(player);
       trade.setCancelOnClose(player, false);
       player.closeInventory();
       double offer = player1.equals(player) ? value1 : value2;
-      gui = new AnvilGUI(pl, player, decimalFormat.format(offer), (p, input) -> {
+
+      new ConversationFactory(pl).withFirstPrompt(new NumericPrompt() {
+        @Override protected Prompt acceptValidatedInput(ConversationContext conversationContext, Number number) {
+          if (trade.cancelled) return null;
+          if (number.doubleValue() >= getMax(player)) {
+            return new NumericPrompt() {
+              @Override protected Prompt acceptValidatedInput(ConversationContext conversationContext, Number number) {
+                if (trade.cancelled) return null;
+                if (number.doubleValue() > getMax(player)) {
+                  return this;
+                }
+                if (player1.equals(player)) {
+                  value1 = number.doubleValue();
+                } else if (player2.equals(player)) {
+                  value2 = number.doubleValue();
+                }
+                return null;
+              }
+              @Override public String getPromptText(ConversationContext conversationContext) {
+                return pl.getTypeMaximum().replace("%BALANCE%", decimalFormat.format(getMax(player)));
+              }
+            };
+          }
+          if (player1.equals(player)) {
+            value1 = number.doubleValue();
+          } else if (player2.equals(player)) {
+            value2 = number.doubleValue();
+          }
+          return null;
+        }
+
+        @Override public String getPromptText(ConversationContext conversationContext) {
+          return pl.getTypeEmpty().replace("%BALANCE%", decimalFormat.format(getMax(player)))
+              .replace("%AMOUNT%", decimalFormat.format(offer));
+        }
+      }).withTimeout(30).addConversationAbandonedListener(event -> {
+        if (!event.gracefulExit()) Sounds.villagerHmm(player, 1f);
+        trade.open(player);
+        trade.updateExtras();
+        trade.setCancelOnClose(player, true);
+      }).buildConversation(player)
+          .begin();
+      /*gui = new AnvilGUI(pl, player, decimalFormat.format(offer), (p, input) -> {
         if (input == null || input.isEmpty())
           return pl.getTypeEmpty();
         try {
@@ -100,7 +141,7 @@ public abstract class Extra {
             }
           }, 1L);
         }
-      };
+      };*/
     } else {
       if (click.isLeftClick()) {
         if (click.isShiftClick()) {
@@ -132,21 +173,21 @@ public abstract class Extra {
         }
       }
 
-      if (increment1 < 0) increment1 = 0;
-      if (increment2 < 0) increment2 = 0;
-
-      if (value1 < 0) value1 = 0;
-      if (value2 < 0) value2 = 0;
-
-      long now = System.currentTimeMillis();
-      if (now > lastUpdatedMax + 5000) {
-        max1 = getMax(player1);
-        max2 = getMax(player2);
-        lastUpdatedMax = now;
-      }
-      if (value1 > max1) value1 = max1;
-      if (value2 > max2) value2 = max2;
     }
+    if (increment1 < 0) increment1 = 0;
+    if (increment2 < 0) increment2 = 0;
+
+    if (value1 < 0) value1 = 0;
+    if (value2 < 0) value2 = 0;
+
+    long now = System.currentTimeMillis();
+    if (now > lastUpdatedMax + 5000) {
+      max1 = getMax(player1);
+      max2 = getMax(player2);
+      lastUpdatedMax = now;
+    }
+    if (value1 > max1) value1 = max1;
+    if (value2 > max2) value2 = max2;
   }
 
   protected abstract double getMax(Player player);

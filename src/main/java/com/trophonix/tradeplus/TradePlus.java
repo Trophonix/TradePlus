@@ -613,11 +613,7 @@ public class TradePlus extends JavaPlugin {
 
   @Override public void onDisable() {
     if (logs != null) {
-      try {
-        logs.save();
-      } catch (IOException ex) {
-        getLogger().warning("Failed to save trade log files.");
-      }
+      logs.save();
     }
   }
 

@@ -1,6 +1,7 @@
 package com.trophonix.tradeplus.logging;
 
 import com.trophonix.tradeplus.util.ItemFactory;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -12,8 +13,7 @@ import java.util.UUID;
 @Getter
 public class TradeLog implements PostProcessor {
 
-  private UUID player1, player2;
-  private transient String lastKnownName1, lastKnownName2;
+  private Trader player1, player2;
   private List<ItemFactory> player1Items, player2Items;
   private List<ExtraOffer> player1ExtraOffers, player2ExtraOffers;
   private Date time;
@@ -23,10 +23,8 @@ public class TradeLog implements PostProcessor {
   public TradeLog(OfflinePlayer player1, OfflinePlayer player2, List<ItemFactory> player1Items,
                   List<ItemFactory> player2Items, List<ExtraOffer> player1ExtraOffers,
                   List<ExtraOffer> player2ExtraOffers) {
-    this.player1 = player1.getUniqueId();
-    this.player2 = player2.getUniqueId();
-    this.lastKnownName1 = player1.getName();
-    this.lastKnownName2 = player2.getName();
+    this.player1 = new Trader(player1.getUniqueId(), player1.getName());
+    this.player2 = new Trader(player2.getUniqueId(), player2.getName());
     player1Items.sort((o1, o2) -> Integer.compare(o2.getAmount(), o1.getAmount()));
     this.player1Items = player1Items;
     player2Items.sort((o1, o2) -> Integer.compare(o2.getAmount(), o1.getAmount()));
@@ -37,10 +35,21 @@ public class TradeLog implements PostProcessor {
   }
 
   @Override public void doPostProcessing() {
-    OfflinePlayer op1 = Bukkit.getOfflinePlayer(player1);
-    if (op1.getName() != null) lastKnownName1 = op1.getName();
-    OfflinePlayer op2 = Bukkit.getOfflinePlayer(player2);
-    if (op2.getName() != null) lastKnownName2 = op2.getName();
+    player1.updateName();
+    player2.updateName();
+  }
+
+  @Getter @AllArgsConstructor
+  public static class Trader {
+
+    private UUID uniqueId;
+    private String lastKnownName;
+
+    void updateName() {
+      OfflinePlayer op = Bukkit.getOfflinePlayer(uniqueId);
+      if (op.getName() != null) lastKnownName = op.getName();
+    }
+
   }
 
   @Getter

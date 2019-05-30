@@ -47,6 +47,7 @@ public class Trade implements Listener {
   private ItemStack[] accepted1, accepted2;
   private boolean forced = false;
   private BukkitTask task = null;
+  public boolean cancelled;
 
   public Trade(Player player1, Player player2) {
     this.player1 = player1;
@@ -302,19 +303,21 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onClose(InventoryCloseEvent event) {
+    System.out.println("Close " + event.getPlayer().getName());
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) {
       return;
     }
-    if (closed.equals(inv1) || closed.equals(inv2) || inv1.getViewers().contains(event.getPlayer()) || inv2.getViewers().contains(event.getPlayer())) {
+    if (closed == inv1 || closed == inv2 || closed.equals(inv1) || closed.equals(inv2) || inv1.getViewers().contains(event.getPlayer()) || inv2.getViewers().contains(event.getPlayer())) {
       if ( (event.getPlayer().equals(player1) && !cancelOnClose1) ||
             event.getPlayer().equals(player2) && !cancelOnClose2 ) {
         return;
       }
-      HandlerList.unregisterAll(this);
       if (closed.getItem(49) == null) {
         return;
       }
+      HandlerList.unregisterAll(this);
+
       pl.ongoingTrades.remove(this);
       if (task != null) {
         task.cancel();
@@ -322,6 +325,8 @@ public class Trade implements Listener {
       }
       inv1.setItem(49, null);
       inv2.setItem(49, null);
+      cancelled = true;
+
       giveItemsOnLeft(inv1, player1);
       giveItemsOnLeft(inv2, player2);
       giveOnCursor(player1);
@@ -531,6 +536,8 @@ public class Trade implements Listener {
               task = null;
               inv1.setItem(49, null);
               inv2.setItem(49, null);
+              cancelled = true;
+
               player1.closeInventory();
               player2.closeInventory();
 
@@ -597,6 +604,7 @@ public class Trade implements Listener {
                       combine(accepted2).stream().map(ItemFactory::new).collect(Collectors.toList()),
                       extras.stream().filter(e -> e.value1 > 0).map(e -> new TradeLog.ExtraOffer(e.name, e.value1)).collect(Collectors.toList()),
                       extras.stream().filter(e -> e.value2 > 0).map(e -> new TradeLog.ExtraOffer(e.name, e.value2)).collect(Collectors.toList())));
+                  pl.getLogs().save();
                 } catch (Exception ex) {
                   pl.log("Failed to save trade log. " + ex.getMessage());
                 }
@@ -764,7 +772,17 @@ public class Trade implements Listener {
   }
 
   private boolean similar(ItemStack item1, ItemStack item2) {
-    return item1 == item2 || (item1 != null && item2 != null && item1.isSimilar(item2));
+    return item1 == item2 || (item1 != null && item1.isSimilar(item2));
+  }
+
+  public void open(Player player) {
+    if (!cancelled) {
+      if (player1.equals(player)) {
+        player.openInventory(inv1);
+      } else if (player2.equals(player)) {
+        player.openInventory(inv2);
+      }
+    }
   }
 
   public void setCancelOnClose(Player player, boolean cancelOnClose) {

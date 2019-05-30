@@ -14,12 +14,13 @@ import java.util.function.UnaryOperator;
 
 public class Logs implements List<TradeLog> {
 
-  private static final Type logListType = new TypeToken<List<TradeLog>>(){ }.getType();
+  private static final DateFormat folderNameFormat = new SimpleDateFormat(
+      "'session_'yyyy-MM-dd'_'HH:mm:ss");
 
   private static final DateFormat fileNameFormat = new SimpleDateFormat(
-      "'session_'yyyy-MM-dd'_'HH:mm:ss'.json'");
+      "'{player1}-{player2}_'HH:mm:ss'.json'");
 
-  private File file;
+  private File folder;
   private List<TradeLog> logs = new ArrayList<>();
 
   private Gson gson = new GsonBuilder()
@@ -37,28 +38,46 @@ public class Logs implements List<TradeLog> {
         .create();
 
   public Logs(File parent, String file) throws IOException {
-    if (!parent.exists()) parent.mkdirs();
-    this.file = new File(parent, file);
-    if (this.file.exists()) {
-      FileReader reader = new FileReader(this.file);
-      logs.addAll(gson.fromJson(reader, logListType));
-      reader.close();
+    if (!parent.exists()) {
+      parent.mkdirs();
+    }
+    folder = new File(parent, file);
+    File[] contents;
+    if (folder.exists() && (contents = folder.listFiles()) != null) {
+      for (File child : contents) {
+        FileReader reader = new FileReader(child);
+        add(gson.fromJson(reader, TradeLog.class));
+        reader.close();
+      }
     }
   }
 
   public Logs(File parent) throws IOException {
-    this(parent, fileNameFormat.format(new Date()));
+    this(parent, folderNameFormat.format(new Date()));
   }
 
   public void log(TradeLog log) {
-    logs.add(log);
+
   }
 
-  public void save() throws IOException {
+  public void save() {
     if (!logs.isEmpty()) {
-      FileWriter writer = new FileWriter(file);
-      gson.toJson(logs, logListType, writer);
-      writer.close();
+      Iterator<TradeLog> iter = iterator();
+      while (iter.hasNext()) {
+        TradeLog log = iter.next();
+        try {
+          FileWriter writer = new FileWriter(
+              new File(folder, fileNameFormat.format(log.getTime())
+                                   .replace("{player1}", log.getPlayer1().getLastKnownName())
+                                   .replace("{player2}", log.getPlayer2().getLastKnownName())));
+          gson.toJson(iter, TradeLog.class, writer);
+          writer.close();
+        } catch (IOException ex) {
+          System.out.println("Failed to save trade log for trade between " + log.getPlayer1().getLastKnownName() + " and " + log.getPlayer2().getLastKnownName());
+          ex.printStackTrace();
+        }
+        iter.remove();
+      }
     }
   }
 
@@ -127,7 +146,9 @@ public class Logs implements List<TradeLog> {
   }
 
   @Override public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     return logs.equals(o);
   }
 

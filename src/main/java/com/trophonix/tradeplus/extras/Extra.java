@@ -107,6 +107,7 @@ public abstract class Extra {
               .replace("%AMOUNT%", decimalFormat.format(offer));
         }
       }).withTimeout(30).addConversationAbandonedListener(event -> {
+        if (trade.cancelled) return;
         if (!event.gracefulExit()) Sounds.villagerHmm(player, 1f);
         trade.open(player);
         trade.updateExtras();

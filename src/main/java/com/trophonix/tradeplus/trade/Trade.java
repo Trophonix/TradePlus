@@ -42,6 +42,7 @@ public class Trade implements Listener {
   public final Inventory inv1;
   public final Inventory inv2;
   private final List<Extra> extras = new ArrayList<>();
+  private final Map<Integer, Extra> placedExtras = new HashMap<>();
   private final long startTime = System.currentTimeMillis();
   private boolean accept1, accept2;
   private ItemStack[] accepted1, accepted2;
@@ -244,20 +245,19 @@ public class Trade implements Listener {
           }
           ItemStack item = event.getCurrentItem();
           ItemStack cursor = player.getItemOnCursor();
-          if ((item == null || item.getType().equals(Material.AIR)) && !(cursor == null || cursor.getType().equals(Material.AIR))) {
+          if ((item == null || item.getType().equals(Material.AIR)) && !cursor.getType().equals(Material.AIR)) {
             for (int j : InvUtils.leftSlots) {
+              if (getExtra(j) != null) continue;
               ItemStack i = open.getItem(j);
-              if (i != null && i.isSimilar(cursor)) {
+              if (i != null && cursor.isSimilar(i)) {
                 int amount = cursor.getAmount() + i.getAmount();
                 if (amount <= cursor.getMaxStackSize()) {
                   open.setItem(j, null);
                   cursor.setAmount(amount);
                 } else {
-                  int buffer = cursor.getMaxStackSize() - cursor.getAmount();
-                  i.setAmount(i.getAmount() - buffer);
+                  int remaining = amount - cursor.getMaxStackSize();
+                  i.setAmount(remaining);
                   cursor.setAmount(cursor.getMaxStackSize());
-                }
-                if (cursor.getAmount() >= cursor.getMaxStackSize()) {
                   break;
                 }
               }
@@ -374,7 +374,7 @@ public class Trade implements Listener {
   }
 
   private void giveOnCursor(Player player) {
-    if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) {
+    if (player.getItemOnCursor().getType() != Material.AIR) {
       player.getInventory().addItem(player.getItemOnCursor()).forEach((i, j) ->
               player.getWorld().dropItemNaturally(player.getLocation(), j));
       player.setItemOnCursor(null);
@@ -464,9 +464,11 @@ public class Trade implements Listener {
       inv2.setItem(slot, InvUtils.placeHolder);
       inv2.setItem(getRight(slot), InvUtils.placeHolder);
     }
+    placedExtras.clear();
     for (Extra extra : extras) {
       inv1.setItem(extraSlots.get(slot1), extra.getIcon(player1));
       inv2.setItem(extraSlots.get(slot1), extra.getIcon(player2));
+      placedExtras.put(slot1, extra);
       slot1++;
       if (extra.value1 > 0) {
         inv2.setItem(getRight(extraSlots.get(slot2a)), extra.getTheirIcon(player1));
@@ -631,13 +633,7 @@ public class Trade implements Listener {
   }
 
   private Extra getExtra(int slot) {
-    ItemStack icon = inv1.getItem(slot);
-    for (Extra extra : extras) {
-      if (icon != null && icon.getType().equals(extra.icon.getType())) {
-        return extra;
-      }
-    }
-    return null;
+    return placedExtras.get(slot);
   }
 
   private int getRight(int slot) {

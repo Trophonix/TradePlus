@@ -468,7 +468,7 @@ public class Trade implements Listener {
     for (Extra extra : extras) {
       inv1.setItem(extraSlots.get(slot1), extra.getIcon(player1));
       inv2.setItem(extraSlots.get(slot1), extra.getIcon(player2));
-      placedExtras.put(slot1, extra);
+      placedExtras.put(extraSlots.get(slot1), extra);
       slot1++;
       if (extra.value1 > 0) {
         inv2.setItem(getRight(extraSlots.get(slot2a)), extra.getTheirIcon(player1));

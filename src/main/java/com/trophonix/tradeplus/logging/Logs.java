@@ -1,12 +1,10 @@
 package com.trophonix.tradeplus.logging;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -35,6 +33,7 @@ public class Logs implements List<TradeLog> {
       }).registerTypeAdapterFactory(new PostProcessingEnabler())
         .registerTypeHierarchyAdapter(List.class, new NullEmptyListAdapter())
         .registerTypeHierarchyAdapter(Number.class, new NullZeroNumberAdapter())
+        .setPrettyPrinting()
         .create();
 
   public Logs(File parent, String file) throws IOException {
@@ -66,15 +65,17 @@ public class Logs implements List<TradeLog> {
       while (iter.hasNext()) {
         TradeLog log = iter.next();
         try {
-          FileWriter writer = new FileWriter(
-              new File(folder, fileNameFormat.format(log.getTime())
-                                   .replace("{player1}", log.getPlayer1().getLastKnownName())
-                                   .replace("{player2}", log.getPlayer2().getLastKnownName())));
+          File file = new File(folder, fileNameFormat.format(log.getTime())
+                                           .replace("{player1}", log.getPlayer1().getLastKnownName())
+                                           .replace("{player2}", log.getPlayer2().getLastKnownName()));
+          if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+          if (!file.exists()) file.createNewFile();
+          FileWriter writer = new FileWriter(file);
           gson.toJson(log, TradeLog.class, writer);
           writer.close();
         } catch (IOException ex) {
           System.out.println("Failed to save trade log for trade between " + log.getPlayer1().getLastKnownName() + " and " + log.getPlayer2().getLastKnownName());
-          ex.printStackTrace();
+          System.out.println(ex.getLocalizedMessage());
         }
         iter.remove();
       }

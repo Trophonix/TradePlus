@@ -564,15 +564,6 @@ public class TradePlus extends JavaPlugin {
       }
     }
 
-    if (config.getBoolean("trade-logs", false)) {
-      try {
-        logs = new Logs(new File(getDataFolder(), "logs"));
-        log("Initialized trade logger.");
-      } catch (IOException ex) {
-        log("Failed to load trade logger. " + ex.getMessage());
-      }
-    }
-
     List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
     for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
       fixList.add(getConfig().getString("extras." + key + ".material"));
@@ -631,6 +622,14 @@ public class TradePlus extends JavaPlugin {
   public void reload() {
     config = YamlConfiguration.loadConfiguration(configFile);
     debugMode = config.getBoolean("debug-mode", false);
+    if (logs == null && config.getBoolean("trade-logs", false)) {
+      try {
+        logs = new Logs(new File(getDataFolder(), "logs"));
+        log("Initialized trade logger.");
+      } catch (IOException ex) {
+        log("Failed to load trade logger. " + ex.getMessage());
+      }
+    }
     lang = YamlConfiguration.loadConfiguration(langFile);
     InvUtils.reloadItems(this);
     commandHandler.clear();

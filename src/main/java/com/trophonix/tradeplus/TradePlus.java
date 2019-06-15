@@ -1,5 +1,7 @@
 package com.trophonix.tradeplus;
 
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import com.trophonix.tradeplus.commands.CommandHandler;
 import com.trophonix.tradeplus.commands.TradeCommand;
 import com.trophonix.tradeplus.commands.TradePlusCommand;
@@ -7,6 +9,7 @@ import com.trophonix.tradeplus.logging.Logs;
 import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.*;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,7 +23,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
-  public ConcurrentLinkedQueue<Trade> ongoingTrades;
+  @Getter private TaskChainFactory taskFactory;
+
+  public ConcurrentLinkedQueue<Trade> ongoingTrades = new ConcurrentLinkedQueue<>();
   private File configFile;
   private FileConfiguration config;
   private File langFile;
@@ -68,6 +73,120 @@ public class TradePlus extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    taskFactory = BukkitTaskChainFactory.create(this);
+    taskFactory.newChain()
+        .async(this::loadConfig)
+        .sync(() -> {
+          List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
+          for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
+            fixList.add(getConfig().getString("extras." + key + ".material"));
+          }
+          for (String key : fixList) {
+            if (key == null || key.equals("")) continue;
+            if (config.contains(key)) {
+              String val = config.getString(key).replace(" ", "_").toUpperCase();
+              if (Material.getMaterial(val) == null) {
+                if (val.contains(":")) {
+                  String[] split = val.split(":");
+                  if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
+                }
+
+                UMaterial uMat = UMaterial.match(val);
+                if (uMat == null) {
+                  getLogger().warning("Couldn't find material for " + val + ". This could cause a crash.");
+                  getLogger().warning("Make sure this is a valid material before reporting this as a bug.");
+                  continue;
+                }
+
+                String name = uMat.getMaterial().name() + (uMat.getData() > 0 ? ":" + uMat.getData() : "");
+                config.set(key, name);
+                getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
+              }
+            }
+          }
+
+          config.set("configversion", Double.parseDouble(getDescription().getVersion()));
+          saveConfig();
+          saveLang();
+          InvUtils.reloadItems(this);
+          typeEmpty = ChatColor.translateAlternateColorCodes('&',
+              config.getString("extras.type.empty"));
+          typeValid = ChatColor.translateAlternateColorCodes('&',
+              config.getString("extras.type.valid"));
+          typeInvalid = ChatColor.translateAlternateColorCodes('&',
+              config.getString("extras.type.invalid"));
+          typeMaximum = ChatColor.translateAlternateColorCodes('&',
+              config.getString("extras.type.maximum"));
+          if (Sounds.version > 17) {
+            getServer().getPluginManager().registerEvents(new InteractListener(this), this);
+          }
+          commandHandler = new CommandHandler(this);
+          commandHandler.add(new TradeCommand(this));
+          commandHandler.add(new TradePlusCommand(this));
+        }).execute();
+  }
+
+  @Override public void onDisable() {
+    if (logs != null) {
+      logs.save();
+    }
+  }
+
+  public void reload() {
+    config = YamlConfiguration.loadConfiguration(configFile);
+    debugMode = config.getBoolean("debug-mode", false);
+    if (logs == null && config.getBoolean("trade-logs", false)) {
+      try {
+        logs = new Logs(new File(getDataFolder(), "logs"));
+        log("Initialized trade logger.");
+      } catch (IOException ex) {
+        log("Failed to load trade logger. " + ex.getMessage());
+      }
+    }
+    lang = YamlConfiguration.loadConfiguration(langFile);
+    InvUtils.reloadItems(this);
+    commandHandler.clear();
+    commandHandler.add(new TradeCommand(this));
+    commandHandler.add(new TradePlusCommand(this));
+  }
+
+  public FileConfiguration getLang() { return lang; }
+
+  private void saveLang() {
+    try {
+      lang.save(langFile);
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public void log(String message) {
+    if (debugMode) {
+      getLogger().info(message);
+    }
+  }
+
+  public Logs getLogs() {
+    return logs;
+  }
+
+  public String getTypeEmpty() {
+    return typeEmpty;
+  }
+
+  public String getTypeValid() {
+    return typeValid;
+  }
+
+  public String getTypeInvalid() {
+    return typeInvalid;
+  }
+
+  public String getTypeMaximum() {
+    return typeMaximum;
+  }
+
+  private void loadConfig() {
     configFile = new File(getDataFolder(), "config.yml");
     config = YamlConfiguration.loadConfiguration(configFile);
     langFile = new File(getDataFolder(), "lang.yml");
@@ -236,8 +355,8 @@ public class TradePlus extends JavaPlugin {
       lang.set("errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
       lang.set("errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
       lang.set("errors.invalid-usage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
-              "    &c- /trade <player name>%NEWLINE%" +
-              "    &c- /trade deny");
+                                           "    &c- /trade <player name>%NEWLINE%" +
+                                           "    &c- /trade deny");
       lang.set("errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
       lang.set("errors.no-perms.send", "&4&l(!) &r&4You do not have permission to send a trade");
       lang.set("errors.no-perms.receive", "&4&l(!) &r&4That player does not have permission to accept a trade");
@@ -345,7 +464,7 @@ public class TradePlus extends JavaPlugin {
         if (config.contains("messages")) {
           for (String key : config.getConfigurationSection("messages").getKeys(false))
             lang.set(key, config.getString("messages." + key).replace("%PLAYERNAME%", "%PLAYER%")
-                    .replace("%MONEYAMOUNT%", "%AMOUNT%").replace("%XPAMOUNT%", "%AMOUNT%"));
+                              .replace("%MONEYAMOUNT%", "%AMOUNT%").replace("%XPAMOUNT%", "%AMOUNT%"));
           config.set("messages", null);
         }
         if (config.contains("hooks")) {
@@ -355,13 +474,13 @@ public class TradePlus extends JavaPlugin {
             config.set("extras.experience." + key.replace("youroffer", "display").replace("theiroffer", "theirdisplay"), config.get("hooks.experience." + key));
           config.set("hooks", null);
           config.set("extras.economy.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                  "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                  "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                  "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
           config.set("extras.experience.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                  "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                  "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                  "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+              "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+              "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+              "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
           config.set("extras.economy.taxpercent", 0);
           config.set("extras.experience.taxpercent", 0);
         }
@@ -375,9 +494,9 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.playerpoints.display", "&7Your current PlayerPoints offer is &b%AMOUNT%");
         config.set("extras.playerpoints.theirdisplay", "&7Their current PlayerPoints offer is &b%AMOUNT%");
         config.set("extras.playerpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+            "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+            "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
         config.set("extras.playerpoints.increment", 5);
         config.set("extras.playerpoints.taxpercent", 0);
       }
@@ -393,9 +512,9 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.griefprevention.display", "&7Your current GriefPrevention offer is &b%AMOUNT%");
         config.set("extras.griefprevention.theirdisplay", "&7Their current GriefPrevention offer is &b%AMOUNT%");
         config.set("extras.griefprevention.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+            "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+            "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
         config.set("extras.griefprevention.increment", 1);
         config.set("extras.griefprevention.taxperecent", 0);
       }
@@ -406,8 +525,8 @@ public class TradePlus extends JavaPlugin {
         lang.set("denied-you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
         if (lang.getString("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>").equals("&4&l(!) &r&4Invalid arguments. Usage: &c/trade <player name>")) {
           lang.set("invalidusage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
-                  "    &c- /trade <player name>%NEWLINE%" +
-                  "    &c- /trade deny");
+                                       "    &c- /trade <player name>%NEWLINE%" +
+                                       "    &c- /trade deny");
         }
       }
 
@@ -452,9 +571,9 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.enjinpoints.display", "&7Your current EnjinPoints offer is &b%AMOUNT%");
         config.set("extras.enjinpoints.theirdisplay", "&7Their current EnjinPoints offer is &b%AMOUNT%");
         config.set("extras.enjinpoints.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+            "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+            "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
         config.set("extras.enjinpoints.increment", 1);
         config.set("extras.enjinpoints.taxpercent", 0);
       }
@@ -469,9 +588,9 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.tokenenchant.display", "&7Your current TokenEnchant tokens offer is &b%AMOUNT%");
         config.set("extras.tokenenchant.theirdisplay", "Their current TokenEnchants tokens offer is &b%AMOUNT%");
         config.set("extras.tokenenchant.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+            "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+            "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
         config.set("extras.tokenenchant.increment", 1);
         config.set("extras.tokenenchant.taxpercent", 0);
       }
@@ -514,7 +633,7 @@ public class TradePlus extends JavaPlugin {
         lang.set("errors.player-not-found", lang.getString("playernotfound", "&4&l(!) &r&4Could not find specified player"));
         lang.set("errors.self-trade", lang.getString("tradewithself", "&4&l(!) &r&4You cannot trade with yourself"));
         lang.set("errors.invalid-usage", lang.getString("invalidusage",
-                "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
+            "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%" +
                 "    &c- /trade <player name>%NEWLINE%" +
                 "    &c- /trade deny"));
         lang.set("errors.no-perms.accept", lang.getString("noperms", "&4&l(!) &r&4You do not have permission to trade"));
@@ -531,9 +650,9 @@ public class TradePlus extends JavaPlugin {
         config.set("extras.tokenmanager.display", "&7Your current TokenManager tokens offer is &b%AMOUNT%");
         config.set("extras.tokenmanager.theirdisplay", "&7Their current TokenManager tokens offer is &b%AMOUNT%");
         config.set("extras.tokenmanager.lore", Arrays.asList("&aLeft Click to &clower &ayour offer by %PLAYERINCREMENT%",
-                "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
-                "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
-                "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
+            "&aRight Click to &braise &ayour offer by %PLAYERINCREMENT%",
+            "&aShift + Left Click to &clower &ayour increment by %INCREMENT%",
+            "&aShift + Right Click to &braise &ayour increment by %INCREMENT%"));
         config.set("extras.tokenmanager.increment", 1);
         config.set("extras.tokenmanager.taxpercent", 0);
       }
@@ -563,114 +682,6 @@ public class TradePlus extends JavaPlugin {
         lang.set("hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
       }
     }
-
-    List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
-    for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
-      fixList.add(getConfig().getString("extras." + key + ".material"));
-    }
-    for (String key : fixList) {
-      if (key == null || key.equals("")) continue;
-      if (config.contains(key)) {
-        String val = config.getString(key).replace(" ", "_").toUpperCase();
-        if (Material.getMaterial(val) == null) {
-          if (val.contains(":")) {
-            String[] split = val.split(":");
-            if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
-          }
-
-          UMaterial uMat = UMaterial.match(val);
-          if (uMat == null) {
-            getLogger().warning("Couldn't find material for " + val + ". This could cause a crash.");
-            getLogger().warning("Make sure this is a valid material before reporting this as a bug.");
-            continue;
-          }
-
-          String name = uMat.getMaterial().name() + (uMat.getData() > 0 ? ":" + uMat.getData() : "");
-          config.set(key, name);
-          getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
-        }
-      }
-    }
-
-    config.set("configversion", Double.parseDouble(getDescription().getVersion()));
-    saveConfig();
-    saveLang();
-    InvUtils.reloadItems(this);
-    typeEmpty = ChatColor.translateAlternateColorCodes('&',
-        config.getString("extras.type.empty"));
-    typeValid = ChatColor.translateAlternateColorCodes('&',
-        config.getString("extras.type.valid"));
-    typeInvalid = ChatColor.translateAlternateColorCodes('&',
-        config.getString("extras.type.invalid"));
-    typeMaximum = ChatColor.translateAlternateColorCodes('&',
-        config.getString("extras.type.maximum"));
-    if (Sounds.version > 17) {
-      getServer().getPluginManager().registerEvents(new InteractListener(this), this);
-    }
-    commandHandler = new CommandHandler(this);
-    commandHandler.add(new TradeCommand(this));
-    commandHandler.add(new TradePlusCommand(this));
-    ongoingTrades = new ConcurrentLinkedQueue<>();
-  }
-
-  @Override public void onDisable() {
-    if (logs != null) {
-      logs.save();
-    }
-  }
-
-  public void reload() {
-    config = YamlConfiguration.loadConfiguration(configFile);
-    debugMode = config.getBoolean("debug-mode", false);
-    if (logs == null && config.getBoolean("trade-logs", false)) {
-      try {
-        logs = new Logs(new File(getDataFolder(), "logs"));
-        log("Initialized trade logger.");
-      } catch (IOException ex) {
-        log("Failed to load trade logger. " + ex.getMessage());
-      }
-    }
-    lang = YamlConfiguration.loadConfiguration(langFile);
-    InvUtils.reloadItems(this);
-    commandHandler.clear();
-    commandHandler.add(new TradeCommand(this));
-    commandHandler.add(new TradePlusCommand(this));
-  }
-
-  public FileConfiguration getLang() { return lang; }
-
-  private void saveLang() {
-    try {
-      lang.save(langFile);
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
-  }
-
-  public void log(String message) {
-    if (debugMode) {
-      getLogger().info(message);
-    }
-  }
-
-  public Logs getLogs() {
-    return logs;
-  }
-
-  public String getTypeEmpty() {
-    return typeEmpty;
-  }
-
-  public String getTypeValid() {
-    return typeValid;
-  }
-
-  public String getTypeInvalid() {
-    return typeInvalid;
-  }
-
-  public String getTypeMaximum() {
-    return typeMaximum;
   }
 
 }

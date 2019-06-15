@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.49</version>
+    <version>3.51</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
@@ -47,6 +47,11 @@
             <id>savagefactions-repo</id>
             <url>https://cdn.jsdelivr.net/gh/ProSavage/SavageFactions@1.6.x/</url>
         </repository>
+
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -58,9 +63,23 @@
         </dependency>
 
         <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>1.14-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>21.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>co.aikar</groupId>
+            <artifactId>taskchain-bukkit</artifactId>
+            <version>3.7.2</version>
             <scope>compile</scope>
         </dependency>
 
@@ -180,12 +199,16 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.google.common</pattern>
-                                    <shadedPattern>com.trophonix.tradeplus.guava</shadedPattern>
+                                    <shadedPattern>com.trophonix.tradeplus.shaded.guava</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>net.wesjd.anvilgui</pattern>
-                                    <shadedPattern>com.trophonix.tradeplus.anvilgui</shadedPattern>
+                                    <pattern>co.aikar.taskchain</pattern>
+                                    <shadedPattern>com.trophonix.tradeplus.shaded.taskchain</shadedPattern>
                                 </relocation>
+<!--                                <relocation>-->
+<!--                                    <pattern>net.wesjd.anvilgui</pattern>-->
+<!--                                    <shadedPattern>com.trophonix.tradeplus.anvilgui</shadedPattern>-->
+<!--                                </relocation>-->
                             </relocations>
                             <minimizeJar>true</minimizeJar>
                         </configuration>

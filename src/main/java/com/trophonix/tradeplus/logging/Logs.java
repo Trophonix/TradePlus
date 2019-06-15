@@ -61,6 +61,7 @@ public class Logs implements List<TradeLog> {
 
   public void save() {
     if (!logs.isEmpty()) {
+      if (!folder.exists()) folder.mkdirs();
       Iterator<TradeLog> iter = iterator();
       while (iter.hasNext()) {
         TradeLog log = iter.next();
@@ -68,7 +69,6 @@ public class Logs implements List<TradeLog> {
           File file = new File(folder, fileNameFormat.format(log.getTime())
                                            .replace("{player1}", log.getPlayer1().getLastKnownName())
                                            .replace("{player2}", log.getPlayer2().getLastKnownName()));
-          if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
           if (!file.exists()) file.createNewFile();
           FileWriter writer = new FileWriter(file);
           gson.toJson(log, TradeLog.class, writer);

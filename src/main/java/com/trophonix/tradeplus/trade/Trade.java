@@ -31,16 +31,16 @@ public class Trade implements Listener {
 
   private static final List<Integer> extraSlots = new LinkedList<>(Arrays.asList(45, 46, 47, 48, 39, 38, 37, 36, 27, 28, 29, 30));
 
-  private final TradePlus pl = (TradePlus) Bukkit.getPluginManager().getPlugin("TradePlus");
+  private final TradePlus pl = TradePlus.getPlugin(TradePlus.class);
 
   private boolean cancelOnClose1 = true, cancelOnClose2 = true;
 
   public final Player player1;
   public final Player player2;
 
-  public final Inventory spectatorInv;
-  public final Inventory inv1;
-  public final Inventory inv2;
+  public Inventory spectatorInv;
+  private Inventory inv1;
+  private Inventory inv2;
   private final List<Extra> extras = new ArrayList<>();
   private final Map<Integer, Extra> placedExtras = new HashMap<>();
   private final long startTime = System.currentTimeMillis();
@@ -50,53 +50,57 @@ public class Trade implements Listener {
   private BukkitTask task = null;
   public boolean cancelled;
 
-  public Trade(Player player1, Player player2) {
-    this.player1 = player1;
-    this.player2 = player2;
-    pl.getServer().getPluginManager().registerEvents(this, pl);
-    inv1 = InvUtils.getTradeInventory(player1, player2);
-    inv2 = InvUtils.getTradeInventory(player2, player1);
-    spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
-    Bukkit.getOnlinePlayers().forEach(p -> {
-      if (p.hasPermission("tradeplus.admin") && !p.hasPermission("tradeplus.admin.silent")) {
-        MsgUtils.send(p, pl.getLang().getString("spectate.hover", "&6&lClick here to spectate this trade"), "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
-                pl.getLang().getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate")
-                  .replace("%PLAYER1%", player1.getName()).replace("%PLAYER2%", player2.getName()).split("%NEWLINE%"));
-      }
-    });
-    player1.openInventory(inv1);
-    player2.openInventory(inv2);
-    if (pl.getConfig().getBoolean("extras.economy.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("Vault")) {
-      try {
-        if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null) {
-          extras.add(new EconomyExtra(player1, player2, pl, this));
-        }
-      } catch (Exception ignored) {
-      }
-    }
-    if (pl.getConfig().getBoolean("extras.experience.enabled", true)) {
-      extras.add(new ExperienceExtra(player1, player2, pl, this));
-    }
-    if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints")) {
-      extras.add(new PlayerPointsExtra(player1, player2, pl, this));
-    }
-    if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention")) {
-      extras.add(new GriefPreventionExtra(player1, player2, pl, this));
-    }
-    if (pl.getConfig().getBoolean("extras.enjinpoints.enabled", false) && pl.getServer().getPluginManager().isPluginEnabled("EnjinMinecraftPlugin")) {
-      extras.add(new EnjinPointsExtra(player1, player2, pl, this));
-    }
-    if (pl.getConfig().getBoolean("extras.tokenenchant.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenEnchant")) {
-      extras.add(new TokenEnchantExtra(player1, player2, pl, this));
-    }
-    if (pl.getConfig().getBoolean("extras.tokenmanager.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenManager")) {
-      extras.add(new TokenManagerExtra(player1, player2, pl, this));
-    }
-    for (Extra extra : extras) {
-      extra.init();
-    }
-    updateExtras();
-    pl.ongoingTrades.add(this);
+  public Trade(Player p1, Player p2) {
+    player1 = p1;
+    player2 = p2;
+    pl.getTaskFactory().newChain()
+        .async(() -> {
+          inv1 = InvUtils.getTradeInventory(player1, player2);
+          inv2 = InvUtils.getTradeInventory(player2, player1);
+          spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
+          Bukkit.getOnlinePlayers().forEach(p -> {
+            if (p.hasPermission("tradeplus.admin") && !p.hasPermission("tradeplus.admin.silent")) {
+              MsgUtils.send(p, pl.getLang().getString("spectate.hover", "&6&lClick here to spectate this trade"), "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
+                  pl.getLang().getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate")
+                      .replace("%PLAYER1%", player1.getName()).replace("%PLAYER2%", player2.getName()).split("%NEWLINE%"));
+            }
+          });
+          if (pl.getConfig().getBoolean("extras.economy.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("Vault")) {
+            try {
+              if (pl.getServer().getServicesManager().getRegistration(Class.forName("net.milkbowl.vault.economy.Economy")) != null) {
+                extras.add(new EconomyExtra(player1, player2, pl, this));
+              }
+            } catch (Exception ignored) {
+            }
+          }
+          if (pl.getConfig().getBoolean("extras.experience.enabled", true)) {
+            extras.add(new ExperienceExtra(player1, player2, pl, this));
+          }
+          if (pl.getConfig().getBoolean("extras.playerpoints.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("PlayerPoints")) {
+            extras.add(new PlayerPointsExtra(player1, player2, pl, this));
+          }
+          if (pl.getConfig().getBoolean("extras.griefprevention.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("GriefPrevention")) {
+            extras.add(new GriefPreventionExtra(player1, player2, pl, this));
+          }
+          if (pl.getConfig().getBoolean("extras.enjinpoints.enabled", false) && pl.getServer().getPluginManager().isPluginEnabled("EnjinMinecraftPlugin")) {
+            extras.add(new EnjinPointsExtra(player1, player2, pl, this));
+          }
+          if (pl.getConfig().getBoolean("extras.tokenenchant.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenEnchant")) {
+            extras.add(new TokenEnchantExtra(player1, player2, pl, this));
+          }
+          if (pl.getConfig().getBoolean("extras.tokenmanager.enabled", true) && pl.getServer().getPluginManager().isPluginEnabled("TokenManager")) {
+            extras.add(new TokenManagerExtra(player1, player2, pl, this));
+          }
+        }).sync(() -> {
+          pl.getServer().getPluginManager().registerEvents(this, pl);
+          player1.openInventory(inv1);
+          player2.openInventory(inv2);
+
+          for (Extra extra : extras) {
+            extra.init();
+          }
+          updateExtras();
+        }).execute(() -> pl.ongoingTrades.add(this));
   }
 
   @EventHandler
@@ -141,6 +145,7 @@ public class Trade implements Listener {
     if (!(event.getWhoClicked() instanceof Player)) {
       return;
     }
+    
     Player player = (Player) event.getWhoClicked();
     Inventory inv = event.getClickedInventory();
     ClickType click = event.getClick();

@@ -96,21 +96,6 @@ public class AnvilGUI {
           }
 
           @EventHandler
-          public void PAE(PrepareAnvilEvent e) {
-            ItemStack IS = e.getResult();
-            if (colorrename && IS != null && IS.hasItemMeta()) {
-              ItemMeta M = IS.getItemMeta();
-              assert M != null;
-              if (M.hasDisplayName()) {
-                M.setDisplayName(
-                    ChatColor.translateAlternateColorCodes(colorchar, M.getDisplayName()));
-              }
-              IS.setItemMeta(M);
-              e.setResult(IS);
-            }
-          }
-
-          @EventHandler
           public void ICE(InventoryCloseEvent e) {
             if (e.getInventory().equals(inventory)) {
               player.setLevel(player.getLevel() - 1);

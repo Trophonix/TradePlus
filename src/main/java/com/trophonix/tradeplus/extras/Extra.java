@@ -9,6 +9,7 @@ import com.trophonix.tradeplus.util.Sounds;
 import lombok.AccessLevel;
 import lombok.Setter;
 import me.badbones69.crazycrates.api.objects.ItemBuilder;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.conversations.ConversationContext;
@@ -116,7 +117,7 @@ public abstract class Extra {
       });
       gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, paper);
       gui.setSlotName(AnvilGUI.AnvilSlot.INPUT_LEFT, decimalFormat.format(offer));
-      gui.setTitle("Enter a value");
+      gui.setTitle(ChatColor.stripColor(pl.getTypeEmpty()));
       gui.open();
     } else if (mode.equals("chat")) {
       trade.setCancelOnClose(player, false);
@@ -163,35 +164,6 @@ public abstract class Extra {
         trade.setCancelOnClose(player, true);
       }).buildConversation(player)
           .begin();
-      /*gui = new AnvilGUI(pl, player, decimalFormat.format(offer), (p, input) -> {
-        if (input == null || input.isEmpty())
-          return pl.getTypeEmpty();
-        try {
-          double value = Double.parseDouble(input.replace(",", ""));
-          if (value > getMax(p)) return pl.getTypeMaximum().replace("%BALANCE%", decimalFormat.format(bal))
-                                     .replace("%AMOUNT%", decimalFormat.format(value));
-          if (player1.equals(p)) value1 = value;
-          else if (player2.equals(p)) value2 = value;
-          trade.updateExtras();
-          return null;
-        } catch (NumberFormatException ignored) {
-          return pl.getTypeInvalid().replace("%BALANCE%", decimalFormat.format(bal)).replace("%AMOUNT%", input);
-        }
-      }) {
-        @Override public void closeInventory() {
-          super.closeInventory();
-          Bukkit.getScheduler().runTaskLater(pl, () -> {
-            if (player1.equals(player)) player.openInventory(trade.inv1);
-            else player.openInventory(trade.inv2);
-            trade.setCancelOnClose(player, true);
-            if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-              Sounds.click(player1, 2);
-              Sounds.click(player2, 2);
-              trade.spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p -> Sounds.click((Player) p, 2));
-            }
-          }, 1L);
-        }
-      };*/
     } else {
       if (click.isLeftClick()) {
         if (click.isShiftClick()) {

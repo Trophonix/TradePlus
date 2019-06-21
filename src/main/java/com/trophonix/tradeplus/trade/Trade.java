@@ -300,6 +300,7 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onClose(InventoryCloseEvent event) {
+    if (cancelled) return;
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) {
       return;
@@ -324,10 +325,10 @@ public class Trade implements Listener {
       giveOnCursor(player1);
       giveOnCursor(player2);
 
+      cancel();
+
       player1.closeInventory();
       player2.closeInventory();
-
-      cancel();
 
       MsgUtils.send(player1, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player2.getName()));
       MsgUtils.send(player2, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player1.getName()));
@@ -337,6 +338,7 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onMove(PlayerMoveEvent event) {
+    if (cancelled) return;
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
       if (System.currentTimeMillis() < startTime + 1000) {
@@ -348,6 +350,7 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onInventoryPickupEvent(InventoryPickupItemEvent event) {
+    if (cancelled) return;
     if (accept1 && accept2 && (event.getInventory() == inv1 || event.getInventory() == inv2)) {
       event.setCancelled(true);
     }
@@ -362,6 +365,7 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onDropItem(PlayerDropItemEvent event) {
+    if (cancelled) return;
     if (player1.equals(event.getPlayer()) || player2.equals(event.getPlayer())) {
       event.setCancelled(true);
       if (accept1 && accept2) {
@@ -395,6 +399,7 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onPickup(PlayerPickupItemEvent event) {
+    if (cancelled) return;
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
       event.setCancelled(true);

@@ -3,10 +3,8 @@ package com.trophonix.tradeplus.trade;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.extras.*;
 import com.trophonix.tradeplus.logging.TradeLog;
-import com.trophonix.tradeplus.util.InvUtils;
-import com.trophonix.tradeplus.util.ItemFactory;
-import com.trophonix.tradeplus.util.MsgUtils;
-import com.trophonix.tradeplus.util.Sounds;
+import com.trophonix.tradeplus.util.*;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -48,7 +46,7 @@ public class Trade implements Listener {
   private ItemStack[] accepted1, accepted2;
   private boolean forced = false;
   private BukkitTask task = null;
-  public boolean cancelled;
+  @Getter private boolean cancelled;
 
   public Trade(Player p1, Player p2) {
     player1 = p1;
@@ -128,12 +126,7 @@ public class Trade implements Listener {
           return;
         }
         Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
-        if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-          Sounds.click(player1, 2);
-          Sounds.click(player2, 2);
-          spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
-                  Sounds.click((Player) p, 2));
-        }
+        click();
       }
     } else if (inv.equals(spectatorInv)) {
       event.setCancelled(true);
@@ -145,7 +138,7 @@ public class Trade implements Listener {
     if (!(event.getWhoClicked() instanceof Player)) {
       return;
     }
-    
+
     Player player = (Player) event.getWhoClicked();
     Inventory inv = event.getClickedInventory();
     ClickType click = event.getClick();
@@ -155,6 +148,11 @@ public class Trade implements Listener {
     }
     int slot = event.getSlot();
     if (event.getRawSlot() < event.getView().getTopInventory().getSize() && (inv1.getViewers().contains(player) || inv2.getViewers().contains(player))) {
+      if (cancelled) {
+        event.setCancelled(true);
+        player.closeInventory();
+        return;
+      }
       ItemStack item49 = inv.getItem(49);
       if (item49 == null || item49.getType().equals(Material.AIR)) {
         event.setCancelled(true);
@@ -182,12 +180,7 @@ public class Trade implements Listener {
           updateAcceptance();
         }
         Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
-        if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-          Sounds.click(player1, 2);
-          Sounds.click(player2, 2);
-          spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
-                  Sounds.click((Player) p, 2));
-        }
+        click();
       } else {
         event.setCancelled(true);
         event.setResult(InventoryClickEvent.Result.DENY);
@@ -231,11 +224,7 @@ public class Trade implements Listener {
               }
               extra.onClick(player, event.getClick());
               updateExtras();
-              if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-                Sounds.click(player1, 2);
-                Sounds.click(player2, 2);
-                spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p -> Sounds.click((Player) p, 2));
-              }
+              click();
             }
           }
         }
@@ -282,12 +271,7 @@ public class Trade implements Listener {
           int amount = click.name().contains("LEFT") ? current.getMaxStackSize() : 1;
           if (current != null) {
             player.getInventory().setItem(event.getSlot(), putOnLeft(player.equals(player1) ? inv1 : inv2, current, amount));
-            if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-              Sounds.click(player1, 2);
-              Sounds.click(player2, 2);
-              spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
-                      Sounds.click((Player) p, 2));
-            }
+            click();
           }
         }
         if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept") && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
@@ -306,6 +290,14 @@ public class Trade implements Listener {
     }
   }
 
+  private void click() {
+    if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
+      Sounds.click(player1, 2);
+      Sounds.click(player2, 2);
+      spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p -> Sounds.click((Player) p, 2));
+    }
+  }
+
   @EventHandler
   public void onClose(InventoryCloseEvent event) {
     Inventory closed = event.getInventory();
@@ -320,23 +312,23 @@ public class Trade implements Listener {
       if (closed.getItem(49) == null) {
         return;
       }
-      HandlerList.unregisterAll(this);
 
       pl.ongoingTrades.remove(this);
       if (task != null) {
         task.cancel();
         task = null;
       }
-      inv1.setItem(49, null);
-      inv2.setItem(49, null);
-      cancelled = true;
 
       giveItemsOnLeft(inv1, player1);
       giveItemsOnLeft(inv2, player2);
       giveOnCursor(player1);
       giveOnCursor(player2);
+
       player1.closeInventory();
       player2.closeInventory();
+
+      cancel();
+
       MsgUtils.send(player1, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player2.getName()));
       MsgUtils.send(player2, pl.getLang().getString("cancelled", "&4&l(!) &r&4The trade was cancelled").replace("%PLAYER%", player1.getName()));
       new ArrayList<>(spectatorInv.getViewers()).forEach(HumanEntity::closeInventory);
@@ -540,14 +532,11 @@ public class Trade implements Listener {
               pl.ongoingTrades.remove(this);
               task.cancel();
               task = null;
-              inv1.setItem(49, null);
-              inv2.setItem(49, null);
-              cancelled = true;
+
+              cancel();
 
               player1.closeInventory();
               player2.closeInventory();
-
-              HandlerList.unregisterAll(this);
 
               if (pl.getConfig().getBoolean("antiscam.discrepancy-detection", true)) {
                 boolean discrepancy = false;
@@ -626,12 +615,7 @@ public class Trade implements Listener {
           accept1 = false;
           accept2 = false;
           task = null;
-          if (pl.getConfig().getBoolean("soundeffects.enabled", true) && pl.getConfig().getBoolean("soundeffects.onchange")) {
-            Sounds.click(player1, 2);
-            Sounds.click(player2, 2);
-            spectatorInv.getViewers().stream().filter(Player.class::isInstance).forEach(p ->
-                    Sounds.click((Player) p, 2));
-          }
+          click();
         }
       }
     }
@@ -776,7 +760,9 @@ public class Trade implements Listener {
   }
 
   public void open(Player player) {
-    if (!cancelled) {
+    if (cancelled) {
+      player.closeInventory();
+    } else {
       if (player1.equals(player)) {
         player.openInventory(inv1);
       } else if (player2.equals(player)) {
@@ -809,6 +795,18 @@ public class Trade implements Listener {
       result.add(item);
     }
     return result;
+  }
+
+  private void cancel() {
+    inv1.setItem(49, null);
+    inv2.setItem(49, null);
+    cancelled = true;
+    Bukkit.getScheduler().runTaskLater(pl, () -> {
+      new ArrayList<>(inv1.getViewers()).forEach(HumanEntity::closeInventory);
+      new ArrayList<>(inv2.getViewers()).forEach(HumanEntity::closeInventory);
+      new ArrayList<>(spectatorInv.getViewers()).forEach(HumanEntity::closeInventory);
+      HandlerList.unregisterAll(this);
+    }, 200L);
   }
 
 }

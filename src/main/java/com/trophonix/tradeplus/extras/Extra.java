@@ -84,6 +84,10 @@ public abstract class Extra {
     if (mode.equals("anvil")) {
       ItemStack paper = new ItemStack(Material.PAPER);
       gui = new AnvilGUI(player, event -> {
+        if (trade.isCancelled()) {
+          player.closeInventory();
+          return;
+        }
         if (event.getSlot() != AnvilGUI.AnvilSlot.OUTPUT) return;
         String text = event.getText();
         ItemStack i = event.getItemStack();
@@ -111,6 +115,7 @@ public abstract class Extra {
         i.setItemMeta(m);
         gui.setSlot(AnvilGUI.AnvilSlot.OUTPUT, i);
       }, () -> {
+        if (trade.isCancelled()) return;
         trade.updateExtras();
         trade.open(player);
         trade.setCancelOnClose(player, true);
@@ -124,11 +129,11 @@ public abstract class Extra {
       player.closeInventory();
       new ConversationFactory(pl).withFirstPrompt(new NumericPrompt() {
         @Override protected Prompt acceptValidatedInput(ConversationContext conversationContext, Number number) {
-          if (trade.cancelled) return null;
+          if (trade.isCancelled()) return null;
           if (number.doubleValue() >= getMax(player)) {
             return new NumericPrompt() {
               @Override protected Prompt acceptValidatedInput(ConversationContext conversationContext, Number number) {
-                if (trade.cancelled) return null;
+                if (trade.isCancelled()) return null;
                 if (number.doubleValue() > getMax(player)) {
                   return this;
                 }
@@ -157,7 +162,7 @@ public abstract class Extra {
               .replace("%AMOUNT%", decimalFormat.format(offer));
         }
       }).withTimeout(30).addConversationAbandonedListener(event -> {
-        if (trade.cancelled) return;
+        if (trade.isCancelled()) return;
         if (!event.gracefulExit()) Sounds.villagerHmm(player, 1f);
         trade.open(player);
         trade.updateExtras();

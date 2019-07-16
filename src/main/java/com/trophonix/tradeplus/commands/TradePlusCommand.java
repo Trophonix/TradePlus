@@ -47,7 +47,7 @@ public class TradePlusCommand extends Command {
           if (trade == null) {
             MsgUtils.send(player, pl.getLang().getString("admin.no-trade", "&4&l(!) &4No trade was found with those arguments."));
           } else {
-            player.openInventory(trade.spectatorInv);
+            player.openInventory(trade.getSpectatorInv());
           }
           return;
         }
@@ -66,7 +66,7 @@ public class TradePlusCommand extends Command {
           MsgUtils.send(p2, message.replace("%PLAYER%", p1.getName()));
           Trade trade = new Trade(p1, p2);
           if (sender instanceof Player && !(sender.equals(p1) || sender.equals(p2)))
-            ((Player) sender).openInventory(trade.spectatorInv);
+            ((Player) sender).openInventory(trade.getSpectatorInv());
           return;
         } else if (args[0].equalsIgnoreCase("spectate")) {
           if (!(sender instanceof Player)) {
@@ -84,7 +84,7 @@ public class TradePlusCommand extends Command {
           if (trade == null) {
             MsgUtils.send(player, pl.getLang().getString("admin.no-trade", "&4&l(!) &4No trade was found with those arguments."));
           } else {
-            player.openInventory(trade.spectatorInv);
+            player.openInventory(trade.getSpectatorInv());
           }
           return;
         }

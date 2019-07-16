@@ -1360,7 +1360,7 @@ public enum UMaterial {
         this.data = data;
         final Material m = Material.matchMaterial(name);
         material = m;
-        if (material != null) is = version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (byte) data) : new ItemStack(m);
+        if (material != null) is = version.contains("1.7.10") || version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (byte) data) : new ItemStack(m);
     }
     UMaterial(String name, int spoofedData, Color color) {
         names[0] = name;
@@ -1386,14 +1386,14 @@ public enum UMaterial {
         this.data = data;
         final Material m = getMaterialName();
         material = m;
-        if (material != null) is = version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (short) data, (byte) data) : new ItemStack(m);
+        if (material != null) is = version.contains("1.7.10") || version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (short) data, (byte) data) : new ItemStack(m);
     }
     UMaterial(int data, int returnData, String... names) {
         this.names = names;
         this.data = data;
         final Material m = getMaterialName();
         material = m;
-        if (material != null) is = version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (short) returnData, (byte) returnData) : new ItemStack(m);
+        if (material != null) is = version.contains("1.7.10") || version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (short) returnData, (byte) returnData) : new ItemStack(m);
     }
     /*private void doPotion(ItemStack m, UPotion up) {
         this.is = up.getItemStack();
@@ -1415,7 +1415,7 @@ public enum UMaterial {
     // 5 = 1.13.2
     // 6 = 1.14.0
     private Material getMaterialName() {
-        final int ver = version.contains("1.8") ? 0 : version.contains("1.9") ? 1 : version.contains("1.10") ? 2 : version.contains("1.11") ? 3 : version.contains("1.12") ? 4 : version.contains("1.13") ? 5 : version.contains("1.14") ? 6 : names.length-1;
+        final int ver = version.contains("1.7.10") || version.contains("1.8") ? 0 : version.contains("1.9") ? 1 : version.contains("1.10") ? 2 : version.contains("1.11") ? 3 : version.contains("1.12") ? 4 : version.contains("1.13") ? 5 : version.contains("1.14") ? 6 : names.length-1;
         int realver = names.length <= ver ? names.length-1 : ver;
         if(names[realver] == null) {
             boolean did = false;
@@ -1434,14 +1434,14 @@ public enum UMaterial {
         this.data = data;
         final Material m = getMaterialName();
         material = m;
-        return version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (byte) data) : new ItemStack(m);
+        return version.contains("1.7.10") || version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (byte) data) : new ItemStack(m);
     }
     private ItemStack setItemStack(int data, String ...names) {
         this.names = names;
         this.data = data;
         final Material m = getMaterialName();
         material = m;
-        return version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (byte) data) : new ItemStack(m);
+        return version.contains("1.7.10") || version.contains("1.8") || version.contains("1.9") || version.contains("1.10") || version.contains("1.11") || version.contains("1.12") ? new ItemStack(m, 1, (byte) data) : new ItemStack(m);
     }
     public static ItemStack getEnchantmentBook(Enchantment enchant, int level, int amount) {
         final LinkedHashMap<Enchantment, Integer> e = new LinkedHashMap<>();
@@ -1498,7 +1498,7 @@ public enum UMaterial {
     public static UMaterial matchSpawnEgg(ItemStack egg) {
         if(egg != null) {
             final String v = Bukkit.getVersion();
-            if(v.contains("1.8")) {
+            if(v.contains("1.7.10") || v.contains("1.8")) {
                 return match("MONSTER_EGG", egg.getData().getData());
             } else if(v.contains("1.9") || v.contains("1.10") || v.contains("1.11") || v.contains("1.12")) {
                 final String id = egg.hasItemMeta() ? egg.getItemMeta().toString().split("id=")[1].split("}")[0].toUpperCase() : "PIG";
@@ -1552,7 +1552,7 @@ public enum UMaterial {
                 final PotionEffectType t;
                 final int l, max;
                 final boolean extended;
-                if(v.contains("1.8")) {
+                if(v.contains("1.7.10") || v.contains("1.8")) {
                     final Potion po = Potion.fromItemStack(potion);
                     t = ((PotionEffect) po.getEffects().toArray()[0]).getType();
                     l = po.getLevel();
@@ -1629,11 +1629,11 @@ public enum UMaterial {
     private final Object potiondata;
     public UPotion(UMaterial.PotionBase base, PotionType type, boolean extended, boolean upgraded) {
         final String bn = base.name();
-        if(v.contains("1.8")) {
+        if(v.contains("1.7.10") || v.contains("1.8")) {
             potion = type.name().equals("WATER") ? new Potion(type).toItemStack(1) : new Potion(type, upgraded ? 2 : 1, bn.equals("SPLASH")).toItemStack(1);
             potiondata = potion.getItemMeta();
         } else {
-            final ItemStack is = new ItemStack(Material.matchMaterial(bn.equals("NORMAL") ? "POTION" : bn.equals("ARROW") ? v.contains("1.8") || v.contains("1.9") || v.contains("1.11") ? "ARROW" : "TIPPED_ARROW" : bn + "_POTION"));
+            final ItemStack is = new ItemStack(Material.matchMaterial(bn.equals("NORMAL") ? "POTION" : bn.equals("ARROW") ? v.contains("1.7.10") || v.contains("1.8") || v.contains("1.9") || v.contains("1.11") ? "ARROW" : "TIPPED_ARROW" : bn + "_POTION"));
             final boolean a = !is.getType().equals(Material.ARROW);
             org.bukkit.inventory.meta.PotionMeta pm = null;
             org.bukkit.potion.PotionData pd = null;

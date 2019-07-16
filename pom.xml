@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.54</version>
+    <version>3.56</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
@@ -66,6 +66,13 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>21.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.WesJD</groupId>
+            <artifactId>AnvilGUI</artifactId>
+            <version>master-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
@@ -198,10 +205,10 @@
                                     <pattern>co.aikar.taskchain</pattern>
                                     <shadedPattern>com.trophonix.tradeplus.shaded.taskchain</shadedPattern>
                                 </relocation>
-<!--                                <relocation>-->
-<!--                                    <pattern>net.wesjd.anvilgui</pattern>-->
-<!--                                    <shadedPattern>com.trophonix.tradeplus.anvilgui</shadedPattern>-->
-<!--                                </relocation>-->
+                                <relocation>
+                                    <pattern>net.wesjd.anvilgui</pattern>
+                                    <shadedPattern>com.trophonix.tradeplus.shaded.anvilgui</shadedPattern>
+                                </relocation>
                             </relocations>
                             <minimizeJar>true</minimizeJar>
                         </configuration>

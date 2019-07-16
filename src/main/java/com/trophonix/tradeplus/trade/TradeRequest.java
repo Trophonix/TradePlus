@@ -15,4 +15,8 @@ public class TradeRequest {
     this.receiver = receiver;
   }
 
+  public boolean contains(Player player) {
+    return sender.equals(player) || receiver.equals(player);
+  }
+
 }

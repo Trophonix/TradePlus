@@ -76,35 +76,8 @@ public class TradePlus extends JavaPlugin {
     taskFactory = BukkitTaskChainFactory.create(this);
     taskFactory.newChain()
         .async(this::loadConfig)
+        .async(this::fixConfig)
         .sync(() -> {
-          List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
-          for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
-            fixList.add(getConfig().getString("extras." + key + ".material"));
-          }
-          for (String key : fixList) {
-            if (key == null || key.equals("")) continue;
-            if (config.contains(key)) {
-              String val = config.getString(key).replace(" ", "_").toUpperCase();
-              if (Material.getMaterial(val) == null) {
-                if (val.contains(":")) {
-                  String[] split = val.split(":");
-                  if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
-                }
-
-                UMaterial uMat = UMaterial.match(val);
-                if (uMat == null) {
-                  getLogger().warning("Couldn't find material for " + val + ". This could cause a crash.");
-                  getLogger().warning("Make sure this is a valid material before reporting this as a bug.");
-                  continue;
-                }
-
-                String name = uMat.getMaterial().name() + (uMat.getData() > 0 ? ":" + uMat.getData() : "");
-                config.set(key, name);
-                getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
-              }
-            }
-          }
-
           config.set("configversion", Double.parseDouble(getDescription().getVersion()));
           saveConfig();
           saveLang();
@@ -184,6 +157,36 @@ public class TradePlus extends JavaPlugin {
 
   public String getTypeMaximum() {
     return typeMaximum;
+  }
+
+  private void fixConfig() {
+    List<String> fixList = new ArrayList<>(Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
+    for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
+      fixList.add(getConfig().getString("extras." + key + ".material"));
+    }
+    for (String key : fixList) {
+      if (key == null || key.equals("")) continue;
+      if (config.contains(key)) {
+        String val = config.getString(key).replace(" ", "_").toUpperCase();
+        if (Material.getMaterial(val) == null) {
+          if (val.contains(":")) {
+            String[] split = val.split(":");
+            if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
+          }
+
+          UMaterial uMat = UMaterial.match(val);
+          if (uMat == null) {
+            getLogger().warning("Couldn't find material for " + val + ". This could cause a crash.");
+            getLogger().warning("Make sure this is a valid material before reporting this as a bug.");
+            continue;
+          }
+
+          String name = uMat.getMaterial().name() + (uMat.getData() != 0 ? ":" + uMat.getData() : "");
+          config.set(key, name);
+          getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
+        }
+      }
+    }
   }
 
   private void loadConfig() {
@@ -271,12 +274,13 @@ public class TradePlus extends JavaPlugin {
 
       config.set("extras.experience.enabled", true);
       config.set("extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
-      config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
-      config.set("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.display", "&aYour current XP Levels offer is &2%AMOUNT%");
+      config.set("extras.experience.theirdisplay", "&aTheir current XP Levels offer is &2%AMOUNT%");
       config.set("extras.experience.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.experience.increment", 5);
       config.set("extras.experience.taxpercent", 0);
       config.set("extras.experience.mode", "type");
+      config.set("extras.experience.levelMode", true);
 
       config.set("extras.playerpoints.enabled", true);
       config.set("extras.playerpoints.material", "diamond");
@@ -680,6 +684,10 @@ public class TradePlus extends JavaPlugin {
         config.set("hooks.factions.allow-trades-in-enemy-territory", false);
         lang.set("errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
         lang.set("hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
+      }
+
+      if (configVersion < 3.55) {
+        config.set("extras.experience.levelMode", false);
       }
     }
   }

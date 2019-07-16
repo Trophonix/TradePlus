@@ -14,12 +14,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.net.InetSocketAddress;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 public class TradeCommand extends Command {
+
+  private static final DecimalFormat format = new DecimalFormat("0.##");
 
   private final ConcurrentLinkedQueue<TradeRequest> requests = new ConcurrentLinkedQueue<>();
 
@@ -89,9 +92,9 @@ public class TradeCommand extends Command {
       }
 
       if (player.getWorld().equals(receiver.getWorld())) {
-        double amount = Math.pow(pl.getConfig().getDouble("ranges.sameworld"), 2);
-        if (amount != 0.0 && player.getLocation().distanceSquared(receiver.getLocation()) > amount) {
-          MsgUtils.send(player, pl.getLang().getString("errors.within-range.same-world").replace("%PLAYER%", receiver.getName()).replace("%AMOUNT%", amount + "").split("%NEWLINE%"));
+        double amount = pl.getConfig().getDouble("ranges.sameworld");
+        if (amount != 0.0 && player.getLocation().distanceSquared(receiver.getLocation()) > Math.pow(amount, 2)) {
+          MsgUtils.send(player, pl.getLang().getString("errors.within-range.same-world").replace("%PLAYER%", receiver.getName()).replace("%AMOUNT%", format.format(amount)).split("%NEWLINE%"));
           return;
         }
       } else {
@@ -127,7 +130,7 @@ public class TradeCommand extends Command {
 
       boolean accept = false;
       for (TradeRequest req : requests) {
-        if (req.sender.equals(receiver) && req.receiver.equals(player))
+        if (req.contains(player) && req.contains(receiver))
           accept = true;
       }
       if (accept) {
@@ -136,8 +139,8 @@ public class TradeCommand extends Command {
         if (tradeAcceptEvent.isCancelled()) return;
         MsgUtils.send(receiver, pl.getLang().getString("accept.sender").replace("%PLAYER%", player.getName()).split("%NEWLINE%"));
         MsgUtils.send(player, pl.getLang().getString("accept.receiver").replace("%PLAYER%", receiver.getName()).split("%NEWLINE%"));
-        new Trade(player, receiver);
-        requests.removeIf(req -> (req.sender.equals(player) && req.receiver.equals(receiver)) || (req.sender.equals(receiver) && req.receiver.equals(player)));
+        new Trade(receiver, player);
+        requests.removeIf(req -> req.contains(player) && req.contains(receiver));
       } else {
         String sendPermission = pl.getConfig().getString("permissions.send", "tradeplus.send");
         if (permissionRequired) {

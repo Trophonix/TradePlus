@@ -2,31 +2,35 @@ package com.trophonix.tradeplus.extras;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
-import com.trophonix.tradeplus.util.Experience;
 import com.trophonix.tradeplus.util.ItemFactory;
+import com.trophonix.tradeplus.util.XP;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class ExperienceExtra extends Extra {
 
+  private boolean levelMode;
+
   public ExperienceExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
     super("experience", player1, player2, pl, trade);
+    levelMode = pl.getConfig().getBoolean("extras.experience.levelMode", false);
   }
 
   @Override
   public double getMax(Player player) {
-    return Experience.getExp(player);
+    if (levelMode) return player.getLevel();
+    else return XP.getExp(player);
   }
 
   @Override
   public void onTradeEnd() {
     if (value1 > 0) {
-      Experience.changeExp(player1, (int) (0 - value1));
-      Experience.changeExp(player2, (int) (value1 - ((value1 / 100) * taxPercent)));
+      changeXp(player1, -value1);
+      changeXp(player2, value1);
     }
     if (value2 > 0) {
-      Experience.changeExp(player2, (int) (0 - value2));
-      Experience.changeExp(player1, (int) (value2 - ((value2 / 100) * taxPercent)));
+      changeXp(player2, -value2);
+      changeXp(player1, value2);
     }
   }
 
@@ -40,6 +44,13 @@ public class ExperienceExtra extends Extra {
   @Override
   public ItemStack getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
+  }
+
+  private void changeXp(Player player, Number amount) {
+    if (levelMode)
+      XP.changeExp(
+          player, XP.getExpFromLevel(player.getLevel() + amount.intValue()) - XP.getExp(player));
+    else XP.changeExp(player, amount.intValue());
   }
 
 }

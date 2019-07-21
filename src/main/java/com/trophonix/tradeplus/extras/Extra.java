@@ -24,8 +24,8 @@ import java.text.DecimalFormat;
 
 public abstract class Extra implements Listener {
 
-  static final DecimalFormat decimalFormat = new DecimalFormat("###,##0.0#");
-  public final ItemStack icon;
+  static final DecimalFormat decimalFormat = new DecimalFormat("###,##0.##");
+  final ItemStack icon;
   public final String name;
   final Player player1;
   final Player player2;
@@ -64,13 +64,10 @@ public abstract class Extra implements Listener {
             .build();
     this.taxPercent = section.getDouble("taxpercent", 0);
     this.mode = section.getString("mode", "increment").toLowerCase();
-    if (mode.equals("type")) {
-      mode = "anvil";
-      section.set("mode", "anvil");
+    if (mode.equals("type") || mode.equals("anvil")) {
+      mode = "chat";
+      section.set("mode", "chat");
       pl.saveConfig();
-    }
-    if (mode.equals("anvil")) {
-      pl.getServer().getPluginManager().registerEvents(this, pl);
     }
     this.trade = trade;
   }

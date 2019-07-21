@@ -314,7 +314,7 @@ public class Trade implements Listener {
         }
       }
     // if they click in the bottom
-    } else if (inv.equals(player.getInventory())) {
+    } else if (player.getInventory().equals(inv)) {
       Inventory open = player.getOpenInventory().getTopInventory();
       if (inv1.getViewers().contains(player) || inv2.getViewers().contains(player)) {
         // Using my own double click
@@ -386,7 +386,7 @@ public class Trade implements Listener {
         Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
       }
     // just cancel spectator clicks
-    } else if (inv.equals(spectatorInv)) {
+    } else if (spectatorInv.equals(inv)) {
       event.setCancelled(true);
     }
   }

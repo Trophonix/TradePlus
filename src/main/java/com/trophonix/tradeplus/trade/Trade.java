@@ -131,25 +131,25 @@ public class Trade implements Listener {
         .execute(
             () -> {
               pl.ongoingTrades.add(this);
-              openTask =
-                  Bukkit.getScheduler()
-                      .runTaskTimer(
-                          pl,
-                          () -> {
-                            if (cancelled) return;
-                            if (player1.getOpenInventory().getTopInventory()
-                                instanceof CraftingInventory) {
-                              open(player1);
-                              setCancelOnClose(player1, true);
-                            }
-                            if (player2.getOpenInventory().getTopInventory()
-                                instanceof CraftingInventory) {
-                              open(player2);
-                              setCancelOnClose(player2, true);
-                            }
-                          },
-                          1L,
-                          1L);
+//              openTask =
+//                  Bukkit.getScheduler()
+//                      .runTaskTimer(
+//                          pl,
+//                          () -> {
+//                            if (cancelled) return;
+//                            if (player1.getOpenInventory().getTopInventory()
+//                                instanceof CraftingInventory) {
+//                              open(player1);
+//                              setCancelOnClose(player1, true);
+//                            }
+//                            if (player2.getOpenInventory().getTopInventory()
+//                                instanceof CraftingInventory) {
+//                              open(player2);
+//                              setCancelOnClose(player2, true);
+//                            }
+//                          },
+//                          1L,
+//                          1L);
             });
   }
 
@@ -462,7 +462,9 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onMove(PlayerMoveEvent event) {
-    if (cancelled) return;
+    if (cancelled || event.getTo() == null) return;
+    if (event.getFrom().distanceSquared(event.getTo()) < 0.01)
+      return;
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
       if (System.currentTimeMillis() < startTime + 1000) {

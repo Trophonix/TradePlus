@@ -117,7 +117,7 @@ public abstract class Extra implements Listener {
                 protected Prompt acceptValidatedInput(
                     ConversationContext conversationContext, Number number) {
                   if (trade.isCancelled()) return null;
-                  if (number.doubleValue() >= getMax(player)) {
+                  if (number.doubleValue() > getMax(player)) {
                     return new NumericPrompt() {
                       @Override
                       protected Prompt acceptValidatedInput(

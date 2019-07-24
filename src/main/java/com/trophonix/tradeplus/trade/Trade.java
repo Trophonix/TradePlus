@@ -10,13 +10,13 @@ import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -46,6 +46,7 @@ public class Trade implements Listener {
   private boolean cancelOnClose1 = true, cancelOnClose2 = true;
   @Getter private Inventory spectatorInv, inv1, inv2;
   private boolean accept1, accept2;
+  private Location location1, location2;
   private ItemStack[] accepted1, accepted2;
   private boolean forced = false;
   private BukkitTask task, openTask;
@@ -54,6 +55,8 @@ public class Trade implements Listener {
   public Trade(Player p1, Player p2) {
     player1 = p1;
     player2 = p2;
+    location1 = p1.getLocation();
+    location2 = p2.getLocation();
     pl.getTaskFactory()
         .newChain()
         .async(
@@ -463,14 +466,18 @@ public class Trade implements Listener {
   @EventHandler
   public void onMove(PlayerMoveEvent event) {
     if (cancelled || event.getTo() == null) return;
-    if (event.getFrom().distanceSquared(event.getTo()) < 0.01)
-      return;
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
+      if (event.getFrom().distanceSquared(event.getTo()) < 0.01)
+        return;
       if (System.currentTimeMillis() < startTime + 1000) {
         return;
       }
-      event.setCancelled(true);
+      if (player.equals(player1)) {
+        player.teleport(location1);
+      } else {
+        player.teleport(location2);
+      }
     }
   }
 

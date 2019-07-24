@@ -5,7 +5,6 @@ import com.trophonix.tradeplus.TradePlus;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -22,7 +21,7 @@ public class ItemFactory {
   private byte data = 0;
   private String display;
   private List<String> lore;
-  private List<ItemFlag> flags;
+  private List flags;
 
   public ItemFactory(Material material) {
         this.material = material;
@@ -63,7 +62,7 @@ public class ItemFactory {
       if (meta.hasLore()) {
         lore = meta.getLore();
       }
-      flags = new ArrayList<>(meta.getItemFlags());
+      if (Sounds.version != 17) flags = new ArrayList<>(meta.getItemFlags());
     }
   }
 
@@ -130,7 +129,7 @@ public class ItemFactory {
       itemMeta.setDisplayName(display);
     }
     itemMeta.setLore(lore);
-    if (flags != null) itemMeta.addItemFlags(flags.toArray(new ItemFlag[0]));
+    if (flags != null) itemMeta.addItemFlags(((List<org.bukkit.inventory.ItemFlag>)flags).toArray(new org.bukkit.inventory.ItemFlag[0]));
     itemStack.setItemMeta(itemMeta);
     return itemStack;
   }
@@ -177,9 +176,10 @@ public class ItemFactory {
     return this;
   }
 
-  public ItemFactory flag(ItemFlag flag) {
-    if (flags == null) flags = new ArrayList<>();
-    flags.add(flag);
+  public ItemFactory flag(String flag) {
+    if (Sounds.version == 17) return this;
+    if (flags == null) flags = new ArrayList<org.bukkit.inventory.ItemFlag>();
+    flags.add(org.bukkit.inventory.ItemFlag.valueOf(flag));
     return this;
   }
 

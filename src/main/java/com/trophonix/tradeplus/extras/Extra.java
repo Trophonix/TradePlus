@@ -17,7 +17,6 @@ import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.DecimalFormat;
@@ -57,7 +56,7 @@ public abstract class Extra implements Listener {
         new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
             .display('&', section.getString("display", "&4ERROR"));
     if (section.contains("lore")) factory.lore('&', section.getStringList("lore"));
-    this.icon = factory.flag(ItemFlag.HIDE_ATTRIBUTES).build();
+    this.icon = factory.flag("HIDE_ATTRIBUTES").build();
     this.theirIcon =
         new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
             .display('&', section.getString("theirdisplay", "&4ERROR"))

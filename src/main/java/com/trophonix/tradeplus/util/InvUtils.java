@@ -6,7 +6,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -28,13 +27,13 @@ public class InvUtils {
 
   public static void reloadItems(TradePlus pl) {
     InvUtils.pl = pl;
-    placeHolder = new ItemFactory(pl.getConfig().getString("gui.separatorid", "stained_glass_pane:15")).display(" ").flag(ItemFlag.HIDE_ATTRIBUTES).build();
-    acceptTrade = new ItemFactory(pl.getConfig().getString("gui.acceptid", "stained_glass_pane:14")).display('&', pl.getConfig().getString("gui.accept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag(ItemFlag.HIDE_ATTRIBUTES).build();
-    cancelTrade = new ItemFactory(pl.getConfig().getString("gui.cancelid", "stained_glass_pane:13")).display('&', pl.getConfig().getString("gui.cancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag(ItemFlag.HIDE_ATTRIBUTES).build();
-    theyAccepted = new ItemFactory(pl.getConfig().getString("gui.cancelid", "stained_glass_pane:13")).display('&', pl.getConfig().getString("gui.theyaccept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag(ItemFlag.HIDE_ATTRIBUTES).build();
-    theyCancelled = new ItemFactory(pl.getConfig().getString("gui.acceptid", "stained_glass_pane:14")).display('&', pl.getConfig().getString("gui.theycancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag(ItemFlag.HIDE_ATTRIBUTES).build();
+    placeHolder = new ItemFactory(pl.getConfig().getString("gui.separatorid", "stained_glass_pane:15")).display(" ").flag("HIDE_ATTRIBUTES").build();
+    acceptTrade = new ItemFactory(pl.getConfig().getString("gui.acceptid", "stained_glass_pane:14")).display('&', pl.getConfig().getString("gui.accept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag("HIDE_ATTRIBUTES").build();
+    cancelTrade = new ItemFactory(pl.getConfig().getString("gui.cancelid", "stained_glass_pane:13")).display('&', pl.getConfig().getString("gui.cancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag("HIDE_ATTRIBUTES").build();
+    theyAccepted = new ItemFactory(pl.getConfig().getString("gui.cancelid", "stained_glass_pane:13")).display('&', pl.getConfig().getString("gui.theyaccept")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag("HIDE_ATTRIBUTES").build();
+    theyCancelled = new ItemFactory(pl.getConfig().getString("gui.acceptid", "stained_glass_pane:14")).display('&', pl.getConfig().getString("gui.theycancel")).amount(pl.getConfig().getInt("antiscam.countdown", 10)).flag("HIDE_ATTRIBUTES").build();
     force = new ItemFactory(pl.getConfig().getString("gui.force.type", "watch"), Sounds.version < 113 ? Material.getMaterial("WATCH") : Material.getMaterial("CLOCK")).display('&', pl.getConfig().getString("gui.force.name"))
-            .lore('&', pl.getConfig().getStringList("gui.force.lore")).flag(ItemFlag.HIDE_ATTRIBUTES).build();
+            .lore('&', pl.getConfig().getStringList("gui.force.lore")).flag("HIDE_ATTRIBUTES").build();
   }
 
   public static Inventory getTradeInventory(Player player1, Player player2) {

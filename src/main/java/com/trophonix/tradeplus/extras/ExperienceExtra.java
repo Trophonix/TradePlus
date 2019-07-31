@@ -24,6 +24,10 @@ public class ExperienceExtra extends Extra {
 
   @Override
   public void onTradeEnd() {
+    if (taxPercent > 0) {
+      value1 -= (value1*taxPercent)/100;
+      value2 -= (value2*taxPercent)/100;
+    }
     if (value1 > 0) {
       changeXp(player1, -value1);
       changeXp(player2, value1);

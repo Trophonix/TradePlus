@@ -42,7 +42,7 @@ public class ItemFactory {
 
   public ItemFactory(String parsable) {
     Preconditions.checkNotNull(parsable, "Material cannot be null.");
-    UMaterial uMat = UMaterial.match(parsable);
+    UMaterial uMat = UMaterial.match(parsable.toUpperCase().replace(" ", "_"));
     Preconditions.checkNotNull(uMat, "Unknown material [%s]", parsable);
     Preconditions.checkArgument(uMat.getMaterial() != null, "Unknown material [%s]. Make sure item exists in your version!", parsable);
     material = uMat.getMaterial();

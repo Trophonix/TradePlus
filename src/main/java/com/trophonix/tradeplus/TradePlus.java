@@ -458,7 +458,7 @@ public class TradePlus extends JavaPlugin {
 
       if (configVersion < 1.5) {
         config.set("hooks.xp.enabled", true);
-        config.set("hooks.xp.material", "exp_bottle");
+        config.set("hooks.xp.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
         config.set("hooks.xp.youroffer", "&7Your current XP offer is &e%XPAMOUNT%");
         config.set("hooks.xp.theiroffer", "&7Their current XP offer is &e%XPAMOUNT%");
         config.set("hooks.xp.increment", 5);

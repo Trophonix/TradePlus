@@ -23,7 +23,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -49,7 +48,7 @@ public class Trade implements Listener {
   private Location location1, location2;
   private ItemStack[] accepted1, accepted2;
   private boolean forced = false;
-  private BukkitTask task, openTask;
+  private BukkitTask task;
   @Getter private boolean cancelled;
 
   public Trade(Player p1, Player p2) {
@@ -122,38 +121,18 @@ public class Trade implements Listener {
             })
         .sync(
             () -> {
-              pl.getServer().getPluginManager().registerEvents(this, pl);
-              player1.openInventory(inv1);
-              player2.openInventory(inv2);
+              Bukkit.getServer().getPluginManager().registerEvents(this, pl);
 
               for (Extra extra : extras) {
                 extra.init();
               }
               updateExtras();
             })
-        .execute(
-            () -> {
-              pl.ongoingTrades.add(this);
-//              openTask =
-//                  Bukkit.getScheduler()
-//                      .runTaskTimer(
-//                          pl,
-//                          () -> {
-//                            if (cancelled) return;
-//                            if (player1.getOpenInventory().getTopInventory()
-//                                instanceof CraftingInventory) {
-//                              open(player1);
-//                              setCancelOnClose(player1, true);
-//                            }
-//                            if (player2.getOpenInventory().getTopInventory()
-//                                instanceof CraftingInventory) {
-//                              open(player2);
-//                              setCancelOnClose(player2, true);
-//                            }
-//                          },
-//                          1L,
-//                          1L);
-            });
+        .execute(() -> {
+          pl.ongoingTrades.add(this);
+          player1.openInventory(inv1);
+          player2.openInventory(inv2);
+        });
   }
 
   private static List<ItemStack> combine(ItemStack[] items) {
@@ -215,6 +194,8 @@ public class Trade implements Listener {
 
     Player player = (Player) event.getWhoClicked();
     Inventory inv = event.getClickedInventory();
+    if (inv == null) return;
+
     ClickType click = event.getClick();
 
     int slot = event.getSlot();
@@ -281,7 +262,7 @@ public class Trade implements Listener {
               updateAcceptance();
               checkAcceptance();
             }
-          // force trade button
+            // force trade button
           } else if (slot == 49) {
             if (item.isSimilar(InvUtils.force)) {
               if (forced) {
@@ -298,7 +279,7 @@ public class Trade implements Listener {
                 checkAcceptance();
               }
             }
-          // extras, or cancel
+            // extras, or cancel
           } else {
             Extra extra = getExtra(slot);
             if (extra != null) {
@@ -316,7 +297,7 @@ public class Trade implements Listener {
           }
         }
       }
-    // if they click in the bottom
+      // if they click in the bottom
     } else if (player.getInventory().equals(inv)) {
       Inventory open = player.getOpenInventory().getTopInventory();
       if (inv1.getViewers().contains(player) || inv2.getViewers().contains(player)) {
@@ -349,9 +330,9 @@ public class Trade implements Listener {
               }
             }
           }
-        // Using my own shift click
-        // code so items only go in
-        // the left side
+          // Using my own shift click
+          // code so items only go in
+          // the left side
         } else if (click.name().contains("SHIFT")) {
           event.setCancelled(true);
           if (accept1 && accept2) {
@@ -388,7 +369,7 @@ public class Trade implements Listener {
         }
         Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
       }
-    // just cancel spectator clicks
+      // just cancel spectator clicks
     } else if (spectatorInv.equals(inv)) {
       event.setCancelled(true);
     }
@@ -468,8 +449,7 @@ public class Trade implements Listener {
     if (cancelled || event.getTo() == null) return;
     Player player = event.getPlayer();
     if (player.equals(player1) || player.equals(player2)) {
-      if (event.getFrom().distanceSquared(event.getTo()) < 0.01)
-        return;
+      if (event.getFrom().distanceSquared(event.getTo()) < 0.01) return;
       if (System.currentTimeMillis() < startTime + 1000) {
         return;
       }
@@ -982,7 +962,6 @@ public class Trade implements Listener {
   }
 
   private void cancel() {
-    if (openTask != null) openTask.cancel();
     inv1.setItem(49, null);
     inv2.setItem(49, null);
     cancelled = true;

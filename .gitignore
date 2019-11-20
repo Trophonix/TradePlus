@@ -21,3 +21,4 @@ target/
 org.eclipse.*
 *.lst
 pom.properties
+dependency-reduced-pom.xml

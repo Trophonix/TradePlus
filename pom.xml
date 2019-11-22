@@ -148,7 +148,7 @@
         <dependency>
             <groupId>com.github.ProSavage</groupId>
             <artifactId>SavageFactions</artifactId>
-            <version>1.6.9.5-0.1.21-gbdd5473-400</version>
+            <version>1.6.3-RC</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

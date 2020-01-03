@@ -115,7 +115,7 @@ public class TradeCommand extends Command {
       try {
         if (!pl.getConfig().getBoolean("hooks.factions.allow-trades-in-enemy-territory", false)) {
           if (FactionsHook.isPlayerInEnemyTerritory(player)) {
-            MsgUtils.send(player, pl.getConfig().getString("hooks.factions.enemy-territory").split("%NEWLINE%"));
+            MsgUtils.send(player, pl.getConfig().getString("hooks.factions.enemy-territory", "&4&l(!) &cYou can't trade in enemy territory.").split("%NEWLINE%"));
             return;
           }
         }
@@ -123,7 +123,7 @@ public class TradeCommand extends Command {
 
       for (TradeRequest req : requests) {
         if (req.sender == player) {
-          MsgUtils.send(player, pl.getLang().getString("errors.wait-for-expire").split("%NEWLINE%"));
+          MsgUtils.send(player, pl.getLang().getString("errors.wait-for-expire", "&4&l(!) &cYou already sent them a request.").split("%NEWLINE%"));
           return;
         }
       }

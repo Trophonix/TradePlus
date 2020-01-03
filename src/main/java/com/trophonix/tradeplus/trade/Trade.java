@@ -344,8 +344,8 @@ public class Trade implements Listener {
             updateAcceptance();
           }
           ItemStack current = event.getCurrentItem();
-          int amount = click.name().contains("LEFT") ? current.getMaxStackSize() : 1;
           if (current != null) {
+            int amount = click.name().contains("LEFT") ? current.getMaxStackSize() : 1;
             player
                 .getInventory()
                 .setItem(

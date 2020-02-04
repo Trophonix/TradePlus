@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.60</version>
+    <version>3.61</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
@@ -56,9 +56,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.trophonix</groupId>
+            <artifactId>PluginBase</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.14.2-R0.1-SNAPSHOT</version>
+            <version>1.15.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -70,9 +76,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.WesJD</groupId>
-            <artifactId>AnvilGUI</artifactId>
-            <version>master-SNAPSHOT</version>
+            <groupId>com.github.WesJD.AnvilGUI</groupId>
+            <artifactId>anvilgui</artifactId>
+            <version>478e0c196e</version>
             <scope>compile</scope>
         </dependency>
 

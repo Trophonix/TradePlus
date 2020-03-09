@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class TradePlus extends JavaPlugin {
+public class  TradePlus extends JavaPlugin {
   @Getter private TaskChainFactory taskFactory;
 
   public ConcurrentLinkedQueue<Trade> ongoingTrades = new ConcurrentLinkedQueue<>();

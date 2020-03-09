@@ -198,6 +198,10 @@ public class Trade implements Listener {
 
     ClickType click = event.getClick();
 
+    if (spectatorInv.equals(inv)) {
+      event.setCancelled(true);
+    }
+
     int slot = event.getSlot();
     // if the event didn't occur
     // within a trade inventory,
@@ -369,9 +373,6 @@ public class Trade implements Listener {
         }
         Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
       }
-      // just cancel spectator clicks
-    } else if (spectatorInv.equals(inv)) {
-      event.setCancelled(true);
     }
   }
 

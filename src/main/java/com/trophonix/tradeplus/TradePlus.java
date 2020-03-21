@@ -258,6 +258,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("gui.force.name", "&4&lForce Trade");
       config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
 
+      config.set("extras.type.prefix", "&6&l!!&6> ");
       config.set("extras.type.empty", "&eEnter a new amount to offer.");
       config.set("extras.type.valid", "&aClick output slot to submit offer.");
       config.set("extras.type.invalid", "&cInvalid amount entered!");
@@ -688,6 +689,10 @@ public class  TradePlus extends JavaPlugin {
 
       if (configVersion < 3.55) {
         config.set("extras.experience.levelMode", false);
+      }
+
+      if (configVersion < 3.63) {
+        config.set("extras.type.prefix", "&6&l!!&6> ");
       }
     }
   }

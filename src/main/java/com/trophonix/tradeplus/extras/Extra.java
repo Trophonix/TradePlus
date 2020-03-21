@@ -8,12 +8,10 @@ import com.trophonix.tradeplus.util.Sounds;
 import lombok.AccessLevel;
 import lombok.Setter;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.conversations.ConversationContext;
-import org.bukkit.conversations.ConversationFactory;
-import org.bukkit.conversations.NumericPrompt;
-import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
@@ -110,6 +108,7 @@ public abstract class Extra implements Listener {
       trade.setCancelOnClose(player, false);
       player.closeInventory();
       new ConversationFactory(pl)
+          .withPrefix(conversationContext -> ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("extras.type.prefix", "&6&l!!&6> ")))
           .withFirstPrompt(
               new NumericPrompt() {
                 @Override

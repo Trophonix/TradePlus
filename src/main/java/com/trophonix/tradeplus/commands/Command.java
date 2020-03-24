@@ -1,13 +1,14 @@
 package com.trophonix.tradeplus.commands;
 
+import lombok.Getter;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-abstract class Command {
+public abstract class Command {
 
-  private List<String> aliases;
+  @Getter private List<String> aliases;
 
   Command(List<String> aliases) {
     this.aliases = aliases;

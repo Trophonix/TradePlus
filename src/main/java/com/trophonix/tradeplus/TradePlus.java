@@ -93,7 +93,12 @@ public class  TradePlus extends JavaPlugin {
           if (Sounds.version > 17) {
             getServer().getPluginManager().registerEvents(new InteractListener(this), this);
           }
-          commandHandler = new CommandHandler(this);
+          boolean tradeCommandCompatMode = config.getBoolean("trade-command-compatible-mode", false);
+          commandHandler = new CommandHandler(this, tradeCommandCompatMode);
+          if (tradeCommandCompatMode) {
+            getCommand("tradeplus").setExecutor(commandHandler);
+            getCommand("trade").setExecutor(commandHandler);
+          }
           commandHandler.add(new TradeCommand(this));
           commandHandler.add(new TradePlusCommand(this));
         }).execute();
@@ -204,6 +209,8 @@ public class  TradePlus extends JavaPlugin {
         ex.printStackTrace();
       }
       config.set("aliases", Collections.singletonList("trade+"));
+      config.set("trade-command-compatible-mode", false);
+
       config.set("trade-logs", false);
       config.set("allow-same-ip-trade", true);
 
@@ -693,6 +700,10 @@ public class  TradePlus extends JavaPlugin {
 
       if (configVersion < 3.63) {
         config.set("extras.type.prefix", "&6&l!!&6> ");
+      }
+
+      if (configVersion < 3.65) {
+        config.set("trade-command-compatible-mode", false);
       }
     }
   }

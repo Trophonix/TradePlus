@@ -1,7 +1,9 @@
 package com.trophonix.tradeplus.commands;
 
 import com.trophonix.tradeplus.TradePlus;
+import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -15,12 +17,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandHandler implements Listener {
+public class CommandHandler implements Listener, CommandExecutor {
 
+  @Getter
   private List<Command> commands = new ArrayList<>();
 
-  public CommandHandler(TradePlus pl) {
-    pl.getServer().getPluginManager().registerEvents(this, pl);
+  public CommandHandler(TradePlus pl, boolean compatMode) {
+    if (!compatMode) pl.getServer().getPluginManager().registerEvents(this, pl);
     try {
       Class.forName("org.bukkit.event.server.TabCompleteEvent");
       Bukkit.getPluginManager().registerEvents(new CommandHandler.TabCompleter() {
@@ -43,8 +46,17 @@ public class CommandHandler implements Listener {
     commands.clear();
   }
 
+  @Override
+  public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+    String[] cmd = new String[args.length + 1];
+    cmd[0] = label;
+    System.arraycopy(args, 0, cmd, 1, args.length);
+    testAndRun(null, sender, cmd);
+    return true;
+  }
+
   @EventHandler(ignoreCancelled = true)
-  public void onCommand(PlayerCommandPreprocessEvent event) {
+  public void onCommandEvent(PlayerCommandPreprocessEvent event) {
     String[] cmd = event.getMessage().substring(1).split("\\s+");
     testAndRun(event, event.getPlayer(), cmd);
   }
@@ -63,7 +75,7 @@ public class CommandHandler implements Listener {
           .filter(command -> command.isAlias(cmd[0]))
           .findFirst().ifPresent(command -> {
         command.onCommand(sender, args);
-        event.setCancelled(true);
+        if (event != null) event.setCancelled(true);
       });
     }
   }

@@ -47,7 +47,8 @@ public class TradeLog implements PostProcessor {
 
     void updateName() {
       OfflinePlayer op = Bukkit.getOfflinePlayer(uniqueId);
-      if (op.getName() != null) lastKnownName = op.getName();
+      if (op.getName() == null) lastKnownName = "unknown";
+      else lastKnownName = op.getName();
     }
 
   }
@@ -58,6 +59,8 @@ public class TradeLog implements PostProcessor {
     private String id;
     private double value;
 
+    // I think gson needs this
+    // so it can construct them from json
     public ExtraOffer() { }
 
     public ExtraOffer(String id, double value) {

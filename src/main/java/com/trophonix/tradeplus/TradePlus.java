@@ -93,14 +93,7 @@ public class  TradePlus extends JavaPlugin {
           if (Sounds.version > 17) {
             getServer().getPluginManager().registerEvents(new InteractListener(this), this);
           }
-          boolean tradeCommandCompatMode = config.getBoolean("trade-command-compatible-mode", false);
-          commandHandler = new CommandHandler(this, tradeCommandCompatMode);
-          if (tradeCommandCompatMode) {
-            getCommand("tradeplus").setExecutor(commandHandler);
-            getCommand("trade").setExecutor(commandHandler);
-          }
-          commandHandler.add(new TradeCommand(this));
-          commandHandler.add(new TradePlusCommand(this));
+          setupCommands();
         }).execute();
   }
 
@@ -108,6 +101,17 @@ public class  TradePlus extends JavaPlugin {
     if (logs != null) {
       logs.save();
     }
+  }
+
+  private void setupCommands() {
+    boolean tradeCommandCompatMode = config.getBoolean("trade-command-compatible-mode", false);
+    commandHandler = new CommandHandler(this, tradeCommandCompatMode);
+    if (tradeCommandCompatMode) {
+      getCommand("tradeplus").setExecutor(commandHandler);
+      getCommand("trade").setExecutor(commandHandler);
+    }
+    commandHandler.add(new TradeCommand(this));
+    commandHandler.add(new TradePlusCommand(this));
   }
 
   public void reload() {

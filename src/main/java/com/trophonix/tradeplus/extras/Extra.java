@@ -52,12 +52,14 @@ public abstract class Extra implements Listener {
     this.increment2 = increment;
     ItemFactory factory =
         new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
-            .display('&', section.getString("display", "&4ERROR"));
+            .display('&', section.getString("display", "&4ERROR"))
+            .customModelData(section.getInt("customModelData", 0));
     if (section.contains("lore")) factory.lore('&', section.getStringList("lore"));
     this.icon = factory.flag("HIDE_ATTRIBUTES").build();
     this.theirIcon =
         new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
             .display('&', section.getString("theirdisplay", "&4ERROR"))
+            .customModelData(section.getInt("customModelData", 0))
             .build();
     this.taxPercent = section.getDouble("taxpercent", 0);
     this.mode = section.getString("mode", "increment").toLowerCase();

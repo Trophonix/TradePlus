@@ -22,10 +22,11 @@ public class ItemFactory {
   private String display;
   private List<String> lore;
   private List flags;
+  private int customModelData;
 
   public ItemFactory(Material material) {
-        this.material = material;
-    }
+    this.material = material;
+  }
 
   public ItemFactory(String parsable, Material fallback) {
     Preconditions.checkNotNull(parsable, "Material cannot be null.");
@@ -63,6 +64,9 @@ public class ItemFactory {
         lore = meta.getLore();
       }
       if (Sounds.version != 17) flags = new ArrayList<>(meta.getItemFlags());
+    }
+    if (Sounds.version > 113) {
+      customModelData = ItemUtils1_14.getCustomModelData(stack);
     }
   }
 
@@ -130,6 +134,9 @@ public class ItemFactory {
     }
     itemMeta.setLore(lore);
     if (flags != null) itemMeta.addItemFlags(((List<org.bukkit.inventory.ItemFlag>)flags).toArray(new org.bukkit.inventory.ItemFlag[0]));
+    if (Sounds.version > 113) {
+      ItemUtils1_14.applyCustomModelData(itemMeta, customModelData);
+    }
     itemStack.setItemMeta(itemMeta);
     return itemStack;
   }
@@ -141,7 +148,8 @@ public class ItemFactory {
     copy.data = data;
     copy.display = display;
     copy.lore = lore;
-    copy.flags = flags;
+    copy.flags = new ArrayList(flags);
+    copy.customModelData = customModelData;
     return copy;
   }
 
@@ -180,6 +188,11 @@ public class ItemFactory {
     if (Sounds.version == 17) return this;
     if (flags == null) flags = new ArrayList<org.bukkit.inventory.ItemFlag>();
     flags.add(org.bukkit.inventory.ItemFlag.valueOf(flag));
+    return this;
+  }
+
+  public ItemFactory customModelData(int customModelData) {
+    this.customModelData = customModelData;
     return this;
   }
 

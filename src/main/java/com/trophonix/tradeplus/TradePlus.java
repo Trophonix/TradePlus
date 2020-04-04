@@ -246,19 +246,19 @@ public class  TradePlus extends JavaPlugin {
       config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
       config.set("gui.head", "&7You are trading with: &3&l%PLAYER%");
       config.set("gui.showhead", !config.contains("showhead") || config.getBoolean("showhead"));
-      config.set("gui.accept", "&a&lClick to accept the trade");
-      config.set("gui.cancel", "&c&lClick to cancel the trade");
+      config.set("gui.accept.display", "&a&lClick to accept the trade");
+      config.set("gui.cancel.display", "&c&lClick to cancel the trade");
       config.set("gui.showaccept", true);
-      config.set("gui.theyaccept", " ");
-      config.set("gui.theycancel", " ");
+      config.set("gui.accept.theirdisplay", " ");
+      config.set("gui.cancel.theirdisplay", " ");
       if (Sounds.version < 113) {
-        config.set("gui.acceptid", "stained_glass_pane:13");
-        config.set("gui.cancelid", "stained_glass_pane:14");
-        config.set("gui.separatorid", "stained_glass_pane:15");
+        config.set("gui.accept.type", "stained_glass_pane:13");
+        config.set("gui.cancel.type", "stained_glass_pane:14");
+        config.set("gui.separator.type", "stained_glass_pane:15");
       } else {
-        config.set("gui.acceptid", "green_stained_glass_pane");
-        config.set("gui.cancelid", "red_stained_glass_pane");
-        config.set("gui.separatorid", "black_stained_glass_pane");
+        config.set("gui.accept.type", "green_stained_glass_pane");
+        config.set("gui.cancel.type", "red_stained_glass_pane");
+        config.set("gui.separator.type", "black_stained_glass_pane");
       }
       config.set("gui.force.enabled", true);
       if (Sounds.version < 113) {
@@ -268,6 +268,10 @@ public class  TradePlus extends JavaPlugin {
       }
       config.set("gui.force.name", "&4&lForce Trade");
       config.set("gui.force.lore", Arrays.asList("&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
+
+      config.set("gui.separator.customModelData", 0);
+      config.set("gui.accept.customModelData", 0);
+      config.set("gui.cancel.customModelData", 0);
 
       config.set("extras.type.prefix", "&6&l!!&6> ");
       config.set("extras.type.empty", "&eEnter a new amount to offer.");
@@ -280,6 +284,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.economy.display", "&eYour current money offer is &6%AMOUNT%");
       config.set("extras.economy.theirdisplay", "&eTheir current money offer is &6%AMOUNT%");
       config.set("extras.economy.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.economy.customModelData", 0);
       config.set("extras.economy.increment", 10.0);
       config.set("extras.economy.taxpercent", 0);
       config.set("extras.economy.mode", "type");
@@ -289,6 +294,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.experience.display", "&aYour current XP Levels offer is &2%AMOUNT%");
       config.set("extras.experience.theirdisplay", "&aTheir current XP Levels offer is &2%AMOUNT%");
       config.set("extras.experience.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.experience.customModelData", 0);
       config.set("extras.experience.increment", 5);
       config.set("extras.experience.taxpercent", 0);
       config.set("extras.experience.mode", "type");
@@ -299,6 +305,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.playerpoints.display", "&bYour current PlayerPoints offer is &3%AMOUNT%");
       config.set("extras.playerpoints.theirdisplay", "&bTheir current PlayerPoints offer is &3%AMOUNT%");
       config.set("extras.playerpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.playerpoints.customModelData", 0);
       config.set("extras.playerpoints.increment", 5);
       config.set("extras.playerpoints.taxpercent", 0);
       config.set("extras.playerpoints.mode", "type");
@@ -308,6 +315,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.griefprevention.display", "&eYour current GriefPrevention offer is &6%AMOUNT%");
       config.set("extras.griefprevention.theirdisplay", "&eTheir current GriefPrevention offer is &6%AMOUNT%");
       config.set("extras.griefprevention.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.griefprevention.customModelData", 0);
       config.set("extras.griefprevention.increment", 1);
       config.set("extras.griefprevention.taxperecent", 0);
       config.set("extras.griefprevention.mode", "type");
@@ -317,6 +325,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.enjinpoints.display", "&eYour current EnjinPoints offer is &6%AMOUNT%");
       config.set("extras.enjinpoints.theirdisplay", "&eTheir current EnjinPoints offer is &6%AMOUNT%");
       config.set("extras.enjinpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.enjinpoints.customModelData", 0);
       config.set("extras.enjinpoints.increment", 1);
       config.set("extras.enjinpoints.taxpercent", 0);
       config.set("extras.enjinpoints.mode", "type");
@@ -326,6 +335,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.tokenenchant.display", "&eYour current TokenEnchant tokens offer is &6%AMOUNT%");
       config.set("extras.tokenenchant.theirdisplay", "&eTheir current TokenEnchants tokens offer is &6%AMOUNT%");
       config.set("extras.tokenenchant.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.tokenenchant.customModelData", 0);
       config.set("extras.tokenenchant.increment", 1);
       config.set("extras.tokenenchant.taxpercent", 0);
       config.set("extras.tokenenchant.mode", "type");
@@ -335,6 +345,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.tokenmanager.display", "&eYour current TokenManager tokens offer is &6%AMOUNT%");
       config.set("extras.tokenmanager.theirdisplay", "&eTheir current TokenManager tokens offer is &6%AMOUNT%");
       config.set("extras.tokenmanager.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.tokenmanager.customModelData", 0);
       config.set("extras.tokenmanager.increment", 1);
       config.set("extras.tokenmanager.taxpercent", 0);
       config.set("extras.tokenmanager.mode", "type");
@@ -708,6 +719,30 @@ public class  TradePlus extends JavaPlugin {
 
       if (configVersion < 3.65) {
         config.set("trade-command-compatible-mode", false);
+      }
+
+      if (configVersion < 3.66) {
+        config.set("gui.accept.display", config.get("gui.accept"));
+        config.set("gui.cancel.display", config.get("gui.cancel"));
+
+        config.set("gui.accept.theirdisplay", config.get("gui.theyaccept"));
+        config.set("gui.cancel.theirdisplay", config.get("gui.theycancel"));
+
+        config.set("gui.separator.type", config.get("gui.separatorid"));
+        config.set("gui.accept.type", config.get("gui.acceptid"));
+        config.set("gui.cancel.type", config.get("gui.cancelid"));
+
+        config.set("gui.separatorid", null);
+        config.set("gui.acceptid", null);
+        config.set("gui.cancelid", null);
+
+        config.set("gui.separator.customModelData", 0);
+        config.set("gui.accept.customModelData", 0);
+        config.set("gui.cancel.customModelData", 0);
+
+        for (String extra : config.getConfigurationSection("extras").getKeys(false)) {
+          config.set("extras." + extra + ".customModelData", 0);
+        }
       }
     }
   }

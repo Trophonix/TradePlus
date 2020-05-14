@@ -5,8 +5,7 @@ import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import com.trophonix.tradeplus.util.Sounds;
-import lombok.AccessLevel;
-import lombok.Setter;
+import lombok.Getter;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -24,12 +23,13 @@ public abstract class Extra implements Listener {
   static final DecimalFormat decimalFormat = new DecimalFormat("###,##0.##");
   final ItemStack icon;
   public final String name;
+  @Getter
+  private String displayName;
   final Player player1;
   final Player player2;
   final double increment;
   final ItemStack theirIcon;
   final double taxPercent;
-  @Setter(AccessLevel.PRIVATE)
   public double value1 = 0, value2 = 0;
   double increment1;
   double increment2;
@@ -45,6 +45,7 @@ public abstract class Extra implements Listener {
     this.name = name;
     ConfigurationSection section =
         Preconditions.checkNotNull(pl.getConfig().getConfigurationSection("extras." + name));
+    this.displayName = section.getString("name");
     this.player1 = player1;
     this.player2 = player2;
     this.increment = section.getDouble("increment", 1D);
@@ -94,10 +95,11 @@ public abstract class Extra implements Listener {
                   double max = getMax(player);
                   if (value > max)
                     return AnvilGUI.Response.text(
-                        pl.getTypeMaximum().replace("%BALANCE%", String.valueOf(max)));
+                        pl.getTypeMaximum().replace("%BALANCE%", String.valueOf(max)).replace("%EXTRA%", displayName));
                   else {
                     if (player1.equals(player)) setValue1(value);
                     else setValue2(value);
+                    updateMax(false);
                     trade.updateExtras();
                   }
                   return AnvilGUI.Response.close();
@@ -117,35 +119,38 @@ public abstract class Extra implements Listener {
                 protected Prompt acceptValidatedInput(
                     ConversationContext conversationContext, Number number) {
                   if (trade.isCancelled()) return null;
-                  if (number.doubleValue() > getMax(player)) {
+                  if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
                     return new NumericPrompt() {
                       @Override
                       protected Prompt acceptValidatedInput(
                           ConversationContext conversationContext, Number number) {
                         if (trade.isCancelled()) return null;
-                        if (number.doubleValue() > getMax(player)) {
+                        if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
                           return this;
                         }
                         if (player1.equals(player)) {
-                          value1 = number.doubleValue();
+                          setValue1(number.doubleValue());
                         } else if (player2.equals(player)) {
-                          value2 = number.doubleValue();
+                          setValue2(number.doubleValue());
                         }
+                        updateMax(false);
                         return null;
                       }
 
                       @Override
                       public String getPromptText(ConversationContext conversationContext) {
                         return pl.getTypeMaximum()
-                            .replace("%BALANCE%", decimalFormat.format(getMax(player)));
+                            .replace("%BALANCE%", decimalFormat.format(getMax(player)))
+                            .replace("%EXTRA%", displayName);
                       }
                     };
                   }
                   if (player1.equals(player)) {
-                    value1 = number.doubleValue();
+                    setValue1(number.doubleValue());
                   } else if (player2.equals(player)) {
-                    value2 = number.doubleValue();
+                    setValue2(number.doubleValue());
                   }
+                  updateMax(false);
                   return null;
                 }
 
@@ -153,7 +158,8 @@ public abstract class Extra implements Listener {
                 public String getPromptText(ConversationContext conversationContext) {
                   return pl.getTypeEmpty()
                       .replace("%BALANCE%", decimalFormat.format(getMax(player)))
-                      .replace("%AMOUNT%", decimalFormat.format(offer));
+                      .replace("%AMOUNT%", decimalFormat.format(offer))
+                      .replace("%EXTRA%", name);
                 }
               })
           .withTimeout(30)
@@ -204,8 +210,20 @@ public abstract class Extra implements Listener {
     if (value1 < 0) value1 = 0;
     if (value2 < 0) value2 = 0;
 
+    updateMax(true);
+  }
+
+  public void setValue1(double value1) {
+    this.value1 = value1;
+  }
+
+  public void setValue2(double value2) {
+    this.value2 = value2;
+  }
+
+  public void updateMax(boolean delay) {
     long now = System.currentTimeMillis();
-    if (now > lastUpdatedMax + 5000) {
+    if (!delay || now > lastUpdatedMax + 5000) {
       max1 = getMax(player1);
       max2 = getMax(player2);
       lastUpdatedMax = now;
@@ -218,7 +236,15 @@ public abstract class Extra implements Listener {
 
   public abstract void onTradeEnd();
 
-  public abstract ItemStack getIcon(Player player);
+  public ItemStack getIcon(Player player) {
+    return ItemFactory.replaceInMeta(_getIcon(player), "%BALANCE%", Double.toString(getMax(player)), "%EXTRA%", displayName);
+  }
 
-  public abstract ItemStack getTheirIcon(Player player);
+  public ItemStack getTheirIcon(Player player) {
+    return ItemFactory.replaceInMeta(_getTheirIcon(player), "%BALANCE%", Double.toString(getMax(player1.equals(player) ? player2 : player1)), "%EXTRA%", displayName);
+  }
+
+  protected abstract ItemStack _getIcon(Player player);
+
+  protected abstract ItemStack _getTheirIcon(Player player);
 }

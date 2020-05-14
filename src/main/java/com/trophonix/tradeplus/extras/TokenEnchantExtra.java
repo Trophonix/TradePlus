@@ -31,14 +31,14 @@ public class TokenEnchantExtra extends Extra {
   }
 
   @Override
-  public ItemStack getIcon(Player player) {
+  public ItemStack _getIcon(Player player) {
     return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
             "%INCREMENT%", decimalFormat.format(increment),
             "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
-  public ItemStack getTheirIcon(Player player) {
+  public ItemStack _getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
   }
 

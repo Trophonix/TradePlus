@@ -39,7 +39,7 @@ public class EnjinPointsExtra extends Extra {
   }
 
   @Override
-  public ItemStack getIcon(Player player) {
+  public ItemStack _getIcon(Player player) {
     return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
             "%CURRENCY%", "Enjin points",
             "%INCREMENT%", decimalFormat.format(increment),
@@ -47,7 +47,7 @@ public class EnjinPointsExtra extends Extra {
   }
 
   @Override
-  public ItemStack getTheirIcon(Player player) {
+  public ItemStack _getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
             "%CURRENCY%", "Enjin points");
   }

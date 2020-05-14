@@ -34,14 +34,14 @@ public class TokenManagerExtra extends Extra {
   }
 
   @Override
-  public ItemStack getIcon(Player player) {
+  public ItemStack _getIcon(Player player) {
     return ItemFactory.replaceInMeta(icon, "%AMOUNT%", Long.toString((long)(player.equals(player1) ? value1 : value2)),
             "%INCREMENT%", Long.toString((long)increment),
             "%PLAYERINCREMENT%", Long.toString((long)(player.equals(player1) ? increment1 : increment2)));
   }
 
   @Override
-  public ItemStack getTheirIcon(Player player) {
+  public ItemStack _getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", Long.toString((long)(player.equals(player1) ? value1 : value2)));
   }
 

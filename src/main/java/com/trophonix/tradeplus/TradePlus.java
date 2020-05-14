@@ -274,12 +274,13 @@ public class  TradePlus extends JavaPlugin {
       config.set("gui.cancel.customModelData", 0);
 
       config.set("extras.type.prefix", "&6&l!!&6> ");
-      config.set("extras.type.empty", "&eEnter a new amount to offer.");
+      config.set("extras.type.empty", "&eHow much %EXTRA% to offer?");
       config.set("extras.type.valid", "&aClick output slot to submit offer.");
       config.set("extras.type.invalid", "&cInvalid amount entered!");
-      config.set("extras.type.maximum", "&cYour balance is %BALANCE%");
+      config.set("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%");
 
       config.set("extras.economy.enabled", true);
+      config.set("extras.economy.name", "money");
       config.set("extras.economy.material", "gold_ingot");
       config.set("extras.economy.display", "&eYour current money offer is &6%AMOUNT%");
       config.set("extras.economy.theirdisplay", "&eTheir current money offer is &6%AMOUNT%");
@@ -290,17 +291,19 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.economy.mode", "type");
 
       config.set("extras.experience.enabled", true);
+      config.set("extras.experience.name", "experience points");
       config.set("extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
-      config.set("extras.experience.display", "&aYour current XP Levels offer is &2%AMOUNT%");
-      config.set("extras.experience.theirdisplay", "&aTheir current XP Levels offer is &2%AMOUNT%");
-      config.set("extras.experience.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.lore", Arrays.asList("&fClick to edit your offer!", "You have %BALANCE% XP."));
       config.set("extras.experience.customModelData", 0);
       config.set("extras.experience.increment", 5);
       config.set("extras.experience.taxpercent", 0);
       config.set("extras.experience.mode", "type");
-      config.set("extras.experience.levelMode", true);
+      config.set("extras.experience.levelMode", false);
 
       config.set("extras.playerpoints.enabled", true);
+      config.set("extras.playerpoints.name", "player points");
       config.set("extras.playerpoints.material", "diamond");
       config.set("extras.playerpoints.display", "&bYour current PlayerPoints offer is &3%AMOUNT%");
       config.set("extras.playerpoints.theirdisplay", "&bTheir current PlayerPoints offer is &3%AMOUNT%");
@@ -311,6 +314,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.playerpoints.mode", "type");
 
       config.set("extras.griefprevention.enabled", true);
+      config.set("extras.griefprevention.name", "grief prevention");
       config.set("extras.griefprevention.material", "diamond_pickaxe");
       config.set("extras.griefprevention.display", "&eYour current GriefPrevention offer is &6%AMOUNT%");
       config.set("extras.griefprevention.theirdisplay", "&eTheir current GriefPrevention offer is &6%AMOUNT%");
@@ -321,6 +325,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.griefprevention.mode", "type");
 
       config.set("extras.enjinpoints.enabled", false);
+      config.set("extras.enjinpoints.name", "enjin points");
       config.set("extras.enjinpoints.material", "emerald");
       config.set("extras.enjinpoints.display", "&eYour current EnjinPoints offer is &6%AMOUNT%");
       config.set("extras.enjinpoints.theirdisplay", "&eTheir current EnjinPoints offer is &6%AMOUNT%");
@@ -331,6 +336,7 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.enjinpoints.mode", "type");
 
       config.set("extras.tokenenchant.enabled", true);
+      config.set("extras.tokenenchant.name", "token enchant points");
       config.set("extras.tokenenchant.material", "enchanted_book");
       config.set("extras.tokenenchant.display", "&eYour current TokenEnchant tokens offer is &6%AMOUNT%");
       config.set("extras.tokenenchant.theirdisplay", "&eTheir current TokenEnchants tokens offer is &6%AMOUNT%");
@@ -341,8 +347,9 @@ public class  TradePlus extends JavaPlugin {
       config.set("extras.tokenenchant.mode", "type");
 
       config.set("extras.tokenmanager.enabled", true);
+      config.set("extras.tokenmanager.name", "tokens");
       config.set("extras.tokenmanager.material", "emerald");
-      config.set("extras.tokenmanager.display", "&eYour current TokenManager tokens offer is &6%AMOUNT%");
+      config.set("extras.tokenmanager.display", "&eYour current tokens offer is &6%AMOUNT%");
       config.set("extras.tokenmanager.theirdisplay", "&eTheir current TokenManager tokens offer is &6%AMOUNT%");
       config.set("extras.tokenmanager.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenmanager.customModelData", 0);
@@ -414,6 +421,7 @@ public class  TradePlus extends JavaPlugin {
         config.set("gui.theyaccept", " ");
         config.set("gui.theycancel", " ");
       }
+
 
       if (configVersion < 1.12) {
         config.set("messages.tradecomplete", "&6&l(!) &r&6The trade was successful!");
@@ -692,10 +700,10 @@ public class  TradePlus extends JavaPlugin {
         for (String extra : config.getConfigurationSection("extras").getKeys(false)) {
           config.set("extras." + extra + ".mode", "increment");
         }
-        config.set("extras.type.empty", "&eEnter a new amount to offer.");
+        config.set("extras.type.empty", "&eHow much %EXTRA% to offer?");
         config.set("extras.type.valid", "&aClick output slot to submit offer.");
         config.set("extras.type.invalid", "&cInvalid amount entered!");
-        config.set("extras.type.maximum", "&cYour balance is %BALANCE%");
+        config.set("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%");
       }
 
       if (configVersion < 3.40) {
@@ -743,6 +751,16 @@ public class  TradePlus extends JavaPlugin {
         for (String extra : config.getConfigurationSection("extras").getKeys(false)) {
           config.set("extras." + extra + ".customModelData", 0);
         }
+      }
+
+      if (configVersion < 3.67) {
+        config.set("extras.economy.name", "money");
+        config.set("extras.experience.name", "experience points");
+        config.set("extras.playerpoints.name", "player points");
+        config.set("extras.griefprevention.name", "grief prevention");
+        config.set("extras.enjinpoints.name", "enjin points");
+        config.set("extras.tokenenchant.name", "token enchant points");
+        config.set("extras.tokenmanager.name", "tokens");
       }
     }
   }

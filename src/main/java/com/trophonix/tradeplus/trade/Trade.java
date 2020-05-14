@@ -215,7 +215,7 @@ public class Trade implements Listener {
         player.closeInventory();
         return;
       }
-      // item in slot 49 is set to null
+      // item in slot 49 is set to nothing
       // when trade ends as an extra
       // precaution
       ItemStack item49 = inv.getItem(49);
@@ -339,6 +339,11 @@ public class Trade implements Listener {
           // the left side
         } else if (click.name().contains("SHIFT")) {
           event.setCancelled(true);
+          if (isBlocked(event.getCurrentItem())) {
+            Sounds.villagerHit(player, 1);
+            return;
+          }
+
           if (accept1 && accept2) {
             return;
           }

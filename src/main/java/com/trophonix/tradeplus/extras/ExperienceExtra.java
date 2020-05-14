@@ -18,8 +18,9 @@ public class ExperienceExtra extends Extra {
 
   @Override
   public double getMax(Player player) {
-    if (levelMode) return player.getLevel();
-    else return XP.getExp(player);
+//    if (levelMode) return player.getLevel();
+//    else
+    return XP.getExp(player);
   }
 
   @Override
@@ -39,22 +40,19 @@ public class ExperienceExtra extends Extra {
   }
 
   @Override
-  public ItemStack getIcon(Player player) {
+  public ItemStack _getIcon(Player player) {
     return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
             "%INCREMENT%", decimalFormat.format(increment),
             "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
-  public ItemStack getTheirIcon(Player player) {
+  public ItemStack _getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
   }
 
   private void changeXp(Player player, Number amount) {
-    if (levelMode)
-      XP.changeExp(
-          player, XP.getExpFromLevel(player.getLevel() + amount.intValue()) - XP.getExp(player));
-    else XP.changeExp(player, amount.intValue());
+    XP.changeExp(player, amount.intValue());
   }
 
 }

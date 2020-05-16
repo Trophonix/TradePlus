@@ -23,5 +23,4 @@ public abstract class Command {
   public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
     return Collections.emptyList();
   }
-
 }

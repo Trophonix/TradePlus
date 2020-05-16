@@ -7,35 +7,35 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CommandHandler implements Listener, CommandExecutor {
 
-  @Getter
-  private List<Command> commands = new ArrayList<>();
+  @Getter private List<Command> commands = new ArrayList<>();
 
   public CommandHandler(TradePlus pl, boolean compatMode) {
     if (!compatMode) pl.getServer().getPluginManager().registerEvents(this, pl);
     try {
       Class.forName("org.bukkit.event.server.TabCompleteEvent");
-      Bukkit.getPluginManager().registerEvents(new CommandHandler.TabCompleter() {
-        @Override public List<String> getCompletions(CommandSender sender, String cmd, String[] args, String buffer) {
-          Command command = commands.stream()
-              .filter(c -> c.isAlias(cmd))
-              .findFirst().orElse(null);
-          return command != null ? command.onTabComplete(sender, args, buffer)
-                     : null;
-        }
-      }, pl);
-    } catch (ClassNotFoundException ignored) { }
+      Bukkit.getPluginManager()
+          .registerEvents(
+              new CommandHandler.TabCompleter() {
+                @Override
+                public List<String> getCompletions(
+                    CommandSender sender, String cmd, String[] args, String buffer) {
+                  Command command =
+                      commands.stream().filter(c -> c.isAlias(cmd)).findFirst().orElse(null);
+                  return command != null ? command.onTabComplete(sender, args, buffer) : null;
+                }
+              },
+              pl);
+    } catch (ClassNotFoundException ignored) {
+    }
   }
 
   public void add(Command command) {
@@ -47,7 +47,8 @@ public class CommandHandler implements Listener, CommandExecutor {
   }
 
   @Override
-  public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+  public boolean onCommand(
+      CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
     String[] cmd = new String[args.length + 1];
     cmd[0] = label;
     System.arraycopy(args, 0, cmd, 1, args.length);
@@ -73,10 +74,12 @@ public class CommandHandler implements Listener, CommandExecutor {
       System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
       commands.stream()
           .filter(command -> command.isAlias(cmd[0]))
-          .findFirst().ifPresent(command -> {
-        command.onCommand(sender, args);
-        if (event != null) event.setCancelled(true);
-      });
+          .findFirst()
+          .ifPresent(
+              command -> {
+                command.onCommand(sender, args);
+                if (event != null) event.setCancelled(true);
+              });
     }
   }
 
@@ -88,13 +91,13 @@ public class CommandHandler implements Listener, CommandExecutor {
       if (cmd.length > 0) {
         String[] args = new String[cmd.length - 1];
         System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
-        List<String> completions = getCompletions(event.getSender(), cmd[0], args, event.getBuffer());
+        List<String> completions =
+            getCompletions(event.getSender(), cmd[0], args, event.getBuffer());
         if (completions != null) event.setCompletions(completions);
       }
     }
 
-    protected abstract List<String> getCompletions(CommandSender sender, String command, String[] args, String buffer);
-
+    protected abstract List<String> getCompletions(
+        CommandSender sender, String command, String[] args, String buffer);
   }
-
 }

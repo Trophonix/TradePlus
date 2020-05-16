@@ -11,14 +11,17 @@ import java.io.IOException;
 
 class PostProcessingEnabler implements TypeAdapterFactory {
 
-  @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+  @Override
+  public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
     TypeAdapter<T> delegate = gson.getDelegateAdapter(this, type);
     return new TypeAdapter<T>() {
-      @Override public void write(JsonWriter writer, T obj) throws IOException {
+      @Override
+      public void write(JsonWriter writer, T obj) throws IOException {
         delegate.write(writer, obj);
       }
 
-      @Override public T read(JsonReader reader) throws IOException {
+      @Override
+      public T read(JsonReader reader) throws IOException {
         T obj = delegate.read(reader);
         if (obj instanceof PostProcessor) {
           ((PostProcessor) obj).doPostProcessing();

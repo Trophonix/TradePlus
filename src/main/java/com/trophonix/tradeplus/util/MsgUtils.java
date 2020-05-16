@@ -28,7 +28,7 @@ public class MsgUtils {
     if (message.contains("%NEWLINE%")) {
       send(player, onHover, onClick, message.split("%NEWLINE%"));
     } else {
-      send(player, onHover, onClick, new String[]{ message });
+      send(player, onHover, onClick, new String[] {message});
     }
   }
 
@@ -41,5 +41,4 @@ public class MsgUtils {
   public static void send(CommandSender sender, String message) {
     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
   }
-
 }

@@ -40,26 +40,38 @@ public class EnjinPointsExtra extends Extra {
 
   @Override
   public ItemStack _getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
-            "%CURRENCY%", "Enjin points",
-            "%INCREMENT%", decimalFormat.format(increment),
-            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
+    return ItemFactory.replaceInMeta(
+        icon,
+        "%AMOUNT%",
+        decimalFormat.format(player.equals(player1) ? value1 : value2),
+        "%CURRENCY%",
+        "Enjin points",
+        "%INCREMENT%",
+        decimalFormat.format(increment),
+        "%PLAYERINCREMENT%",
+        decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack _getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
-            "%CURRENCY%", "Enjin points");
+    return ItemFactory.replaceInMeta(
+        theirIcon,
+        "%AMOUNT%",
+        decimalFormat.format(player.equals(player1) ? value1 : value2),
+        "%CURRENCY%",
+        "Enjin points");
   }
 
   private void transact(Player take, Player give, double points) {
     PointService pointService = EnjinServices.getService(PointService.class);
     RPCData<Integer> withdrawResponse = pointService.remove(take.getName(), (int) points);
     if (withdrawResponse == null) {
-      pl.getLogger().warning("Failed to withdraw " + points + " points from " + take.getName() + ":");
+      pl.getLogger()
+          .warning("Failed to withdraw " + points + " points from " + take.getName() + ":");
       pl.getLogger().warning("Couldn't connect to enjin points api");
     } else if (withdrawResponse.getError() != null) {
-      pl.getLogger().warning("Failed to withdraw " + points + " points from " + take.getName() + ":");
+      pl.getLogger()
+          .warning("Failed to withdraw " + points + " points from " + take.getName() + ":");
       pl.getLogger().warning(withdrawResponse.getError().getMessage());
     } else {
       RPCData<Integer> depositResponse = pointService.add(give.getName(), (int) points);
@@ -72,5 +84,4 @@ public class EnjinPointsExtra extends Extra {
       }
     }
   }
-
 }

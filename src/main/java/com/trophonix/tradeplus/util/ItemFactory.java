@@ -5,12 +5,14 @@ import com.trophonix.tradeplus.TradePlus;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class ItemFactory {
@@ -34,7 +36,16 @@ public class ItemFactory {
     UMaterial uMat = UMaterial.match(parsable);
     if (uMat == null) {
       material = fallback;
-      TradePlus.getPlugin(TradePlus.class).getLogger().warning("Unknown material [" + parsable + "]." + (Sounds.version >= 113 ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: " + fallback.name() : ""));
+      TradePlus.getPlugin(TradePlus.class)
+          .getLogger()
+          .warning(
+              "Unknown material ["
+                  + parsable
+                  + "]."
+                  + (Sounds.version >= 113
+                      ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
+                          + fallback.name()
+                      : ""));
     } else {
       material = uMat.getMaterial();
       data = uMat.getData();
@@ -45,7 +56,10 @@ public class ItemFactory {
     Preconditions.checkNotNull(parsable, "Material cannot be null.");
     UMaterial uMat = UMaterial.match(parsable.toUpperCase().replace(" ", "_"));
     Preconditions.checkNotNull(uMat, "Unknown material [%s]", parsable);
-    Preconditions.checkArgument(uMat.getMaterial() != null, "Unknown material [%s]. Make sure item exists in your version!", parsable);
+    Preconditions.checkArgument(
+        uMat.getMaterial() != null,
+        "Unknown material [%s]. Make sure item exists in your version!",
+        parsable);
     material = uMat.getMaterial();
     data = uMat.getData();
   }
@@ -70,13 +84,14 @@ public class ItemFactory {
     }
   }
 
-  static ItemStack getPlayerSkull(String name, String displayName) {
+  static ItemStack getPlayerSkull(Player player, String displayName) {
     ItemStack skull = UMaterial.PLAYER_HEAD_ITEM.getItemStack();
     Preconditions.checkNotNull(skull, "Failed to load skull.");
-    skull.getData().setData((byte)3);
+    if (Sounds.version < 113) skull.getData().setData((byte) 3);
     SkullMeta meta = (SkullMeta) skull.getItemMeta();
     meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
-    meta.setOwner(name);
+    if (Sounds.version >= 112) meta.setOwningPlayer(player);
+    else meta.setOwner(player.getName());
     skull.setItemMeta(meta);
     return skull;
   }
@@ -104,7 +119,8 @@ public class ItemFactory {
             meta.setLore(lore);
           }
         }
-      } catch (Exception ignored) { }
+      } catch (Exception ignored) {
+      }
     }
     item.setItemMeta(meta);
     return item;
@@ -115,7 +131,10 @@ public class ItemFactory {
       display = display.replace(replace[i], replace[i + 1]);
       if (lore != null) {
         int n = i;
-        lore = lore.stream().map(str -> str.replace(replace[n], replace[n + 1])).collect(Collectors.toList());
+        lore =
+            lore.stream()
+                .map(str -> str.replace(replace[n], replace[n + 1]))
+                .collect(Collectors.toList());
       }
     }
     return this;
@@ -123,7 +142,7 @@ public class ItemFactory {
 
   public ItemStack build() {
     ItemStack itemStack;
-    if (Sounds.version < 113 && data != (byte)0) {
+    if (Sounds.version < 113 && data != (byte) 0) {
       itemStack = new ItemStack(material, amount, damage, data);
     } else {
       itemStack = new ItemStack(material, amount, damage);
@@ -133,7 +152,10 @@ public class ItemFactory {
       itemMeta.setDisplayName(display);
     }
     itemMeta.setLore(lore);
-    if (flags != null) itemMeta.addItemFlags(((List<org.bukkit.inventory.ItemFlag>)flags).toArray(new org.bukkit.inventory.ItemFlag[0]));
+    if (flags != null)
+      itemMeta.addItemFlags(
+          ((List<org.bukkit.inventory.ItemFlag>) flags)
+              .toArray(new org.bukkit.inventory.ItemFlag[0]));
     if (Sounds.version > 113) {
       ItemUtils1_14.applyCustomModelData(itemMeta, customModelData);
     }
@@ -195,5 +217,4 @@ public class ItemFactory {
     this.customModelData = customModelData;
     return this;
   }
-
 }

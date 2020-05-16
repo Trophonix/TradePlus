@@ -19,7 +19,8 @@ class NullEmptyListAdapter implements JsonSerializer<List<?>>, JsonDeserializer<
   }
 
   @Override
-  public List<?> deserialize(JsonElement src, Type type, JsonDeserializationContext context) throws JsonParseException {
+  public List<?> deserialize(JsonElement src, Type type, JsonDeserializationContext context)
+      throws JsonParseException {
     List<?> list = new ArrayList<>();
     if (src == null) return list;
     if (!(src instanceof JsonArray)) throw new JsonParseException("Invalid list");
@@ -28,5 +29,4 @@ class NullEmptyListAdapter implements JsonSerializer<List<?>>, JsonDeserializer<
     }
     return list;
   }
-
 }

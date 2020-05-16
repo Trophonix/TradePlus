@@ -6,7 +6,7 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.67</version>
+    <version>3.68</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
@@ -51,6 +51,11 @@
         <repository>
             <id>aikar</id>
             <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
+
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -164,6 +169,12 @@
             <version>1.6.3-RC</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.codemc.worldguardwrapper</groupId>
+            <artifactId>worldguardwrapper</artifactId>
+            <version>1.1.6-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -221,6 +232,10 @@
                                 <relocation>
                                     <pattern>net.wesjd.anvilgui</pattern>
                                     <shadedPattern>com.trophonix.tradeplus.shaded.anvilgui</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.codemc.worldguardwrapper</pattern>
+                                    <shadedPattern>com.trophonix.tradeplus.shaded.worldguardwrapper</shadedPattern>
                                 </relocation>
                             </relocations>
                             <minimizeJar>true</minimizeJar>

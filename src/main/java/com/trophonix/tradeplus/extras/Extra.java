@@ -10,7 +10,10 @@ import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.conversations.*;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.ConversationFactory;
+import org.bukkit.conversations.NumericPrompt;
+import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
@@ -21,10 +24,8 @@ import java.text.DecimalFormat;
 public abstract class Extra implements Listener {
 
   static final DecimalFormat decimalFormat = new DecimalFormat("###,##0.##");
-  final ItemStack icon;
   public final String name;
-  @Getter
-  private String displayName;
+  final ItemStack icon;
   final Player player1;
   final Player player2;
   final double increment;
@@ -33,6 +34,7 @@ public abstract class Extra implements Listener {
   public double value1 = 0, value2 = 0;
   double increment1;
   double increment2;
+  @Getter private String displayName;
   private TradePlus pl;
   private double max1;
   private double max2;
@@ -63,7 +65,7 @@ public abstract class Extra implements Listener {
             .customModelData(section.getInt("customModelData", 0))
             .build();
     this.taxPercent = section.getDouble("taxpercent", 0);
-    this.mode = section.getString("mode", "increment").toLowerCase();
+    this.mode = section.getString("mode", "chat").toLowerCase();
     if (mode.equals("type") || mode.equals("anvil")) {
       mode = "chat";
       section.set("mode", "chat");
@@ -95,7 +97,9 @@ public abstract class Extra implements Listener {
                   double max = getMax(player);
                   if (value > max)
                     return AnvilGUI.Response.text(
-                        pl.getTypeMaximum().replace("%BALANCE%", String.valueOf(max)).replace("%EXTRA%", displayName));
+                        pl.getTypeMaximum()
+                            .replace("%BALANCE%", String.valueOf(max))
+                            .replace("%EXTRA%", displayName));
                   else {
                     if (player1.equals(player)) setValue1(value);
                     else setValue2(value);
@@ -112,7 +116,10 @@ public abstract class Extra implements Listener {
       trade.setCancelOnClose(player, false);
       player.closeInventory();
       new ConversationFactory(pl)
-          .withPrefix(conversationContext -> ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("extras.type.prefix", "&6&l!!&6> ")))
+          .withPrefix(
+              conversationContext ->
+                  ChatColor.translateAlternateColorCodes(
+                      '&', pl.getConfig().getString("extras.type.prefix", "&6&l!!&6> ")))
           .withFirstPrompt(
               new NumericPrompt() {
                 @Override
@@ -159,7 +166,7 @@ public abstract class Extra implements Listener {
                   return pl.getTypeEmpty()
                       .replace("%BALANCE%", decimalFormat.format(getMax(player)))
                       .replace("%AMOUNT%", decimalFormat.format(offer))
-                      .replace("%EXTRA%", name);
+                      .replace("%EXTRA%", displayName);
                 }
               })
           .withTimeout(30)
@@ -237,11 +244,17 @@ public abstract class Extra implements Listener {
   public abstract void onTradeEnd();
 
   public ItemStack getIcon(Player player) {
-    return ItemFactory.replaceInMeta(_getIcon(player), "%BALANCE%", Double.toString(getMax(player)), "%EXTRA%", displayName);
+    return ItemFactory.replaceInMeta(
+        _getIcon(player), "%BALANCE%", Double.toString(getMax(player)), "%EXTRA%", displayName);
   }
 
   public ItemStack getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(_getTheirIcon(player), "%BALANCE%", Double.toString(getMax(player1.equals(player) ? player2 : player1)), "%EXTRA%", displayName);
+    return ItemFactory.replaceInMeta(
+        _getTheirIcon(player),
+        "%BALANCE%",
+        Double.toString(getMax(player1.equals(player) ? player2 : player1)),
+        "%EXTRA%",
+        displayName);
   }
 
   protected abstract ItemStack _getIcon(Player player);

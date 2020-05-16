@@ -13,5 +13,4 @@ public class ItemUtils1_14 {
   public static void applyCustomModelData(ItemMeta meta, int customModelData) {
     meta.setCustomModelData(customModelData);
   }
-
 }

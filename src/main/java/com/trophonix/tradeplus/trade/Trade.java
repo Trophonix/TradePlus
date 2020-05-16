@@ -58,11 +58,13 @@ public class Trade implements Listener {
     location2 = p2.getLocation();
     pl.getTaskFactory()
         .newChain()
+        .sync(() -> {
+          inv1 = InvUtils.getTradeInventory(player1, player2);
+          inv2 = InvUtils.getTradeInventory(player2, player1);
+          spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
+        })
         .async(
             () -> {
-              inv1 = InvUtils.getTradeInventory(player1, player2);
-              inv2 = InvUtils.getTradeInventory(player2, player1);
-              spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
               Bukkit.getOnlinePlayers()
                   .forEach(
                       p -> {
@@ -128,11 +130,12 @@ public class Trade implements Listener {
               }
               updateExtras();
             })
-        .execute(() -> {
-          pl.ongoingTrades.add(this);
-          player1.openInventory(inv1);
-          player2.openInventory(inv2);
-        });
+        .execute(
+            () -> {
+              pl.ongoingTrades.add(this);
+              player1.openInventory(inv1);
+              player2.openInventory(inv2);
+            });
   }
 
   private static List<ItemStack> combine(ItemStack[] items) {
@@ -400,6 +403,7 @@ public class Trade implements Listener {
     if (closed == null || closed.getSize() < 54) {
       return;
     }
+
     // I keep having issues with
     // identifying inventories so
     // trying to make sure it catches
@@ -427,14 +431,14 @@ public class Trade implements Listener {
         task = null;
       }
 
+      player1.closeInventory();
+      player2.closeInventory();
+
       // Return items to them
       giveItemsOnLeft(inv1, player1);
       giveItemsOnLeft(inv2, player2);
       giveOnCursor(player1);
       giveOnCursor(player2);
-
-      player1.closeInventory();
-      player2.closeInventory();
 
       MsgUtils.send(
           player1,
@@ -528,12 +532,20 @@ public class Trade implements Listener {
   }
 
   private void giveItemsOnLeft(Inventory inv, Player player) {
+    List<ItemStack> dropoff = new ArrayList<>();
     getItemsOnLeft(inv)
-        .forEach(
-            item ->
-                player.getInventory().addItem(item).values().stream()
-                    .findFirst()
-                    .ifPresent(i -> player.getWorld().dropItemNaturally(player.getLocation(), i)));
+        .forEach(item -> player.getInventory().addItem(item).values().forEach(dropoff::add));
+    if (!dropoff.isEmpty()) {
+      int size = dropoff.size() / 9;
+      if (dropoff.size() % 9 > 0) {
+        size ++;
+      }
+      size *= 9;
+      Inventory excessChest = Bukkit.createInventory(null, size, pl.getExcessTitle());
+      dropoff.forEach(excessChest::addItem);
+      pl.getExcessChests().add(excessChest);
+      Bukkit.getScheduler().runTaskLater(pl, () -> player.openInventory(excessChest), 1L);
+    }
   }
 
   private List<ItemStack> getItemsOnLeft(Inventory inv) {

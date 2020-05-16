@@ -14,7 +14,9 @@ public class PlayerPointsExtra extends Extra {
 
   public PlayerPointsExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
     super("playerpoints", player1, player2, pl, trade);
-    this.playerPointsAPI = new PlayerPointsAPI((PlayerPoints) pl.getServer().getPluginManager().getPlugin("PlayerPoints"));
+    this.playerPointsAPI =
+        new PlayerPointsAPI(
+            (PlayerPoints) pl.getServer().getPluginManager().getPlugin("PlayerPoints"));
   }
 
   @Override
@@ -36,14 +38,19 @@ public class PlayerPointsExtra extends Extra {
 
   @Override
   public ItemStack _getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
-            "%INCREMENT%", decimalFormat.format(increment),
-            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
+    return ItemFactory.replaceInMeta(
+        icon,
+        "%AMOUNT%",
+        decimalFormat.format(player.equals(player1) ? value1 : value2),
+        "%INCREMENT%",
+        decimalFormat.format(increment),
+        "%PLAYERINCREMENT%",
+        decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack _getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
+    return ItemFactory.replaceInMeta(
+        theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
   }
-
 }

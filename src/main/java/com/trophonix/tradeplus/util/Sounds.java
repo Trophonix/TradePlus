@@ -15,7 +15,8 @@ public class Sounds {
   private static Sound villagerHmm;
 
   static {
-    String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
+    String[] split =
+        Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("_");
     version = Integer.parseInt(split[0].replace("v", "") + split[1]);
     System.out.println("You appear to be running version " + version);
   }
@@ -42,32 +43,27 @@ public class Sounds {
         villagerHmm = Sound.valueOf("ENTITY_VILLAGER_AMBIENT");
       }
     } catch (IllegalArgumentException | NullPointerException | NoSuchFieldError ex) {
-      Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "Unable to load sounds! Sound effects will be disabled.");
+      Bukkit.getConsoleSender()
+          .sendMessage(
+              ChatColor.DARK_RED + "Unable to load sounds! Sound effects will be disabled.");
     }
   }
 
   public static void pling(Player player, float v1) {
-    if (pling != null)
-      player.playSound(player.getEyeLocation(), pling, 1, v1);
+    if (pling != null) player.playSound(player.getEyeLocation(), pling, 1, v1);
   }
 
   public static void click(Player player, float v1) {
-    if (click != null)
-      player.playSound(player.getEyeLocation(), click, 1, v1);
+    if (click != null) player.playSound(player.getEyeLocation(), click, 1, v1);
   }
 
   public static void levelUp(Player player, float v1) {
-    if (levelUp != null)
-      player.playSound(player.getEyeLocation(), levelUp, 1, v1);
+    if (levelUp != null) player.playSound(player.getEyeLocation(), levelUp, 1, v1);
   }
 
   public static void villagerHit(Player player, float v1) {
-    if (villagerHit != null)
-      player.playSound(player.getEyeLocation(), villagerHit, 1, v1);
+    if (villagerHit != null) player.playSound(player.getEyeLocation(), villagerHit, 1, v1);
   }
 
-  public static void villagerHmm(Player player, float v1) {
-
-  }
-
+  public static void villagerHmm(Player player, float v1) {}
 }

@@ -7,12 +7,7 @@ public class MassiveCraftFactionsHook {
 
   public static boolean isPlayerInEnemyTerritory(Player player) {
     FPlayer me = FPlayers.getInstance().getByPlayer(player);
-    Faction faction = Board.getInstance().getFactionAt(
-        new FLocation(player.getLocation()));
-    if (me.getRelationTo(faction).isEnemy()) {
-      return true;
-    }
-    return false;
+    Faction faction = Board.getInstance().getFactionAt(new FLocation(player.getLocation()));
+    return me.getRelationTo(faction).isEnemy();
   }
-
 }

@@ -18,11 +18,15 @@ public class TradeLog implements PostProcessor {
   private List<ExtraOffer> player1ExtraOffers, player2ExtraOffers;
   private Date time;
 
-  public TradeLog() { }
+  public TradeLog() {}
 
-  public TradeLog(OfflinePlayer player1, OfflinePlayer player2, List<ItemFactory> player1Items,
-                  List<ItemFactory> player2Items, List<ExtraOffer> player1ExtraOffers,
-                  List<ExtraOffer> player2ExtraOffers) {
+  public TradeLog(
+      OfflinePlayer player1,
+      OfflinePlayer player2,
+      List<ItemFactory> player1Items,
+      List<ItemFactory> player2Items,
+      List<ExtraOffer> player1ExtraOffers,
+      List<ExtraOffer> player2ExtraOffers) {
     this.player1 = new Trader(player1.getUniqueId(), player1.getName());
     this.player2 = new Trader(player2.getUniqueId(), player2.getName());
     player1Items.sort((o1, o2) -> Integer.compare(o2.getAmount(), o1.getAmount()));
@@ -34,12 +38,14 @@ public class TradeLog implements PostProcessor {
     this.time = new Date();
   }
 
-  @Override public void doPostProcessing() {
+  @Override
+  public void doPostProcessing() {
     player1.updateName();
     player2.updateName();
   }
 
-  @Getter @AllArgsConstructor
+  @Getter
+  @AllArgsConstructor
   public static class Trader {
 
     private UUID uniqueId;
@@ -50,7 +56,6 @@ public class TradeLog implements PostProcessor {
       if (op.getName() == null) lastKnownName = "unknown";
       else lastKnownName = op.getName();
     }
-
   }
 
   @Getter
@@ -61,13 +66,11 @@ public class TradeLog implements PostProcessor {
 
     // I think gson needs this
     // so it can construct them from json
-    public ExtraOffer() { }
+    public ExtraOffer() {}
 
     public ExtraOffer(String id, double value) {
       this.id = id;
       this.value = value;
     }
-
   }
-
 }

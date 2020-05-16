@@ -36,16 +36,29 @@ public class EconomyExtra extends Extra {
 
   @Override
   public ItemStack _getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
-            "%CURRENCY%", economy.getBalance(player) == 1 ? economy.currencyNameSingular() : economy.currencyNamePlural(),
-            "%INCREMENT%", decimalFormat.format(increment),
-            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
+    return ItemFactory.replaceInMeta(
+        icon,
+        "%AMOUNT%",
+        decimalFormat.format(player.equals(player1) ? value1 : value2),
+        "%CURRENCY%",
+        economy.getBalance(player) == 1
+            ? economy.currencyNameSingular()
+            : economy.currencyNamePlural(),
+        "%INCREMENT%",
+        decimalFormat.format(increment),
+        "%PLAYERINCREMENT%",
+        decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack _getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
-            "%CURRENCY%", economy.getBalance(player) == 1 ? economy.currencyNameSingular() : economy.currencyNamePlural());
+    return ItemFactory.replaceInMeta(
+        theirIcon,
+        "%AMOUNT%",
+        decimalFormat.format(player.equals(player1) ? value1 : value2),
+        "%CURRENCY%",
+        economy.getBalance(player) == 1
+            ? economy.currencyNameSingular()
+            : economy.currencyNamePlural());
   }
-
 }

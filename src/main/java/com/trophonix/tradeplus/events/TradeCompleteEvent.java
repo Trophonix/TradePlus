@@ -18,7 +18,12 @@ class TradeCompleteEvent extends Event {
   private final Set<ItemStack> playerOneTrades;
   private final Set<ItemStack> playerTwoTrades;
 
-  public TradeCompleteEvent(TradeLog trade, Player playerOne, Player playerTwo, Set<ItemStack> playerOneTrades, Set<ItemStack> playerTwoTrades) {
+  public TradeCompleteEvent(
+      TradeLog trade,
+      Player playerOne,
+      Player playerTwo,
+      Set<ItemStack> playerOneTrades,
+      Set<ItemStack> playerTwoTrades) {
     this.trade = trade;
     this.playerOne = playerOne;
     this.playerTwo = playerTwo;
@@ -30,19 +35,28 @@ class TradeCompleteEvent extends Event {
     return handlers;
   }
 
-  public TradeLog getTrade() { return trade; }
+  public TradeLog getTrade() {
+    return trade;
+  }
 
-  public Player getPlayerOne() { return playerOne; }
+  public Player getPlayerOne() {
+    return playerOne;
+  }
 
-  public Player getPlayerTwo() { return playerTwo; }
+  public Player getPlayerTwo() {
+    return playerTwo;
+  }
 
-  public Set<ItemStack> getPlayerOneTrades() { return playerOneTrades; }
+  public Set<ItemStack> getPlayerOneTrades() {
+    return playerOneTrades;
+  }
 
-  public Set<ItemStack> getPlayerTwoTrades() { return playerTwoTrades; }
+  public Set<ItemStack> getPlayerTwoTrades() {
+    return playerTwoTrades;
+  }
 
   @Override
   public HandlerList getHandlers() {
     return handlers;
   }
-
 }

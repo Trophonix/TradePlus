@@ -26,24 +26,31 @@ public class GriefPreventionExtra extends Extra {
     PlayerData data2 = GriefPrevention.instance.dataStore.getPlayerData(player2.getUniqueId());
     if (value1 > 0) {
       data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() - (int) value1);
-      data2.setAccruedClaimBlocks(data2.getAccruedClaimBlocks() + (int) (value1 - ((value1 / 100) * taxPercent)));
+      data2.setAccruedClaimBlocks(
+          data2.getAccruedClaimBlocks() + (int) (value1 - ((value1 / 100) * taxPercent)));
     }
     if (value2 > 0) {
       data2.setAccruedClaimBlocks(data2.getAccruedClaimBlocks() - (int) value2);
-      data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() + (int) (value2 - ((value2 / 100) * taxPercent)));
+      data1.setAccruedClaimBlocks(
+          data1.getAccruedClaimBlocks() + (int) (value2 - ((value2 / 100) * taxPercent)));
     }
   }
 
   @Override
   public ItemStack _getIcon(Player player) {
-    return ItemFactory.replaceInMeta(icon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
-            "%INCREMENT%", decimalFormat.format(increment),
-            "%PLAYERINCREMENT%", decimalFormat.format(player.equals(player1) ? increment1 : increment2));
+    return ItemFactory.replaceInMeta(
+        icon,
+        "%AMOUNT%",
+        decimalFormat.format(player.equals(player1) ? value1 : value2),
+        "%INCREMENT%",
+        decimalFormat.format(increment),
+        "%PLAYERINCREMENT%",
+        decimalFormat.format(player.equals(player1) ? increment1 : increment2));
   }
 
   @Override
   public ItemStack _getTheirIcon(Player player) {
-    return ItemFactory.replaceInMeta(theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
+    return ItemFactory.replaceInMeta(
+        theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
   }
-
 }

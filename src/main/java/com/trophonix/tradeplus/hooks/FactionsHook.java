@@ -22,5 +22,4 @@ public class FactionsHook {
     }
     return false;
   }
-
 }

@@ -54,14 +54,25 @@ public class ItemFactory {
 
   public ItemFactory(String parsable) {
     Preconditions.checkNotNull(parsable, "Material cannot be null.");
-    UMaterial uMat = UMaterial.match(parsable.toUpperCase().replace(" ", "_"));
+    byte data = -1;
+    if (parsable.contains(":")) {
+      String[] split = parsable.split(":");
+      data = Byte.parseByte(split[1]);
+      parsable = split[0];
+    }
+    parsable = parsable.toUpperCase().replace(" ", "_");
+    UMaterial uMat;
+    if (data > -1 && Sounds.version < 113) {
+      uMat = UMaterial.match(parsable, data);
+    } else {
+      uMat = UMaterial.match(parsable);
+    }
     Preconditions.checkNotNull(uMat, "Unknown material [%s]", parsable);
-    Preconditions.checkArgument(
-        uMat.getMaterial() != null,
-        "Unknown material [%s]. Make sure item exists in your version!",
-        parsable);
-    material = uMat.getMaterial();
-    data = uMat.getData();
+    if (uMat.getMaterial() == null) {
+
+    }
+    this.material = uMat.getMaterial();
+    this.data = uMat.getData();
   }
 
   public ItemFactory(ItemStack stack) {

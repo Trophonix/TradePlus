@@ -10,6 +10,7 @@
 
     <properties>
         <res>${project.basedir}/res/</res>
+        <revision>3.68.1</revision>
     </properties>
 
     <repositories>
@@ -175,11 +176,18 @@
             <artifactId>worldguardwrapper</artifactId>
             <version>1.1.6-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.Angeschossen</groupId>
+            <artifactId>LandsAPI</artifactId>
+            <version>4.5.2.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>${basedir}/src/main/java/</sourceDirectory>
-        <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${revision}</finalName>
         <resources>
             <resource>
                 <targetPath>.</targetPath>

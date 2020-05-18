@@ -43,7 +43,7 @@ import java.util.*;
  */
 interface Versionable {
   String VERSION = Bukkit.getVersion();
-  boolean EIGHT = VERSION.contains("1.8"), NINE = VERSION.contains("1.9"), TEN = VERSION.contains("1.10"), ELEVEN = VERSION.contains("1.11"), TWELVE = VERSION.contains("1.12"), THIRTEEN = VERSION.contains("1.13"), FOURTEEN = VERSION.contains("1.14"), FIFTEEN = VERSION.contains("1.15");
+  boolean EIGHT = VERSION.contains("1.7") || VERSION.contains("1.8"), NINE = VERSION.contains("1.9"), TEN = VERSION.contains("1.10"), ELEVEN = VERSION.contains("1.11"), TWELVE = VERSION.contains("1.12"), THIRTEEN = VERSION.contains("1.13"), FOURTEEN = VERSION.contains("1.14"), FIFTEEN = VERSION.contains("1.15");
   boolean LEGACY = EIGHT || NINE || TEN || ELEVEN || TWELVE;
 }
 
@@ -390,9 +390,9 @@ public enum UMaterial implements Versionable {
   ENCHANTED_BOOK_CHANNELING("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("CHANNELING") != null ? "CHANNELING" : "PROTECTION_EXPLOSIONS"), 1),
   ENCHANTED_BOOK_CURSE_OF_BINDING("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("BINDING_CURSE") != null ? "BINDING_CURSE" : "PROTECTION_EXPLOSIONS"), 1),
   ENCHANTED_BOOK_CURSE_OF_VANISHING("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("VANISHING_CURSE") != null ? "VANISHING_CURSE" : "PROTECTION_EXPLOSIONS"), 1),
-  ENCHANTED_BOOK_DEPTH_STRIDER_1("ENCHANTED_BOOK", Enchantment.DEPTH_STRIDER, 1),
-  ENCHANTED_BOOK_DEPTH_STRIDER_2("ENCHANTED_BOOK", Enchantment.DEPTH_STRIDER, 2),
-  ENCHANTED_BOOK_DEPTH_STRIDER_3("ENCHANTED_BOOK", Enchantment.DEPTH_STRIDER, 3),
+  ENCHANTED_BOOK_DEPTH_STRIDER_1("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("DEPTH_STRIDER") != null ? "DEPTH_STRIDER" : "PROTECTION_EXPLOSIONS"), 1),
+  ENCHANTED_BOOK_DEPTH_STRIDER_2("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("DEPTH_STRIDER") != null ? "DEPTH_STRIDER" : "PROTECTION_EXPLOSIONS"), 2),
+  ENCHANTED_BOOK_DEPTH_STRIDER_3("ENCHANTED_BOOK", Enchantment.getByName(Enchantment.getByName("DEPTH_STRIDER") != null ? "DEPTH_STRIDER" : "PROTECTION_EXPLOSIONS"), 3),
   ENCHANTED_BOOK_EFFICIENCY_1("ENCHANTED_BOOK", Enchantment.DIG_SPEED, 1),
   ENCHANTED_BOOK_EFFICIENCY_2("ENCHANTED_BOOK", Enchantment.DIG_SPEED, 2),
   ENCHANTED_BOOK_EFFICIENCY_3("ENCHANTED_BOOK", Enchantment.DIG_SPEED, 3),

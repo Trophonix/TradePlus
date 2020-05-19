@@ -87,8 +87,8 @@ public class TradePlus extends JavaPlugin {
   @Override public void onLoad() {
     try {
       WorldGuardHook.init();
-    } catch (Exception ignored) {
-      getLogger().info("Failed to hook into worldguard.");
+    } catch (Throwable ignored) {
+      getLogger().info("Failed to hook into worldguard. Ignore this if you don't have worldguard.");
     }
   }
 

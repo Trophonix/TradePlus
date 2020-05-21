@@ -50,18 +50,22 @@ public class TradeCommand extends Command {
     }
     final Player player = (Player) sender;
 
-    if (pl.getConfig().getBoolean("hooks.worldguard.trading-flag", true)) {
-      if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
-        if (!WorldGuardHook.isTradingAllowed(player, player.getLocation())) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString(
-                      "hooks.worldguard.trading-not-allowed",
-                      "&4&l(!) &4You can't trade in this area."));
-          return;
+    try {
+      if (pl.getConfig().getBoolean("hooks.worldguard.trading-flag", true)) {
+        if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
+          if (!WorldGuardHook.isTradingAllowed(player, player.getLocation())) {
+            MsgUtils.send(
+                player,
+                pl.getLang()
+                    .getString(
+                        "hooks.worldguard.trading-not-allowed",
+                        "&4&l(!) &4You can't trade in this area."));
+            return;
+          }
         }
       }
+    } catch(Throwable ignored) {
+
     }
 
     try {
@@ -77,7 +81,7 @@ public class TradeCommand extends Command {
           return;
         }
       }
-    } catch (Exception ignored) {
+    } catch (Throwable ignored) {
     }
 
     boolean permissionRequired = pl.getConfig().getBoolean("permissions.required", false);

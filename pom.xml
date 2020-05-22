@@ -10,7 +10,7 @@
 
     <properties>
         <res>${project.basedir}/res/</res>
-        <revision>3.68.3</revision>
+        <revision>3.68.4</revision>
     </properties>
 
     <repositories>

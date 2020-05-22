@@ -108,7 +108,7 @@ public class TradePlus extends JavaPlugin {
               InvUtils.reloadItems(this);
               typeEmpty =
                   ChatColor.translateAlternateColorCodes(
-                      '&', config.getString("extras.type.empty"));
+                      '&', config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
               typeValid =
                   ChatColor.translateAlternateColorCodes(
                       '&', config.getString("extras.type.valid"));

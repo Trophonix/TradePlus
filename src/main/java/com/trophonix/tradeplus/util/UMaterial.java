@@ -1410,7 +1410,7 @@ public enum UMaterial implements Versionable {
     names[0] = name;
     versionName = name;
     data = 0;
-    attributes = "enchant=" + enchant.getName() + ":" + level;
+    attributes = "enchant=" + (Sounds.version < 114 ? enchant.getName() : ItemUtils1_14.getName(enchant)) + ":" + level;
   }
   UMaterial(int data, String ...names) {
     this.names = names;
@@ -1434,7 +1434,7 @@ public enum UMaterial implements Versionable {
         } else if(s.startsWith("enchant=")) {
           final String[] e = s.split("=")[1].split(":");
           final EnchantmentStorageMeta sm = (EnchantmentStorageMeta) is.getItemMeta();
-          sm.addStoredEnchant(Enchantment.getByName(e[0]), Integer.parseInt(e[1]), true);
+          sm.addStoredEnchant(Sounds.version < 114 ? Enchantment.getByName(e[0]) : ItemUtils1_14.getEnchantment(e[0]), Integer.parseInt(e[1]), true);
           is.setItemMeta(sm);
         } else if(s.startsWith("upotion=")) {
           final String[] p = s.split("=")[1].split(":");

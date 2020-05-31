@@ -6,11 +6,11 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.69</version>
+    <version>3.70</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
-        <revision>3.69</revision>
+        <revision>3.70</revision>
     </properties>
 
     <repositories>
@@ -181,6 +181,13 @@
             <groupId>com.github.Angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
             <version>4.5.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.Ben12345rocks</groupId>
+            <artifactId>VotingPlugin</artifactId>
+            <version>LATEST</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

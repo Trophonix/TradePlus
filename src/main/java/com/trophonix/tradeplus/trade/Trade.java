@@ -122,6 +122,10 @@ public class Trade implements Listener {
                   && pl.getServer().getPluginManager().isPluginEnabled("TokenManager")) {
                 extras.add(new TokenManagerExtra(player1, player2, pl, this));
               }
+              if (pl.getConfig().getBoolean("extras.votingplugin.enabled", true)
+                  && pl.getServer().getPluginManager().isPluginEnabled("VotingPlugin")) {
+                extras.add(new VotingPluginExtra(player1, player2, pl, this));
+              }
             })
         .sync(
             () -> {

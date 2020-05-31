@@ -1023,6 +1023,21 @@ public class TradePlus extends JavaPlugin {
         config.set("spectate.broadcast", true);
       }
 
+      if (configVersion < 3.70) {
+        config.set("extras.votingplugin.name", "vote points");
+        config.set("extras.votingplugin.material", "sunflower");
+        config.set(
+            "extras.votingplugin.display",
+            "&7Your current vote points offer is &b%AMOUNT%");
+        config.set(
+            "extras.votingplugin.theirdisplay",
+            "&7Their current vote points offer is &b%AMOUNT%");
+        config.set(
+            "extras.votingplugin.lore",
+            Arrays.asList("&fClick to edit your offer!"));
+        config.set("extras.votingplugin.taxpercent", 0);
+      }
+
     }
   }
 }

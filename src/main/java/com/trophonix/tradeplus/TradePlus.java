@@ -290,6 +290,9 @@ public class TradePlus extends JavaPlugin {
       config.set("antiscam.preventchangeonaccept", true);
       config.set("antiscam.discrepancy-detection", true);
 
+      config.set("spectate.enabled", true);
+      config.set("spectate.broadcast", true);
+
       config.set("gui.title", "Your Items <|     |> Their Items");
       config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
       config.set("gui.head", "&7You are trading with: &3&l%PLAYER%");
@@ -1013,6 +1016,11 @@ public class TradePlus extends JavaPlugin {
         config.set("excess-chest.title", "&7Your inventory is full!");
         config.set("hooks.worldguard.trading-flag", true);
         lang.set("hooks.worldguard.trading-not-allowed", "&4&l(!) &4You can't trade in this area.");
+      }
+
+      if (configVersion < 3.69) {
+        config.set("spectate.enabled", true);
+        config.set("spectate.broadcast", true);
       }
 
     }

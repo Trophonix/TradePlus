@@ -40,7 +40,7 @@ public class TradePlusCommand extends Command {
         }
         break;
       case 2:
-        if (args[0].equalsIgnoreCase("spectate")) {
+        if (pl.getConfig().getBoolean("spectate.enabled", true) && args[0].equalsIgnoreCase("spectate")) {
           Player player = Bukkit.getPlayer(args[1]);
           if (player == null || !player.isOnline()) {
             MsgUtils.send(
@@ -124,9 +124,10 @@ public class TradePlusCommand extends Command {
           "&6&l<----- Trade+ by Trophonix ----->",
           "&e/trade <player> &fSend a trade request",
           "&e/tradeplus reload &fReload config files",
-          "&e/tradeplus force <player1> <player2> &fForce 2 players to trade",
-          "&e/tradeplus spectate <player(s)> &fSpectate an ongoing trade"
+          "&e/tradeplus force <player1> <player2> &fForce 2 players to trade"
         });
+    if (pl.getConfig().getBoolean("spectate.enabled", true))
+      MsgUtils.send(sender, "&e/tradeplus spectate <player(s)> &fSpectate an ongoing trade");
   }
 
   @Override

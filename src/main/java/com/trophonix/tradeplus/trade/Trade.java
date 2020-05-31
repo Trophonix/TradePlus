@@ -65,6 +65,8 @@ public class Trade implements Listener {
         })
         .async(
             () -> {
+              if (pl.getConfig().getBoolean("spectate.enabled", true) &&
+                  pl.getConfig().getBoolean("spectate.broadcast"))
               Bukkit.getOnlinePlayers()
                   .forEach(
                       p -> {

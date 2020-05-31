@@ -22,8 +22,9 @@ public class GriefPreventionExtra extends Extra {
 
   @Override
   public void onTradeEnd() {
-    PlayerData data1 = GriefPrevention.instance.dataStore.getPlayerData(player1.getUniqueId());
-    PlayerData data2 = GriefPrevention.instance.dataStore.getPlayerData(player2.getUniqueId());
+    GriefPrevention inst = GriefPrevention.instance;
+    PlayerData data1 = inst.dataStore.getPlayerData(player1.getUniqueId());
+    PlayerData data2 = inst.dataStore.getPlayerData(player2.getUniqueId());
     if (value1 > 0) {
       data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() - (int) value1);
       data2.setAccruedClaimBlocks(
@@ -34,6 +35,8 @@ public class GriefPreventionExtra extends Extra {
       data1.setAccruedClaimBlocks(
           data1.getAccruedClaimBlocks() + (int) (value2 - ((value2 / 100) * taxPercent)));
     }
+    inst.dataStore.savePlayerData(player1.getUniqueId(), data1);
+    inst.dataStore.savePlayerData(player2.getUniqueId(), data2);
   }
 
   @Override

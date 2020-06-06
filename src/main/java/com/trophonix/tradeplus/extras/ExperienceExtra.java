@@ -54,7 +54,14 @@ public class ExperienceExtra extends Extra {
   @Override
   public ItemStack _getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(
-        theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2));
+        theirIcon, "%AMOUNT%", decimalFormat.format(player.equals(player1) ? value1 : value2),
+            "%LEVELS%", Integer.toString(player.equals(player1) ? getLevelsFromXp(player2, value1) : getLevelsFromXp(player1, value2)));
+  }
+
+  private int getLevelsFromXp(Player receiver, double amount) {
+    int currentXp = XP.getExp(receiver);
+    double currentLevel = XP.getLevelFromExp(currentXp);
+    return (int)(XP.getLevelFromExp(currentXp + (int)amount) - currentLevel);
   }
 
   private void changeXp(Player player, Number amount) {

@@ -349,7 +349,7 @@ public class TradePlus extends JavaPlugin {
       config.set(
           "extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
       config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
-      config.set("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
       config.set(
           "extras.experience.lore",
           Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% XP."));
@@ -1036,6 +1036,12 @@ public class TradePlus extends JavaPlugin {
             "extras.votingplugin.lore",
             Arrays.asList("&fClick to edit your offer!"));
         config.set("extras.votingplugin.taxpercent", 0);
+      }
+
+      if (configVersion < 3.71) {
+        if (!config.getString("extras.experience.theirdisplay").contains("%LEVELS%")) {
+          config.set("extras.experience.theirdisplay", config.getString("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%") + " &a(+%LEVELS% levels)");
+        }
       }
 
     }

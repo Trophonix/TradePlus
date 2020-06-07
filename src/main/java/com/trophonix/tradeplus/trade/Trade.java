@@ -122,7 +122,7 @@ public class Trade implements Listener {
                   && pl.getServer().getPluginManager().isPluginEnabled("TokenManager")) {
                 extras.add(new TokenManagerExtra(player1, player2, pl, this));
               }
-              if (pl.getConfig().getBoolean("extras.votingplugin.enabled", true)
+              if (pl.getConfig().getBoolean("extras.votingplugin.enabled", false)
                   && pl.getServer().getPluginManager().isPluginEnabled("VotingPlugin")) {
                 extras.add(new VotingPluginExtra(player1, player2, pl, this));
               }
@@ -136,12 +136,12 @@ public class Trade implements Listener {
               }
               updateExtras();
             })
-        .execute(
+        .sync(
             () -> {
               pl.ongoingTrades.add(this);
               player1.openInventory(inv1);
               player2.openInventory(inv2);
-            });
+            }).execute();
   }
 
   private static List<ItemStack> combine(ItemStack[] items) {

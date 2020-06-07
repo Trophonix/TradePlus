@@ -429,6 +429,20 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.tokenmanager.taxpercent", 0);
       config.set("extras.tokenmanager.mode", "chat");
 
+      config.set("extras.votingplugin.name", "vote points");
+      config.set("extras.votingplugin.enabled", true);
+      config.set("extras.votingplugin.material", "sunflower");
+      config.set(
+              "extras.votingplugin.display",
+              "&7Your current vote points offer is &b%AMOUNT%");
+      config.set(
+              "extras.votingplugin.theirdisplay",
+              "&7Their current vote points offer is &b%AMOUNT%");
+      config.set(
+              "extras.votingplugin.lore",
+              Arrays.asList("&fClick to edit your offer!"));
+      config.set("extras.votingplugin.taxpercent", 0);
+
       config.set("hooks.factions.allow-trades-in-enemy-territory", false);
 
       config.set("hooks.worldguard.trading-flag", true);
@@ -1039,9 +1053,26 @@ public class TradePlus extends JavaPlugin {
       }
 
       if (configVersion < 3.71) {
-        if (!config.getString("extras.experience.theirdisplay").contains("%LEVELS%")) {
+        if (!config.getString("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%").contains("%LEVELS%")) {
           config.set("extras.experience.theirdisplay", config.getString("extras.experience.theirdisplay", "&aTheir current XP offer is &2%AMOUNT%") + " &a(+%LEVELS% levels)");
         }
+      }
+
+      if (configVersion < 3.72) {
+        config.set("extras.votingplugin.name", "vote points");
+        config.set("extras.votingplugin.enabled", true);
+        config.set("extras.votingplugin.material", "sunflower");
+        config.set(
+                "extras.votingplugin.display",
+                "&7Your current vote points offer is &b%AMOUNT%");
+        config.set(
+                "extras.votingplugin.theirdisplay",
+                "&7Their current vote points offer is &b%AMOUNT%");
+        config.set(
+                "extras.votingplugin.lore",
+                Arrays.asList("&fClick to edit your offer!"));
+        config.set("extras.votingplugin.taxpercent", 0);
+
       }
 
     }

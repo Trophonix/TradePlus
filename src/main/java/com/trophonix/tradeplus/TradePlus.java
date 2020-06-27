@@ -374,7 +374,7 @@ public class TradePlus extends JavaPlugin {
 
       config.set("extras.griefprevention.enabled", true);
       config.set("extras.griefprevention.name", "grief prevention");
-      config.set("extras.griefprevention.material", "diamond_pickaxe");
+      config.set("extras.griefprevention.material", UMaterial.GOLDEN_SHOVEL.getVersionName());
       config.set(
           "extras.griefprevention.display", "&eYour current GriefPrevention offer is &6%AMOUNT%");
       config.set(
@@ -430,7 +430,7 @@ public class TradePlus extends JavaPlugin {
       config.set("extras.tokenmanager.mode", "chat");
 
       config.set("extras.votingplugin.name", "vote points");
-      config.set("extras.votingplugin.enabled", true);
+      config.set("extras.votingplugin.enabled", false);
       config.set("extras.votingplugin.material", "sunflower");
       config.set(
               "extras.votingplugin.display",
@@ -1060,7 +1060,7 @@ public class TradePlus extends JavaPlugin {
 
       if (configVersion < 3.72) {
         config.set("extras.votingplugin.name", "vote points");
-        config.set("extras.votingplugin.enabled", true);
+        config.set("extras.votingplugin.enabled", false);
         config.set("extras.votingplugin.material", "sunflower");
         config.set(
                 "extras.votingplugin.display",

@@ -209,6 +209,7 @@ public class Trade implements Listener {
 
     if (spectatorInv.equals(inv)) {
       event.setCancelled(true);
+      return;
     }
 
     int slot = event.getSlot();
@@ -404,7 +405,6 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onClose(InventoryCloseEvent event) {
-    if (cancelled) return;
     Inventory closed = event.getInventory();
     if (closed == null || closed.getSize() < 54) {
       return;
@@ -414,9 +414,7 @@ public class Trade implements Listener {
     // identifying inventories so
     // trying to make sure it catches
     // all events
-    if (closed == inv1
-        || closed == inv2
-        || closed.equals(inv1)
+    if (closed.equals(inv1)
         || closed.equals(inv2)
         || inv1.getViewers().contains(event.getPlayer())
         || inv2.getViewers().contains(event.getPlayer())) {
@@ -425,7 +423,9 @@ public class Trade implements Listener {
         return;
       }
 
-      if (closed.getItem(49) == null) {
+      giveOnCursor((Player)event.getPlayer());
+
+      if (cancelled || closed.getItem(49) == null) {
         return;
       }
 
@@ -443,8 +443,6 @@ public class Trade implements Listener {
       // Return items to them
       giveItemsOnLeft(inv1, player1);
       giveItemsOnLeft(inv2, player2);
-      giveOnCursor(player1);
-      giveOnCursor(player2);
 
       MsgUtils.send(
           player1,

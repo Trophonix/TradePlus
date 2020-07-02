@@ -12,11 +12,8 @@ import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.Sounds;
-import com.trophonix.tradeplus.util.UMaterial;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -98,7 +95,6 @@ public class TradePlus extends JavaPlugin {
     taskFactory
         .newChain()
         .async(this::loadConfig)
-        .async(this::fixConfig)
         .sync(
             () -> {
               excessChests = new ArrayList<>();
@@ -203,41 +199,6 @@ public class TradePlus extends JavaPlugin {
 
   public String getTypeMaximum() {
     return typeMaximum;
-  }
-
-  private void fixConfig() {
-    List<String> fixList =
-        new ArrayList<>(
-            Arrays.asList("gui.acceptid", "gui.cancelid", "gui.separatorid", "gui.force.type"));
-    for (String key : getConfig().getConfigurationSection("extras").getKeys(false)) {
-      fixList.add(getConfig().getString("extras." + key + ".material"));
-    }
-    for (String key : fixList) {
-      if (key == null || key.equals("")) continue;
-      if (config.contains(key)) {
-        String val = config.getString(key).replace(" ", "_").toUpperCase();
-        if (Material.getMaterial(val) == null) {
-          if (val.contains(":")) {
-            String[] split = val.split(":");
-            if (Material.getMaterial(split[0].toUpperCase()) != null) continue;
-          }
-
-          UMaterial uMat = UMaterial.match(val);
-          if (uMat == null) {
-            getLogger()
-                .warning("Couldn't find material for " + val + ". This could cause a crash.");
-            getLogger()
-                .warning("Make sure this is a valid material before reporting this as a bug.");
-            continue;
-          }
-
-          String name =
-              uMat.getMaterial().name() + (uMat.getData() != 0 ? ":" + uMat.getData() : "");
-          config.set(key, name);
-          getLogger().info("Corrected " + key + " (" + val + " -> " + name + ")");
-        }
-      }
-    }
   }
 
   private void loadConfig() {
@@ -374,7 +335,7 @@ public class TradePlus extends JavaPlugin {
 
       config.set("extras.griefprevention.enabled", true);
       config.set("extras.griefprevention.name", "grief prevention");
-      config.set("extras.griefprevention.material", UMaterial.GOLDEN_SHOVEL.getVersionName());
+      config.set("extras.griefprevention.material", Sounds.version > 112 ? "golden_shovel" : "gold_spade");
       config.set(
           "extras.griefprevention.display", "&eYour current GriefPrevention offer is &6%AMOUNT%");
       config.set(
@@ -736,7 +697,11 @@ public class TradePlus extends JavaPlugin {
         config.set("gui.spectator-title", "%PLAYER1%              %PLAYER2%");
         config.set("gui.force.enabled", config.getBoolean("gui.showadminforce", true));
         config.set("gui.showadminforce", null);
-        config.set("gui.force.type", "clock");
+        if (Sounds.version < 113) {
+          config.set("gui.force.type", "watch");
+        } else {
+          config.set("gui.force.type", "clock");
+        }
         config.set("gui.force.name", "&4&lForce Trade");
         config.set(
             "gui.force.lore",

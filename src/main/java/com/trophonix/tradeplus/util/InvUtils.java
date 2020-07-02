@@ -30,33 +30,33 @@ public class InvUtils {
   public static void reloadItems(TradePlus pl) {
     InvUtils.pl = pl;
     placeHolder =
-        new ItemFactory(pl.getConfig().getString("gui.separator.type", "stained_glass_pane:15"))
+        new ItemFactory(pl.getConfig().getString("gui.separator.type", "stained_glass_pane:15"), Sounds.version > 112 ? Material.getMaterial("GLASS_PANE") : Material.getMaterial("THIN_GLASS"))
             .display(" ")
             .flag("HIDE_ATTRIBUTES")
             .build();
     acceptTrade =
-        new ItemFactory(pl.getConfig().getString("gui.accept.type", "stained_glass_pane:14"))
+        new ItemFactory(pl.getConfig().getString("gui.accept.type", "stained_glass_pane:14"), Material.EMERALD)
             .display('&', pl.getConfig().getString("gui.accept.display"))
             .customModelData(pl.getConfig().getInt("gui.accept.customModelData", 0))
             .amount(pl.getConfig().getInt("antiscam.countdown", 10))
             .flag("HIDE_ATTRIBUTES")
             .build();
     cancelTrade =
-        new ItemFactory(pl.getConfig().getString("gui.cancel.type", "stained_glass_pane:13"))
+        new ItemFactory(pl.getConfig().getString("gui.cancel.type", "stained_glass_pane:13"), Material.BARRIER)
             .display('&', pl.getConfig().getString("gui.cancel.display"))
             .customModelData(pl.getConfig().getInt("gui.cancel.customModelData", 0))
             .amount(pl.getConfig().getInt("antiscam.countdown", 10))
             .flag("HIDE_ATTRIBUTES")
             .build();
     theyAccepted =
-        new ItemFactory(pl.getConfig().getString("gui.cancel.type", "stained_glass_pane:13"))
+        new ItemFactory(pl.getConfig().getString("gui.cancel.type", "stained_glass_pane:13"), Material.EMERALD)
             .display('&', pl.getConfig().getString("gui.accept.theirdisplay"))
             .customModelData(pl.getConfig().getInt("gui.accept.customModelData"))
             .amount(pl.getConfig().getInt("antiscam.countdown", 10))
             .flag("HIDE_ATTRIBUTES")
             .build();
     theyCancelled =
-        new ItemFactory(pl.getConfig().getString("gui.accept.type", "stained_glass_pane:14"))
+        new ItemFactory(pl.getConfig().getString("gui.accept.type", "stained_glass_pane:14"), Material.BARRIER)
             .display('&', pl.getConfig().getString("gui.cancel.theirdisplay"))
             .customModelData(pl.getConfig().getInt("gui.cancel.customModelData"))
             .amount(pl.getConfig().getInt("antiscam.countdown", 10))

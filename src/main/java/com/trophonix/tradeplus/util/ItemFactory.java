@@ -32,24 +32,31 @@ public class ItemFactory {
 
   public ItemFactory(String parsable, Material fallback) {
     Preconditions.checkNotNull(parsable, "Material cannot be null.");
-    parsable = parsable.toUpperCase().replace(" ", "_");
-    UMaterial uMat = UMaterial.match(parsable);
-    if (uMat == null) {
-      material = fallback;
-      TradePlus.getPlugin(TradePlus.class)
-          .getLogger()
-          .warning(
-              "Unknown material ["
-                  + parsable
-                  + "]."
-                  + (Sounds.version >= 113
-                      ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
-                          + fallback.name()
-                      : ""));
-    } else {
-      material = uMat.getMaterial();
-      data = uMat.getData();
+    byte data = -1;
+    if (parsable.contains(":")) {
+      String[] split = parsable.split(":");
+      data = Byte.parseByte(split[1]);
+      parsable = split[0];
     }
+    parsable = parsable.toUpperCase().replace(" ", "_");
+
+    Material mat = Material.getMaterial(parsable);
+    if (mat == null) {
+      mat = fallback;
+      TradePlus.getPlugin(TradePlus.class)
+              .getLogger()
+              .warning(
+                      "Unknown material ["
+                              + parsable
+                              + "]."
+                              + (Sounds.version >= 113
+                              ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
+                              + fallback.name()
+                              : ""));
+    }
+
+    this.material = mat;
+    this.data = data;
   }
 
   public ItemFactory(String parsable) {
@@ -61,18 +68,9 @@ public class ItemFactory {
       parsable = split[0];
     }
     parsable = parsable.toUpperCase().replace(" ", "_");
-    UMaterial uMat;
-    if (data > -1 && Sounds.version < 113) {
-      uMat = UMaterial.match(parsable, data);
-    } else {
-      uMat = UMaterial.match(parsable);
-    }
-    Preconditions.checkNotNull(uMat, "Unknown material [%s]", parsable);
-    if (uMat.getMaterial() == null) {
-
-    }
-    this.material = uMat.getMaterial();
-    this.data = uMat.getData();
+    Material mat = Material.getMaterial(parsable);
+    this.material = Preconditions.checkNotNull(mat, "Unknown material [%s]", parsable);;
+    this.data = data;
   }
 
   public ItemFactory(ItemStack stack) {
@@ -96,7 +94,7 @@ public class ItemFactory {
   }
 
   static ItemStack getPlayerSkull(Player player, String displayName) {
-    ItemStack skull = UMaterial.PLAYER_HEAD_ITEM.getItemStack();
+    ItemStack skull = new ItemStack(Material.getMaterial(Sounds.version > 112 ? "PLAYER_HEAD" : "SKULL_ITEM"));
     Preconditions.checkNotNull(skull, "Failed to load skull.");
     if (Sounds.version < 113) skull.getData().setData((byte) 3);
     SkullMeta meta = (SkullMeta) skull.getItemMeta();

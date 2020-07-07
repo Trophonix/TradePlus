@@ -23,5 +23,4 @@ public class ItemUtils1_14 {
   public static Enchantment getEnchantment(String key) {
     return Enchantment.getByKey(NamespacedKey.minecraft(key));
   }
-
 }

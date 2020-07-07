@@ -12,7 +12,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class ItemFactory {
@@ -44,15 +43,15 @@ public class ItemFactory {
     if (mat == null) {
       mat = fallback;
       TradePlus.getPlugin(TradePlus.class)
-              .getLogger()
-              .warning(
-                      "Unknown material ["
-                              + parsable
-                              + "]."
-                              + (Sounds.version >= 113
-                              ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
-                              + fallback.name()
-                              : ""));
+          .getLogger()
+          .warning(
+              "Unknown material ["
+                  + parsable
+                  + "]."
+                  + (Sounds.version >= 113
+                      ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
+                          + fallback.name()
+                      : ""));
     }
 
     this.material = mat;
@@ -69,7 +68,8 @@ public class ItemFactory {
     }
     parsable = parsable.toUpperCase().replace(" ", "_");
     Material mat = Material.getMaterial(parsable);
-    this.material = Preconditions.checkNotNull(mat, "Unknown material [%s]", parsable);;
+    this.material = Preconditions.checkNotNull(mat, "Unknown material [%s]", parsable);
+    ;
     this.data = data;
   }
 
@@ -94,7 +94,8 @@ public class ItemFactory {
   }
 
   static ItemStack getPlayerSkull(Player player, String displayName) {
-    ItemStack skull = new ItemStack(Material.getMaterial(Sounds.version > 112 ? "PLAYER_HEAD" : "SKULL_ITEM"));
+    ItemStack skull =
+        new ItemStack(Material.getMaterial(Sounds.version > 112 ? "PLAYER_HEAD" : "SKULL_ITEM"));
     Preconditions.checkNotNull(skull, "Failed to load skull.");
     if (Sounds.version < 113) skull.getData().setData((byte) 3);
     SkullMeta meta = (SkullMeta) skull.getItemMeta();

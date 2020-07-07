@@ -34,8 +34,8 @@ public class TradeCommand extends Command {
         new ArrayList<String>() {
           {
             add("trade");
-            if (pl.getConfig().contains("aliases")) {
-              addAll(pl.getConfig().getStringList("aliases"));
+            if (pl.getTradeConfig().getAliases() != null) {
+              addAll(pl.getTradeConfig().getAliases());
             }
           }
         });
@@ -51,33 +51,22 @@ public class TradeCommand extends Command {
     final Player player = (Player) sender;
 
     try {
-      if (pl.getConfig().getBoolean("hooks.worldguard.trading-flag", true)) {
+      if (pl.getTradeConfig().isWorldguardTradingFlag()) {
         if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
           if (!WorldGuardHook.isTradingAllowed(player, player.getLocation())) {
-            MsgUtils.send(
-                player,
-                pl.getLang()
-                    .getString(
-                        "hooks.worldguard.trading-not-allowed",
-                        "&4&l(!) &4You can't trade in this area."));
+            pl.getTradeConfig().getWorldguardTradingNotAllowed().send(player);
             return;
           }
         }
       }
-    } catch(Throwable ignored) {
+    } catch (Throwable ignored) {
 
     }
 
     try {
-      if (!pl.getConfig().getBoolean("hooks.factions.allow-trades-in-enemy-territory", false)) {
+      if (!pl.getTradeConfig().isFactionsAllowTradeInEnemyTerritory()) {
         if (FactionsHook.isPlayerInEnemyTerritory(player)) {
-          MsgUtils.send(
-              player,
-              pl.getConfig()
-                  .getString(
-                      "hooks.factions.enemy-territory",
-                      "&4&l(!) &cYou can't trade in enemy territory.")
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getFactionsEnemyTerritory().send(player);
           return;
         }
       }
@@ -95,112 +84,68 @@ public class TradeCommand extends Command {
                 if (req.receiver == player) {
                   requests.remove(req);
                   if (req.sender.isOnline()) {
-                    MsgUtils.send(
-                        req.sender,
-                        pl.getLang()
-                            .getString("denied.them")
-                            .replace("%PLAYER%", player.getName())
-                            .split("%NEWLINE%"));
+                    pl.getTradeConfig().getTheyDenied().send(req.sender, "%PLAYER%", player.getName());
                   }
                 }
               });
-          MsgUtils.send(player, pl.getLang().getString("denied.you").split("%NEWLINE%"));
+          pl.getTradeConfig().getYouDenied().send(player);
           return;
         }
-        MsgUtils.send(
-            player,
-            pl.getLang()
-                .getString("errors.player-not-found")
-                .replace("%PLAYER%", args[0])
-                .split("%NEWLINE%"));
+        pl.getTradeConfig().getErrorsPlayerNotFound().send(player);
         return;
       }
 
       if (player == receiver) {
-        MsgUtils.send(player, pl.getLang().getString("errors.self-trade").split("%NEWLINE%"));
+        pl.getTradeConfig().getErrorsSelfTrade().send(player);
         return;
       }
 
-      if (!pl.getConfig().getBoolean("allow-same-ip-trade", true)) {
+      if (!pl.getTradeConfig().isAllowSameIpTrade()) {
         InetSocketAddress address = player.getAddress();
         InetSocketAddress receiverAddress = receiver.getAddress();
         if (address != null
             && receiverAddress != null
             && address.getHostName().equals(receiverAddress.getHostName())) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString(
-                      "errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!")
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsSameIp().send(player);
           return;
         }
       }
 
-      if (!pl.getConfig().getBoolean("allow-trade-in-creative", true)) {
+      if (!pl.getTradeConfig().isAllowTradeInCreative()) {
         if (player.getGameMode().equals(GameMode.CREATIVE)) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString("errors.creative", "&4&l(!) &r&4You can't trade in creative mode!")
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsCreative().send(player);
           return;
         } else if (receiver.getGameMode().equals(GameMode.CREATIVE)) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString("errors.creative-them", "&4&l(!) &r&4That player is in creative mode!")
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsCreativeThem().send(player, "%PLAYER%", receiver.getName());
           return;
         }
       }
 
       if (player.getWorld().equals(receiver.getWorld())) {
-        double amount = pl.getConfig().getDouble("ranges.sameworld");
+        double amount = pl.getTradeConfig().getSameWorldRange();
         if (amount != 0.0
             && player.getLocation().distanceSquared(receiver.getLocation()) > Math.pow(amount, 2)) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString("errors.within-range.same-world")
-                  .replace("%PLAYER%", receiver.getName())
-                  .replace("%AMOUNT%", format.format(amount))
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsSameWorldRange().send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
           return;
         }
       } else {
-        if (pl.getConfig().getBoolean("ranges.allowcrossworld", false)) {
-          double amount = Math.pow(pl.getConfig().getDouble("ranges.crossworld"), 2);
+        if (pl.getTradeConfig().isAllowCrossWorld()) {
+          double amount = Math.pow(pl.getTradeConfig().getCrossWorldRange(), 2);
           Location test = receiver.getLocation().clone();
           test.setWorld(player.getWorld());
           if (amount != 0.0 && player.getLocation().distanceSquared(test) > amount) {
-            MsgUtils.send(
-                player,
-                pl.getLang()
-                    .getString("errors.within-range.cross-world")
-                    .replace("%PLAYER%", receiver.getName())
-                    .replace("%AMOUNT%", amount + "")
-                    .split("%NEWLINE%"));
+            pl.getTradeConfig().getErrorsCrossWorldRange().send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
             return;
           }
         } else {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString("errors.no-cross-world")
-                  .replace("%PLAYER%", receiver.getName())
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsNoCrossWorld().send(player, "%PLAYER%", receiver.getName());
           return;
         }
       }
 
       for (TradeRequest req : requests) {
         if (req.sender == player) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString("errors.wait-for-expire", "&4&l(!) &cYou already sent them a request.")
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsWaitForExpire().send(player, "%PLAYER%", receiver.getName());
           return;
         }
       }
@@ -213,46 +158,23 @@ public class TradeCommand extends Command {
         TradeAcceptEvent tradeAcceptEvent = new TradeAcceptEvent(receiver, player);
         Bukkit.getPluginManager().callEvent(tradeAcceptEvent);
         if (tradeAcceptEvent.isCancelled()) return;
-        MsgUtils.send(
-            receiver,
-            pl.getLang()
-                .getString("accept.sender", "&6&l(!) &r&e%PLAYER% &6accepted your trade request")
-                .replace("%PLAYER%", player.getName())
-                .split("%NEWLINE%"));
-        MsgUtils.send(
-            player,
-            pl.getLang()
-                .getString(
-                    "accept.receiver", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request")
-                .replace("%PLAYER%", receiver.getName())
-                .split("%NEWLINE%"));
+        pl.getTradeConfig().getAcceptSender().send(receiver, "%PLAYER%", player.getName());
+        pl.getTradeConfig().getAcceptReceiver().send(player, "%PLAYER%", receiver.getName());
         new Trade(receiver, player);
         requests.removeIf(req -> req.contains(player) && req.contains(receiver));
       } else {
-        String sendPermission = pl.getConfig().getString("permissions.send", "tradeplus.send");
+        String sendPermission = pl.getTradeConfig().getSendPermission();
         if (permissionRequired) {
           if (!sender.hasPermission(sendPermission)) {
-            MsgUtils.send(
-                player,
-                pl.getLang()
-                    .getString(
-                        "errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade")
-                    .split("%NEWLINE%"));
+            pl.getTradeConfig().getErrorsNoPermsAccept().send(player);
             return;
           }
         }
 
         String acceptPermission =
-            pl.getConfig().getString("permissions.accept", "tradeplus.accept");
+            pl.getTradeConfig().getAcceptPermission();
         if (permissionRequired && !receiver.hasPermission(acceptPermission)) {
-          MsgUtils.send(
-              player,
-              pl.getLang()
-                  .getString(
-                      "errors.no-perms.receive",
-                      "&4&l(!) &r&4That player does not have permission to accept a trade")
-                  .replace("%PLAYER%", receiver.getName())
-                  .split("%NEWLINE%"));
+          pl.getTradeConfig().getErrorsNoPermsReceive().send(player, "%PLAYER%", receiver.getName());
           return;
         }
 
@@ -261,53 +183,22 @@ public class TradeCommand extends Command {
         if (event.isCancelled()) return;
         final TradeRequest request = new TradeRequest(player, receiver);
         requests.add(request);
-        MsgUtils.send(
-            player,
-            pl.getLang()
-                .getString("request.sent", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%")
-                .replace("%PLAYER%", receiver.getName())
-                .split("%NEWLINE%"));
-        MsgUtils.send(
-            receiver,
-            pl.getLang()
-                .getString("request.received.hover", "&6&lClick here to trade with &e&l%PLAYER%")
-                .replace("%PLAYER%", player.getName()),
-            "/trade " + player.getName(),
-            pl.getLang()
-                .getString(
-                    "request.received.text",
-                    "&6&l(!) &r&6You received a trade request from &e%PLAYER%"
-                        + "%NEWLINE%"
-                        + "&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading")
-                .replace("%PLAYER%", player.getName())
-                .split("%NEWLINE%"));
+        pl.getTradeConfig().getRequestSent().send(player, "%PLAYER%", receiver.getName());
+        pl.getTradeConfig().getRequestReceived().setOnClick("/trade " + player.getName()).send(receiver, "%PLAYER%", player.getName());
         Bukkit.getScheduler()
             .runTaskLater(
                 pl,
                 () -> {
                   boolean was = requests.remove(request);
                   if (player.isOnline() && was) {
-                    MsgUtils.send(
-                        player,
-                        pl.getLang()
-                            .getString("expired", "&4&l(!) &r&4Your last trade request expired")
-                            .replace("%PLAYER%", receiver.getName())
-                            .split("%NEWLINE%"));
+                    pl.getTradeConfig().getExpired().send(player, "%PLAYER%", receiver.getName());
                   }
                 },
-                20 * pl.getConfig().getInt("requestcooldownseconds", 15));
+                20 * pl.getTradeConfig().getRequestCooldownSeconds());
       }
       return;
     }
-    MsgUtils.send(
-        player,
-        pl.getLang()
-            .getString(
-                "errors.invalid-usage",
-                "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
-                    + "    &c- /trade <player name>%NEWLINE%"
-                    + "    &c- /trade deny")
-            .split("%NEWLINE%"));
+    pl.getTradeConfig().getErrorsInvalidUsage().send(player);
   }
 
   @Override

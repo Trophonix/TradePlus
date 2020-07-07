@@ -5,7 +5,6 @@ import com.trophonix.tradeplus.extras.*;
 import com.trophonix.tradeplus.logging.TradeLog;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.ItemFactory;
-import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -58,35 +57,36 @@ public class Trade implements Listener {
     location2 = p2.getLocation();
     pl.getTaskFactory()
         .newChain()
-        .sync(() -> {
-          inv1 = InvUtils.getTradeInventory(player1, player2);
-          inv2 = InvUtils.getTradeInventory(player2, player1);
-          spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
-        })
+        .sync(
+            () -> {
+              inv1 = InvUtils.getTradeInventory(player1, player2);
+              inv2 = InvUtils.getTradeInventory(player2, player1);
+              spectatorInv = InvUtils.getSpectatorInventory(player1, player2);
+            })
         .async(
             () -> {
-              if (pl.getConfig().getBoolean("spectate.enabled", true) &&
-                  pl.getConfig().getBoolean("spectate.broadcast"))
-              Bukkit.getOnlinePlayers()
-                  .forEach(
-                      p -> {
-                        if (p.hasPermission("tradeplus.admin")
-                            && !p.hasPermission("tradeplus.admin.silent")) {
-                          MsgUtils.send(
-                              p,
-                              pl.getLang()
-                                  .getString(
-                                      "spectate.hover", "&6&lClick here to spectate this trade"),
-                              "/tradeplus spectate " + player1.getName() + " " + player2.getName(),
-                              pl.getLang()
-                                  .getString(
-                                      "spectate.message",
-                                      "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate")
-                                  .replace("%PLAYER1%", player1.getName())
-                                  .replace("%PLAYER2%", player2.getName())
-                                  .split("%NEWLINE%"));
-                        }
-                      });
+              if (pl.getTradeConfig().isSpectateEnabled()
+                  && pl.getTradeConfig().isSpectateBroadcast())
+                Bukkit.getOnlinePlayers()
+                    .forEach(
+                        p -> {
+                          if (p.hasPermission("tradeplus.admin")
+                              && !p.hasPermission("tradeplus.admin.silent")) {
+                            pl.getTradeConfig()
+                                .getSpectateMessage()
+                                .setOnClick(
+                                    "/tradeplus spectate "
+                                        + player1.getName()
+                                        + " "
+                                        + player2.getName())
+                                .send(
+                                    p,
+                                    "%PLAYER1%",
+                                    player1.getName(),
+                                    "%PLAYER2%",
+                                    player2.getName());
+                          }
+                        });
               if (pl.getConfig().getBoolean("extras.economy.enabled", true)
                   && pl.getServer().getPluginManager().isPluginEnabled("Vault")) {
                 try {
@@ -141,7 +141,8 @@ public class Trade implements Listener {
               pl.ongoingTrades.add(this);
               player1.openInventory(inv1);
               player2.openInventory(inv2);
-            }).execute();
+            })
+        .execute();
   }
 
   private static List<ItemStack> combine(ItemStack[] items) {
@@ -182,7 +183,7 @@ public class Trade implements Listener {
         }
       }
       if (event.getInventorySlots().size() > 0) {
-        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept")
+        if (pl.getTradeConfig().isPreventChangeOnAccept()
             && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
           event.setCancelled(true);
           return;
@@ -247,13 +248,13 @@ public class Trade implements Listener {
           return;
         }
 
-        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept")
+        if (pl.getTradeConfig().isPreventChangeOnAccept()
             && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
           event.setCancelled(true);
           event.setResult(InventoryClickEvent.Result.DENY);
           return;
         }
-        if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+        if (pl.getTradeConfig().isAntiscamCancelOnChange()) {
           accept1 = false;
           accept2 = false;
           updateAcceptance();
@@ -297,7 +298,7 @@ public class Trade implements Listener {
           } else {
             Extra extra = getExtra(slot);
             if (extra != null) {
-              if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept", true)
+              if (pl.getTradeConfig().isPreventChangeOnAccept()
                   && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
                 return;
               }
@@ -357,7 +358,7 @@ public class Trade implements Listener {
           if (accept1 && accept2) {
             return;
           }
-          if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+          if (pl.getTradeConfig().isAntiscamCancelOnChange()) {
             accept1 = false;
             accept2 = false;
             updateAcceptance();
@@ -375,13 +376,13 @@ public class Trade implements Listener {
         }
         // don't allow changing
         // after cancellation
-        if (pl.getConfig().getBoolean("antiscam.preventchangeonaccept")
+        if (pl.getTradeConfig().isPreventChangeOnAccept()
             && ((player.equals(player1) && accept1) || (player.equals(player2) && accept2))) {
           event.setCancelled(true);
           return;
         }
         // cancel on change
-        if (pl.getConfig().getBoolean("antiscam.cancelonchange")) {
+        if (pl.getTradeConfig().isAntiscamCancelOnChange()) {
           accept1 = false;
           accept2 = false;
           updateAcceptance();
@@ -393,8 +394,7 @@ public class Trade implements Listener {
 
   // plays a click sound effect to all viewers
   private void click() {
-    if (pl.getConfig().getBoolean("soundeffects.enabled", true)
-        && pl.getConfig().getBoolean("soundeffects.onchange")) {
+    if (pl.getTradeConfig().isSoundEffectsEnabled() && pl.getTradeConfig().isSoundOnChange()) {
       Sounds.click(player1, 2);
       Sounds.click(player2, 2);
       spectatorInv.getViewers().stream()
@@ -423,7 +423,7 @@ public class Trade implements Listener {
         return;
       }
 
-      giveOnCursor((Player)event.getPlayer());
+      giveOnCursor((Player) event.getPlayer());
 
       if (cancelled || closed.getItem(49) == null) {
         return;
@@ -444,16 +444,8 @@ public class Trade implements Listener {
       giveItemsOnLeft(inv1, player1);
       giveItemsOnLeft(inv2, player2);
 
-      MsgUtils.send(
-          player1,
-          pl.getLang()
-              .getString("cancelled", "&4&l(!) &r&4The trade was cancelled")
-              .replace("%PLAYER%", player2.getName()));
-      MsgUtils.send(
-          player2,
-          pl.getLang()
-              .getString("cancelled", "&4&l(!) &r&4The trade was cancelled")
-              .replace("%PLAYER%", player1.getName()));
+      pl.getTradeConfig().getCancelled().send(player1, "%PLAYER%", player2.getName());
+      pl.getTradeConfig().getCancelled().send(player2, "%PLAYER%", player1.getName());
       new ArrayList<>(spectatorInv.getViewers()).forEach(HumanEntity::closeInventory);
     }
   }
@@ -542,10 +534,11 @@ public class Trade implements Listener {
     if (!dropoff.isEmpty()) {
       int size = dropoff.size() / 9;
       if (dropoff.size() % 9 > 0) {
-        size ++;
+        size++;
       }
       size *= 9;
-      Inventory excessChest = Bukkit.createInventory(null, size, pl.getExcessTitle());
+      Inventory excessChest =
+          Bukkit.createInventory(null, size, pl.getTradeConfig().getExcessTitle());
       dropoff.forEach(excessChest::addItem);
       pl.getExcessChests().add(excessChest);
       Bukkit.getScheduler().runTaskLater(pl, () -> player.openInventory(excessChest), 1L);
@@ -632,7 +625,7 @@ public class Trade implements Listener {
   }
 
   private void updateAcceptance() {
-    if (pl.getConfig().getBoolean("gui.showaccept", true)) {
+    if (pl.getTradeConfig().isShowAccept()) {
       inv1.setItem(0, accept1 ? InvUtils.cancelTrade : InvUtils.acceptTrade);
       inv1.setItem(8, accept2 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
       inv2.setItem(0, accept2 ? InvUtils.cancelTrade : InvUtils.acceptTrade);
@@ -642,7 +635,7 @@ public class Trade implements Listener {
   }
 
   private void checkAcceptance() {
-    if (pl.getConfig().getBoolean("gui.showaccept", true)) {
+    if (pl.getTradeConfig().isShowAccept()) {
       if (accept1 && accept2) {
         if (task != null) {
           return;
@@ -655,8 +648,7 @@ public class Trade implements Listener {
 
         accepted2 = getItemsOnLeft(inv2).toArray(new ItemStack[0]);
 
-        if (pl.getConfig().getBoolean("soundeffects.enabled", true)
-            && pl.getConfig().getBoolean("soundeffects.onaccept", true)) {
+        if (pl.getTradeConfig().isSoundEffectsEnabled() && pl.getTradeConfig().isSoundOnAccept()) {
           Sounds.pling(player1, 1);
           Sounds.pling(player2, 1);
           spectatorInv.getViewers().stream()
@@ -676,8 +668,8 @@ public class Trade implements Listener {
                         inv2.getItem(0).setAmount(current - 1);
                         inv2.getItem(8).setAmount(current - 1);
                         spectatorInv.getItem(4).setAmount(current - 1);
-                        if (pl.getConfig().getBoolean("soundeffects.enabled", true)
-                            && pl.getConfig().getBoolean("soundeffects.oncountdown")) {
+                        if (pl.getTradeConfig().isSoundEffectsEnabled()
+                            && pl.getTradeConfig().isSoundOnCountdown()) {
                           Sounds.click(player1, 2);
                           Sounds.click(player2, 2);
                           spectatorInv.getViewers().stream()
@@ -695,7 +687,7 @@ public class Trade implements Listener {
                           player1.closeInventory();
                           player2.closeInventory();
 
-                          if (pl.getConfig().getBoolean("antiscam.discrepancy-detection", true)) {
+                          if (pl.getTradeConfig().isDiscrepancyDetection()) {
                             boolean discrepancy = false;
                             int i = 0;
                             for (ItemStack item : getItemsOnLeft(inv1)) {
@@ -722,18 +714,12 @@ public class Trade implements Listener {
                                       + player1.getName()
                                       + " and "
                                       + player2.getName());
-                              MsgUtils.send(
-                                  player1,
-                                  pl.getLang()
-                                      .getString("antiscam.discrepancy")
-                                      .replace("%PLAYER%", player2.getName())
-                                      .split("%NEWLINE%"));
-                              MsgUtils.send(
-                                  player2,
-                                  pl.getLang()
-                                      .getString("antiscam.discrepancy")
-                                      .replace("%PLAYER%", player1.getName())
-                                      .split("%NEWLINE%"));
+                              pl.getTradeConfig()
+                                  .getDiscrepancyDetected()
+                                  .send(player1, "%PLAYER%", player2.getName());
+                              pl.getTradeConfig()
+                                  .getDiscrepancyDetected()
+                                  .send(player2, "%PLAYER%", player1.getName());
                               giveItemsOnLeft(inv1, player1);
                               giveItemsOnLeft(inv2, player2);
                               return;
@@ -752,8 +738,8 @@ public class Trade implements Listener {
                             extra.onTradeEnd();
                           }
 
-                          if (pl.getConfig().getBoolean("soundeffects.enabled", true)
-                              && pl.getConfig().getBoolean("soundeffects.oncomplete")) {
+                          if (pl.getTradeConfig().isSoundEffectsEnabled()
+                              && pl.getTradeConfig().isSoundOnComplete()) {
                             Sounds.levelUp(player1, 1);
                             Sounds.levelUp(player2, 1);
                             List<Player> viewers =
@@ -768,8 +754,12 @@ public class Trade implements Listener {
                                 });
                           }
 
-                          MsgUtils.send(player1, pl.getLang().getString("trade-complete"));
-                          MsgUtils.send(player2, pl.getLang().getString("trade-complete"));
+                          pl.getTradeConfig()
+                              .getTradeComplete()
+                              .send(player1, "%PLAYER%", player2.getName());
+                          pl.getTradeConfig()
+                              .getTradeComplete()
+                              .send(player2, "%PLAYER%", player1.getName());
 
                           if (pl.getLogs() != null) {
                             try {
@@ -876,15 +866,13 @@ public class Trade implements Listener {
     if (item == null || item.getType().equals(Material.AIR)) {
       return false;
     }
-    if (pl.getConfig().getBoolean("blocked.named-items", false)
+    if (pl.getTradeConfig().isDenyNamedItems()
         && item.hasItemMeta()
         && item.getItemMeta().hasDisplayName()) {
       return true;
     }
     if (item.hasItemMeta()) {
-      String regex =
-          ChatColor.translateAlternateColorCodes(
-              '&', pl.getConfig().getString("blocked.regex", ""));
+      String regex = pl.getConfig().getString("blocked.regex", "");
       if (!regex.isEmpty()) {
         try {
           Pattern pattern = Pattern.compile(regex);
@@ -904,7 +892,7 @@ public class Trade implements Listener {
           Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Your blocked.regex is invalid!");
         }
       }
-      List<String> blockedLore = pl.getConfig().getStringList("blocked.lore");
+      List<String> blockedLore = pl.getTradeConfig().getLoreBlacklist();
       if (!blockedLore.isEmpty()) {
         for (int i = 0; i < blockedLore.size(); i++) {
           String line = ChatColor.translateAlternateColorCodes('&', blockedLore.get(i));
@@ -931,7 +919,7 @@ public class Trade implements Listener {
         }
       }
     }
-    List<String> blocked = pl.getConfig().getStringList("blocked.blacklist");
+    List<String> blocked = pl.getTradeConfig().getItemBlacklist();
     if (blocked.isEmpty()) {
       return false;
     }

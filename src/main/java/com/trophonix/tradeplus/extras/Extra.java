@@ -82,44 +82,14 @@ public abstract class Extra implements Listener {
 
   public void onClick(Player player, ClickType click) {
     double offer = player1.equals(player) ? value1 : value2;
-    if (mode.equals("anvil")) {
-      String insert = String.valueOf(offer);
-      trade.setCancelOnClose(player, false);
-      player.closeInventory();
-      new AnvilGUI.Builder()
-          .plugin(pl)
-          .text(insert)
-          .onComplete(
-              (_player, input) -> {
-                try {
-                  double value = Double.parseDouble(input);
-                  if (value < 0) throw new NumberFormatException();
-                  double max = getMax(player);
-                  if (value > max)
-                    return AnvilGUI.Response.text(
-                        pl.getTypeMaximum()
-                            .replace("%BALANCE%", String.valueOf(max))
-                            .replace("%EXTRA%", displayName));
-                  else {
-                    if (player1.equals(player)) setValue1(value);
-                    else setValue2(value);
-                    updateMax(false);
-                    trade.updateExtras();
-                  }
-                  return AnvilGUI.Response.close();
-                } catch (NumberFormatException ignored) {
-                  return AnvilGUI.Response.text(pl.getTypeInvalid());
-                }
-              })
-          .open(player);
-    } else if (mode.equals("chat")) {
+    if (mode.equals("chat")) {
       trade.setCancelOnClose(player, false);
       player.closeInventory();
       new ConversationFactory(pl)
           .withPrefix(
               conversationContext ->
                   ChatColor.translateAlternateColorCodes(
-                      '&', pl.getConfig().getString("extras.type.prefix", "&6&l!!&6> ")))
+                      '&', pl.getTradeConfig().getExtrasTypePrefix()))
           .withFirstPrompt(
               new NumericPrompt() {
                 @Override
@@ -146,7 +116,7 @@ public abstract class Extra implements Listener {
 
                       @Override
                       public String getPromptText(ConversationContext conversationContext) {
-                        return pl.getTypeMaximum()
+                        return pl.getTradeConfig().getExtrasTypeMaximum()
                             .replace("%BALANCE%", decimalFormat.format(getMax(player)))
                             .replace("%EXTRA%", displayName);
                       }
@@ -163,7 +133,7 @@ public abstract class Extra implements Listener {
 
                 @Override
                 public String getPromptText(ConversationContext conversationContext) {
-                  return pl.getTypeEmpty()
+                  return pl.getTradeConfig().getExtrasTypeEmpty()
                       .replace("%BALANCE%", decimalFormat.format(getMax(player)))
                       .replace("%AMOUNT%", decimalFormat.format(offer))
                       .replace("%EXTRA%", displayName);

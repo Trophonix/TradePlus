@@ -30,46 +30,56 @@ public class InvUtils {
   public static void reloadItems(TradePlus pl) {
     InvUtils.pl = pl;
     placeHolder =
-        new ItemFactory(pl.getConfig().getString("gui.separator.type", "stained_glass_pane:15"), Sounds.version > 112 ? Material.getMaterial("GLASS_PANE") : Material.getMaterial("THIN_GLASS"))
+        new ItemFactory(
+                pl.getTradeConfig().getGuiSeparatorType())
             .display(" ")
+            .customModelData(pl.getTradeConfig().getGuiSeparatorModelData())
             .flag("HIDE_ATTRIBUTES")
             .build();
     acceptTrade =
-        new ItemFactory(pl.getConfig().getString("gui.accept.type", "stained_glass_pane:14"), Material.EMERALD)
-            .display('&', pl.getConfig().getString("gui.accept.display"))
-            .customModelData(pl.getConfig().getInt("gui.accept.customModelData", 0))
-            .amount(pl.getConfig().getInt("antiscam.countdown", 10))
+        new ItemFactory(
+                pl.getTradeConfig().getGuiCancelType(),
+                Material.EMERALD)
+            .display(pl.getTradeConfig().getGuiAcceptDisplay())
+            .customModelData(pl.getTradeConfig().getGuiAcceptModelData())
+            .amount(pl.getTradeConfig().getAntiscamCountdown())
             .flag("HIDE_ATTRIBUTES")
             .build();
     cancelTrade =
-        new ItemFactory(pl.getConfig().getString("gui.cancel.type", "stained_glass_pane:13"), Material.BARRIER)
-            .display('&', pl.getConfig().getString("gui.cancel.display"))
-            .customModelData(pl.getConfig().getInt("gui.cancel.customModelData", 0))
-            .amount(pl.getConfig().getInt("antiscam.countdown", 10))
+        new ItemFactory(
+                pl.getTradeConfig().getGuiAcceptType(),
+                Material.BARRIER)
+            .display(pl.getTradeConfig().getGuiCancelDisplay())
+            .customModelData(pl.getTradeConfig().getGuiCancelModelData())
+            .amount(pl.getTradeConfig().getAntiscamCountdown())
             .flag("HIDE_ATTRIBUTES")
             .build();
     theyAccepted =
-        new ItemFactory(pl.getConfig().getString("gui.cancel.type", "stained_glass_pane:13"), Material.EMERALD)
-            .display('&', pl.getConfig().getString("gui.accept.theirdisplay"))
-            .customModelData(pl.getConfig().getInt("gui.accept.customModelData"))
-            .amount(pl.getConfig().getInt("antiscam.countdown", 10))
+            new ItemFactory(
+                    pl.getTradeConfig().getGuiAcceptType(),
+                    Material.EMERALD)
+            .display(pl.getTradeConfig().getGuiTheirAcceptDisplay())
+            .customModelData(pl.getTradeConfig().getGuiAcceptModelData())
+            .amount(pl.getTradeConfig().getAntiscamCountdown())
             .flag("HIDE_ATTRIBUTES")
             .build();
     theyCancelled =
-        new ItemFactory(pl.getConfig().getString("gui.accept.type", "stained_glass_pane:14"), Material.BARRIER)
-            .display('&', pl.getConfig().getString("gui.cancel.theirdisplay"))
-            .customModelData(pl.getConfig().getInt("gui.cancel.customModelData"))
-            .amount(pl.getConfig().getInt("antiscam.countdown", 10))
+        new ItemFactory(
+                pl.getTradeConfig().getGuiCancelType(),
+                Material.BARRIER)
+            .display(pl.getTradeConfig().getGuiTheirCancelDisplay())
+            .customModelData(pl.getTradeConfig().getGuiCancelModelData())
+            .amount(pl.getTradeConfig().getAntiscamCountdown())
             .flag("HIDE_ATTRIBUTES")
             .build();
     force =
         new ItemFactory(
-                pl.getConfig().getString("gui.force.type", "watch"),
+                pl.getTradeConfig().getGuiForceType(),
                 Sounds.version < 113
                     ? Material.getMaterial("WATCH")
                     : Material.getMaterial("CLOCK"))
-            .display('&', pl.getConfig().getString("gui.force.name"))
-            .lore('&', pl.getConfig().getStringList("gui.force.lore"))
+            .display(pl.getTradeConfig().getGuiForceName())
+            .lore('&', pl.getTradeConfig().getGuiForceLore())
             .flag("HIDE_ATTRIBUTES")
             .build();
   }
@@ -79,10 +89,10 @@ public class InvUtils {
         Bukkit.createInventory(
             player1.getInventory().getHolder(),
             54,
-            ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("gui.title"))
+            pl.getTradeConfig().getGuiTitle()
                 .replace("%PLAYER%", player2.getName()));
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, placeHolder);
-    if (pl.getConfig().getBoolean("gui.showaccept")) {
+    if (pl.getTradeConfig().isShowAccept()) {
       inv.setItem(0, acceptTrade);
       inv.setItem(8, theyCancelled);
       if (pl.getConfig().getBoolean("gui.force.enabled", true)
@@ -91,19 +101,19 @@ public class InvUtils {
       inv.setItem(0, placeHolder);
       inv.setItem(8, placeHolder);
     }
-    if (pl.getConfig().getBoolean("gui.showhead", true))
+    if (pl.getTradeConfig().isShowHead())
       inv.setItem(
           4,
           ItemFactory.getPlayerSkull(
               player2,
-              pl.getConfig().getString("gui.head").replace("%PLAYER%", player2.getName())));
+              pl.getTradeConfig().getGuiHeadDisplayName().replace("%PLAYER%", player2.getName())));
     return inv;
   }
 
   public static Inventory getSpectatorInventory(Player player1, Player player2) {
     String title =
         ChatColor.translateAlternateColorCodes(
-            '&', pl.getConfig().getString("gui.spectator-title"));
+            '&', pl.getTradeConfig().getSpectatorTitle());
     if (Sounds.version > 1.8)
       title = title.replace("%PLAYER1%", player1.getName()).replace("%PLAYER2%", player2.getName());
     Inventory inv = Bukkit.createInventory(player1.getInventory().getHolder(), 54, title);

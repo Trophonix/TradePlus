@@ -25,7 +25,7 @@ public class TradePlusCommand extends Command {
   @Override
   public void onCommand(CommandSender sender, String[] args) {
     if (!sender.hasPermission("tradeplus.admin")) {
-      MsgUtils.send(sender, pl.getLang().getString("errors.no-perms.admin").split("%NEWLINE%"));
+      pl.getTradeConfig().getErrorsNoPermsAdmin().send(sender);
       return;
     }
 
@@ -33,28 +33,21 @@ public class TradePlusCommand extends Command {
       case 1:
         if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
           pl.reload();
-          MsgUtils.send(
-              sender,
-              pl.getLang().getString("admin.configs-reloaded", "&6&l(!) &6Configs reloaded!"));
+          pl.getTradeConfig().getAdminConfigReloaded().send(sender);
           return;
         }
         break;
       case 2:
-        if (pl.getConfig().getBoolean("spectate.enabled", true) && args[0].equalsIgnoreCase("spectate")) {
+        if (pl.getTradeConfig().isSpectateEnabled()
+            && args[0].equalsIgnoreCase("spectate")) {
           Player player = Bukkit.getPlayer(args[1]);
           if (player == null || !player.isOnline()) {
-            MsgUtils.send(
-                sender,
-                pl.getLang().getString("admin.invalid-players", "&4&l(!) &4Invalid players!"));
+            pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
             return;
           }
           Trade trade = pl.getTrade(player);
           if (trade == null) {
-            MsgUtils.send(
-                player,
-                pl.getLang()
-                    .getString(
-                        "admin.no-trade", "&4&l(!) &4No trade was found with those arguments."));
+            pl.getTradeConfig().getAdminNoTrade().send(player);
           } else {
             player.openInventory(trade.getSpectatorInv());
           }
@@ -66,51 +59,31 @@ public class TradePlusCommand extends Command {
           Player p1 = Bukkit.getPlayer(args[1]);
           Player p2 = Bukkit.getPlayer(args[2]);
           if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
-            MsgUtils.send(
-                sender,
-                pl.getLang().getString("admin.invalid-players", "&4&l(!) &4Invalid players!"));
+            pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
             return;
           }
-          MsgUtils.send(
-              sender,
-              pl.getLang()
-                  .getString(
-                      "admin.forced-trade",
-                      "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%"));
-          String message =
-              pl.getLang()
-                  .getString(
-                      "forced-trade", "&6&l(!) &6You've been forced into a trade with &e%PLAYER%");
-          MsgUtils.send(p1, message.replace("%PLAYER%", p2.getName()));
-          MsgUtils.send(p2, message.replace("%PLAYER%", p1.getName()));
+          pl.getTradeConfig().getAdminForcedTrade().send(sender, "%PLAYER1%", p1.getName(), "%PLAYER2%", p2.getName());
+          pl.getTradeConfig().getForcedTrade().send(p1, "%PLAYER%", p2.getName());
+          pl.getTradeConfig().getForcedTrade().send(p2, "%PLAYER%", p1.getName());
           Trade trade = new Trade(p1, p2);
           if (sender instanceof Player && !(sender.equals(p1) || sender.equals(p2)))
             ((Player) sender).openInventory(trade.getSpectatorInv());
           return;
         } else if (args[0].equalsIgnoreCase("spectate")) {
           if (!(sender instanceof Player)) {
-            MsgUtils.send(
-                sender,
-                pl.getLang()
-                    .getString("admin.player-only", "&4&l(!) &4This command is for players only."));
+            pl.getTradeConfig().getAdminPlayersOnly().send(sender);
             return;
           }
           Player player = (Player) sender;
           Player p1 = Bukkit.getPlayer(args[1]);
           Player p2 = Bukkit.getPlayer(args[2]);
           if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
-            MsgUtils.send(
-                sender,
-                pl.getLang().getString("admin.invalid-players", "&4&l(!) &4Invalid players!"));
+            pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
             return;
           }
           Trade trade = pl.getTrade(p1, p2);
           if (trade == null) {
-            MsgUtils.send(
-                player,
-                pl.getLang()
-                    .getString(
-                        "admin.no-trade", "&4&l(!) &4No trade was found with those arguments."));
+            pl.getTradeConfig().getAdminNoTrade().send(player);
           } else {
             player.openInventory(trade.getSpectatorInv());
           }
@@ -126,7 +99,7 @@ public class TradePlusCommand extends Command {
           "&e/tradeplus reload &fReload config files",
           "&e/tradeplus force <player1> <player2> &fForce 2 players to trade"
         });
-    if (pl.getConfig().getBoolean("spectate.enabled", true))
+    if (pl.getTradeConfig().isSpectateEnabled())
       MsgUtils.send(sender, "&e/tradeplus spectate <player(s)> &fSpectate an ongoing trade");
   }
 

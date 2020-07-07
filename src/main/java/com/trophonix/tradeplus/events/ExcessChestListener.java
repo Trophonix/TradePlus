@@ -1,7 +1,6 @@
 package com.trophonix.tradeplus.events;
 
 import com.trophonix.tradeplus.TradePlus;
-import lombok.AllArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,13 +24,9 @@ public class ExcessChestListener implements Listener {
     if (pl.getExcessChests().contains(closed)) {
       for (ItemStack i : event.getInventory()) {
         if (i == null || i.getType() == Material.AIR) continue;
-        event
-            .getPlayer()
-            .getWorld()
-            .dropItemNaturally(event.getPlayer().getLocation(), i);
+        event.getPlayer().getWorld().dropItemNaturally(event.getPlayer().getLocation(), i);
       }
       pl.getExcessChests().remove(closed);
     }
   }
-
 }

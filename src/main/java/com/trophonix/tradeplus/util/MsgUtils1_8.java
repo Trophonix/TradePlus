@@ -14,11 +14,13 @@ class MsgUtils1_8 {
       BaseComponent[] comps =
           TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', m));
       for (BaseComponent comp : comps) {
+        if (onHover != null)
         comp.setHoverEvent(
             new HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
                 TextComponent.fromLegacyText(
                     ChatColor.translateAlternateColorCodes('&', onHover))));
+        if (onClick != null)
         comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, onClick));
       }
       player.spigot().sendMessage(comps);

@@ -18,7 +18,7 @@ public class ConfigMessage {
   private String onHover;
   private String onClick;
 
-  public ConfigMessage(ConfigurationSection yml, String key) {
+  public ConfigMessage(ConfigurationSection yml, String key, String defaultText) {
     String text = null;
     if (yml.isString(key)) {
       text = yml.getString(key);
@@ -26,6 +26,7 @@ public class ConfigMessage {
       text = yml.getString(key + ".text");
       onHover = yml.getString(key + ".hover");
     }
+    if (text == null) text = defaultText;
     if (text.contains("%NEWLINE%")) {
       message = text.split("%NEWLINE%");
       for (int i = 0; i < message.length; i++) {

@@ -197,48 +197,50 @@ public class TradePlusConfig {
     soundOnComplete = config.getBoolean("soundeffects.oncomplete", true);
     soundOnCountdown = config.getBoolean("soundeffects.oncountdown", true);
 
-    requestSent = new ConfigMessage(lang, "request.sent");
-    requestReceived = new ConfigMessage(lang, "request.received");
+    requestSent = new ConfigMessage(lang, "request.sent", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
+    requestReceived = new ConfigMessage(lang, "request.received", "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
 
-    errorsCreative = new ConfigMessage(lang, "errors.creative");
-    errorsCreativeThem = new ConfigMessage(lang, "errors.creative-them");
-    errorsSameIp = new ConfigMessage(lang, "errors.same-ip");
+    errorsCreative = new ConfigMessage(lang, "errors.creative", "&4&l(!) &r&4You can't trade in creative mode!");
+    errorsCreativeThem = new ConfigMessage(lang, "errors.creative-them", "&4&l(!) &r&4That player is in creative mode!");
+    errorsSameIp = new ConfigMessage(lang, "errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
 
-    errorsSameWorldRange = new ConfigMessage(lang, "errors.within-range.same-world");
-    errorsCrossWorldRange = new ConfigMessage(lang, "errors.within-range.cross-world");
-    errorsNoCrossWorld = new ConfigMessage(lang, "errors.no-cross-world");
+    errorsSameWorldRange = new ConfigMessage(lang, "errors.within-range.same-world", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them");
+    errorsCrossWorldRange = new ConfigMessage(lang, "errors.within-range.cross-world", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!");
+    errorsNoCrossWorld = new ConfigMessage(lang, "errors.no-cross-world", "&4&l(!) &r&4You must be in the same world as a player to trade with them!");
 
-    acceptSender = new ConfigMessage(lang, "accept.sender");
-    acceptReceiver = new ConfigMessage(lang, "accept.receiver");
-    cancelled = new ConfigMessage(lang, "cancelled");
-    expired = new ConfigMessage(lang, "expired");
+    acceptSender = new ConfigMessage(lang, "accept.sender", "&6&l(!) &r&e%PLAYER% &6accepted your trade request");
+    acceptReceiver = new ConfigMessage(lang, "accept.receiver", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request");
+    cancelled = new ConfigMessage(lang, "cancelled", "&4&l(!) &r&4The trade was cancelled");
+    expired = new ConfigMessage(lang, "expired", "&4&l(!) &r&4Your last trade request expired");
 
-    errorsWaitForExpire = new ConfigMessage(lang, "errors.wait-for-expire");
-    errorsPlayerNotFound = new ConfigMessage(lang, "errors.player-not-found");
-    errorsSelfTrade = new ConfigMessage(lang, "errors.self-trade");
-    errorsInvalidUsage = new ConfigMessage(lang, "errors.invalid-usage");
-    errorsNoPermsAccept = new ConfigMessage(lang, "errors.no-perms.accept");
-    errorsNoPermsSend = new ConfigMessage(lang, "errors.no-perms.send");
-    errorsNoPermsReceive = new ConfigMessage(lang, "errors.no-perms.receive");
-    errorsNoPermsAdmin = new ConfigMessage(lang, "errors.no-perms.admin");
+    errorsWaitForExpire = new ConfigMessage(lang, "errors.wait-for-expire", "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
+    errorsPlayerNotFound = new ConfigMessage(lang, "errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
+    errorsSelfTrade = new ConfigMessage(lang, "errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
+    errorsInvalidUsage = new ConfigMessage(lang, "errors.invalid-usage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
+            + "    &c- /trade <player name>%NEWLINE%"
+            + "    &c- /trade deny");
+    errorsNoPermsAccept = new ConfigMessage(lang, "errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
+    errorsNoPermsSend = new ConfigMessage(lang, "errors.no-perms.send", "&4&l(!) &r&4You do not have permission to send a trade");
+    errorsNoPermsReceive = new ConfigMessage(lang, "errors.no-perms.receive", "&4&l(!) &r&4That player does not have permission to accept a trade");
+    errorsNoPermsAdmin = new ConfigMessage(lang, "errors.no-perms.admin", "&4&l(!) &r&4You do not have permission to use this command");
 
-    tradeComplete = new ConfigMessage(lang, "trade-complete");
-    forcedTrade = new ConfigMessage(lang, "forced-trade");
+    tradeComplete = new ConfigMessage(lang, "trade-complete", "&6&l(!) &r&6The trade was successful!");
+    forcedTrade = new ConfigMessage(lang, "forced-trade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
 
-    theyDenied = new ConfigMessage(lang, "denied.them");
-    youDenied = new ConfigMessage(lang, "denied.you");
+    theyDenied = new ConfigMessage(lang, "denied.them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
+    youDenied = new ConfigMessage(lang, "denied.you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
 
-    spectateMessage = new ConfigMessage(lang, "spectate");
-    discrepancyDetected = new ConfigMessage(lang, "antiscam.discrepancy");
+    spectateMessage = new ConfigMessage(lang, "spectate", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
+    discrepancyDetected = new ConfigMessage(lang, "antiscam.discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
 
-    adminConfigReloaded = new ConfigMessage(lang, "admin.configs-reloaded");
-    adminInvalidPlayers = new ConfigMessage(lang, "admin.invalid-players");
-    adminForcedTrade = new ConfigMessage(lang, "admin.forced-trade");
-    adminPlayersOnly = new ConfigMessage(lang, "admin.players-only");
-    adminNoTrade = new ConfigMessage(lang, "admin.no-trade");
+    adminConfigReloaded = new ConfigMessage(lang, "admin.configs-reloaded", "&6&l(!) &6Configs reloaded!");
+    adminInvalidPlayers = new ConfigMessage(lang, "admin.invalid-players", "&4&l(!) &4Invalid players!");
+    adminForcedTrade = new ConfigMessage(lang, "admin.forced-trade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
+    adminPlayersOnly = new ConfigMessage(lang, "admin.players-only", "&4&l(!) &4This command is for players only.");
+    adminNoTrade = new ConfigMessage(lang, "admin.no-trade", "&4&l(!) &4This command is for players only.");
 
-    factionsEnemyTerritory = new ConfigMessage(lang, "hooks.factions.enemy-territory");
-    worldguardTradingNotAllowed = new ConfigMessage(lang, "hooks.worldguard.trading-not-allowed");
+    factionsEnemyTerritory = new ConfigMessage(lang, "hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
+    worldguardTradingNotAllowed = new ConfigMessage(lang, "hooks.worldguard.trading-not-allowed", "&4&l(!) &4You can't trade in this area.");
 
     debugMode = config.getBoolean("debug-mode", false);
   }
@@ -549,7 +551,6 @@ public class TradePlusConfig {
   }
 
   public void update() {
-
     double configVersion =
         config.contains("configversion") && config.isDouble("configversion")
             ? config.getDouble("configversion")
@@ -1101,5 +1102,7 @@ public class TradePlusConfig {
               lang.getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate"));
       if (!lang.isString("errors.same-ip")) lang.set("errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
     }
+
+    config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));
   }
 }

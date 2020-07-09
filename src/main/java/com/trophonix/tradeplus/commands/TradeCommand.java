@@ -8,6 +8,7 @@ import com.trophonix.tradeplus.hooks.WorldGuardHook;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.trade.TradeRequest;
 import com.trophonix.tradeplus.util.MsgUtils;
+import com.trophonix.tradeplus.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -77,7 +78,7 @@ public class TradeCommand extends Command {
 
     if (args.length == 1) {
       final Player receiver = Bukkit.getPlayer(args[0]);
-      if (receiver == null) {
+      if (receiver == null || PlayerUtil.isVanished(receiver)) {
         if (args[0].equalsIgnoreCase("deny")) {
           requests.forEach(
               req -> {

@@ -169,8 +169,8 @@ public class TradePlusConfig {
     guiTheirAcceptDisplay = ChatColor.translateAlternateColorCodes('&', config.getString("gui.accept.theirdisplay", " "));
     guiTheirCancelDisplay = ChatColor.translateAlternateColorCodes('&', config.getString("gui.cancel.theirdisplay", " "));
 
-    guiAcceptType = config.getString("gui.accept.type");
-    guiCancelType = config.getString("gui.cancel.type");
+    guiAcceptType = config.getString("gui.accept.type", "emerald");
+    guiCancelType = config.getString("gui.cancel.type", "barrier");
     guiSeparatorType = config.getString("gui.separator.type", "black_stained_glass_pane");
 
     guiForceEnabled = config.getBoolean("gui.force.enabled", true);

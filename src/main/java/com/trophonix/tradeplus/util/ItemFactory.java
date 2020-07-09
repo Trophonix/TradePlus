@@ -30,32 +30,35 @@ public class ItemFactory {
   }
 
   public ItemFactory(String parsable, Material fallback) {
-    Preconditions.checkNotNull(parsable, "Material cannot be null.");
-    byte data = -1;
-    if (parsable.contains(":")) {
-      String[] split = parsable.split(":");
-      data = Byte.parseByte(split[1]);
-      parsable = split[0];
-    }
-    parsable = parsable.toUpperCase().replace(" ", "_");
+    if (parsable == null) {
+      this.material = fallback;
+    } else {
+      byte data = -1;
+      if (parsable.contains(":")) {
+        String[] split = parsable.split(":");
+        data = Byte.parseByte(split[1]);
+        parsable = split[0];
+      }
+      parsable = parsable.toUpperCase().replace(" ", "_");
 
-    Material mat = Material.getMaterial(parsable);
-    if (mat == null) {
-      mat = fallback;
-      TradePlus.getPlugin(TradePlus.class)
-          .getLogger()
-          .warning(
-              "Unknown material ["
-                  + parsable
-                  + "]."
-                  + (Sounds.version >= 113
-                      ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
-                          + fallback.name()
-                      : ""));
-    }
+      Material mat = Material.getMaterial(parsable);
+      if (mat == null) {
+        mat = fallback;
+        TradePlus.getPlugin(TradePlus.class)
+            .getLogger()
+            .warning(
+                "Unknown material ["
+                    + parsable
+                    + "]."
+                    + (Sounds.version >= 113
+                        ? " Make sure you've updated to the new 1.13 standard. Numerical item IDs are no longer supported. Using fallback: "
+                            + fallback.name()
+                        : ""));
+      }
 
-    this.material = mat;
-    this.data = data;
+      this.material = mat;
+      this.data = data;
+    }
   }
 
   public ItemFactory(String parsable) {

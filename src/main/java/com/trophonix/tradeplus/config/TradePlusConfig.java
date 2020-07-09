@@ -182,11 +182,11 @@ public class TradePlusConfig {
     guiCancelModelData = config.getInt("gui.cancel.customModelData", 0);
     guiSeparatorModelData = config.getInt("gui.separator.customModelData", 0);
 
-    extrasTypePrefix = config.getString("extras.type.prefix", "&6&l!!&6> ");
-    extrasTypeEmpty = config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?");
-    extrasTypeValid = config.getString("extras.type.valid", "&aClick output slot to submit offer.");
-    extrasTypeInvalid = config.getString("extras.type.invalid", "&cInvalid amount entered!");
-    extrasTypeMaximum = config.getString("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%");
+    extrasTypePrefix = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.prefix", "&6&l!!&6> "));
+    extrasTypeEmpty = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
+    extrasTypeValid = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.valid", "&aClick output slot to submit offer."));
+    extrasTypeInvalid = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.invalid", "&cInvalid amount entered!"));
+    extrasTypeMaximum = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%"));
 
     factionsAllowTradeInEnemyTerritory = config.getBoolean("hooks.factions.allow-trades-in-enemy-territory", false);
     worldguardTradingFlag = config.getBoolean("hooks.worldguard.trading-flag", true);
@@ -365,7 +365,7 @@ public class TradePlusConfig {
       config.set("extras.experience.name", "experience points");
       config.set(
           "extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
-      config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
+      config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
       config.set(
           "extras.experience.theirdisplay",
           "&aTheir current XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
@@ -1101,6 +1101,13 @@ public class TradePlusConfig {
               "spectate.text",
               lang.getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate"));
       if (!lang.isString("errors.same-ip")) lang.set("errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
+    }
+
+    if (configVersion < 3.74) {
+      String xpDisplay = config.getString("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
+      if (!xpDisplay.contains("%LEVELS%")) {
+        config.set("extras.experience.display", xpDisplay + " &c(%LEVELS% levels)");
+      }
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

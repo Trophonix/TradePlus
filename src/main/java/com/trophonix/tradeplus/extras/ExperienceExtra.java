@@ -48,7 +48,13 @@ public class ExperienceExtra extends Extra {
         "%INCREMENT%",
         decimalFormat.format(increment),
         "%PLAYERINCREMENT%",
-        decimalFormat.format(player.equals(player1) ? increment1 : increment2));
+        decimalFormat.format(player.equals(player1) ? increment1 : increment2),
+        "%LEVELS%",
+        Integer.toString(
+                player.equals(player1)
+                    ? getLevelChangeFromXp(player1, -value1)
+                    : getLevelChangeFromXp(player2, -value2)
+        ));
   }
 
   @Override
@@ -60,11 +66,11 @@ public class ExperienceExtra extends Extra {
         "%LEVELS%",
         Integer.toString(
             player.equals(player1)
-                ? getLevelsFromXp(player2, value1)
-                : getLevelsFromXp(player1, value2)));
+                ? getLevelChangeFromXp(player2, value1)
+                : getLevelChangeFromXp(player1, value2)));
   }
 
-  private int getLevelsFromXp(Player receiver, double amount) {
+  private int getLevelChangeFromXp(Player receiver, double amount) {
     int currentXp = XP.getExp(receiver);
     double currentLevel = XP.getLevelFromExp(currentXp);
     return (int) (XP.getLevelFromExp(currentXp + (int) amount) - currentLevel);

@@ -38,6 +38,10 @@ public class ConfigMessage {
   }
 
   public void send(CommandSender player, String... replacements) {
+    String hover = this.onHover;
+    if (hover != null) for (int i = 0; i < replacements.length - 1; i += 2) {
+      hover = hover.replace(replacements[i], replacements[i + 1]);
+    }
     for (String line : message) {
       for (int i = 0; i < replacements.length - 1; i += 2) {
         line = line.replace(replacements[i], replacements[i + 1]);
@@ -45,7 +49,7 @@ public class ConfigMessage {
       if (onHover == null && onClick == null) {
         player.sendMessage(line);
       } else {
-        MsgUtils.send((Player) player, onHover, onClick, line);
+        MsgUtils.send((Player) player, hover, onClick, line);
       }
     }
   }

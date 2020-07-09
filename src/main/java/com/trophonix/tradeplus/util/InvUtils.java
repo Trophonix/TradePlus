@@ -48,7 +48,7 @@ public class InvUtils {
     cancelTrade =
         new ItemFactory(
                 pl.getTradeConfig().getGuiAcceptType(),
-                Material.BARRIER)
+                Material.REDSTONE)
             .display(pl.getTradeConfig().getGuiCancelDisplay())
             .customModelData(pl.getTradeConfig().getGuiCancelModelData())
             .amount(pl.getTradeConfig().getAntiscamCountdown())
@@ -66,7 +66,7 @@ public class InvUtils {
     theyCancelled =
         new ItemFactory(
                 pl.getTradeConfig().getGuiCancelType(),
-                Material.BARRIER)
+                Material.REDSTONE)
             .display(pl.getTradeConfig().getGuiTheirCancelDisplay())
             .customModelData(pl.getTradeConfig().getGuiCancelModelData())
             .amount(pl.getTradeConfig().getAntiscamCountdown())

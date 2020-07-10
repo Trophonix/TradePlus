@@ -194,29 +194,37 @@ public class ItemFactory {
   }
 
   public ItemFactory display(String display) {
+    if (display.contains("%NEWLINE%")) {
+      String[] split = display.split("%NEWLINE%");
+      this.display = split[0];
+      List<String> lore = new ArrayList<>();
+      for (int i = 1; i < split.length; i++) {
+        lore.add(split[i]);
+      }
+      return this.lore(lore);
+    }
     this.display = display;
     return this;
   }
 
   public ItemFactory display(char colorChar, String display) {
-    this.display = ChatColor.translateAlternateColorCodes(colorChar, display);
-    return this;
+    return display(ChatColor.translateAlternateColorCodes(colorChar, display));
   }
 
   public ItemFactory lore(List<String> lore) {
-    this.lore = lore;
+    if (this.lore == null) this.lore = new ArrayList<>();
+    this.lore.addAll(lore);
     return this;
   }
 
   public ItemFactory lore(char colorChar, List<String> lore) {
     if (lore == null) {
-      return lore(null);
+      return this;
     }
     for (int i = 0; i < lore.size(); i++) {
       lore.set(i, ChatColor.translateAlternateColorCodes(colorChar, lore.get(i)));
     }
-    this.lore = lore;
-    return this;
+    return this.lore(lore);
   }
 
   public ItemFactory flag(String flag) {

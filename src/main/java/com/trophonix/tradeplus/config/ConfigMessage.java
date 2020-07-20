@@ -1,16 +1,10 @@
 package com.trophonix.tradeplus.config;
 
 import com.trophonix.tradeplus.util.MsgUtils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class ConfigMessage {
 
@@ -39,9 +33,10 @@ public class ConfigMessage {
 
   public void send(CommandSender player, String... replacements) {
     String hover = this.onHover;
-    if (hover != null) for (int i = 0; i < replacements.length - 1; i += 2) {
-      hover = hover.replace(replacements[i], replacements[i + 1]);
-    }
+    if (hover != null)
+      for (int i = 0; i < replacements.length - 1; i += 2) {
+        hover = hover.replace(replacements[i], replacements[i + 1]);
+      }
     for (String line : message) {
       for (int i = 0; i < replacements.length - 1; i += 2) {
         line = line.replace(replacements[i], replacements[i + 1]);
@@ -58,5 +53,4 @@ public class ConfigMessage {
     onClick = command;
     return this;
   }
-
 }

@@ -51,10 +51,9 @@ public class ExperienceExtra extends Extra {
         decimalFormat.format(player.equals(player1) ? increment1 : increment2),
         "%LEVELS%",
         Integer.toString(
-                player.equals(player1)
-                    ? getLevelChangeFromXp(player1, -value1)
-                    : getLevelChangeFromXp(player2, -value2)
-        ));
+            player.equals(player1)
+                ? getLevelChangeFromXp(player1, -value1)
+                : getLevelChangeFromXp(player2, -value2)));
   }
 
   @Override

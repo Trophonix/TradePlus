@@ -1,9 +1,11 @@
 package com.trophonix.tradeplus.config;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.util.ItemFactory;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -20,8 +22,12 @@ public class TradePlusConfig {
 
   private File configFile;
   private FileConfiguration config;
+
   private File langFile;
   private FileConfiguration lang;
+
+  private File guiFile;
+  private FileConfiguration gui;
 
   private List<String> aliases;
   private boolean tradeCompatMode;
@@ -47,36 +53,29 @@ public class TradePlusConfig {
 
   private int antiscamCountdown;
   private boolean antiscamCancelOnChange, preventChangeOnAccept, discrepancyDetection;
-
   private boolean spectateEnabled, spectateBroadcast;
 
   private String guiTitle;
   private String spectatorTitle;
 
-  private String guiHeadDisplayName;
-  private boolean showHead;
+  private ItemFactory force, accept, cancel, theirAccept, theirCancel, separator;
+  private boolean forceEnabled, acceptEnabled, headEnabled;
+  private String headDisplayName;
 
-  private String guiAcceptDisplay, guiCancelDisplay;
-  private boolean showAccept;
-  private String guiTheirAcceptDisplay, guiTheirCancelDisplay;
-
-  private String guiAcceptType, guiCancelType, guiSeparatorType;
-
-  private boolean guiForceEnabled;
-  private String guiForceType, guiForceName;
-  private List<String> guiForceLore;
-
-  private int guiAcceptModelData, guiCancelModelData, guiSeparatorModelData;
-
-  private String extrasTypePrefix, extrasTypeEmpty, extrasTypeValid, extrasTypeInvalid, extrasTypeMaximum;
-
+  private String extrasTypePrefix,
+      extrasTypeEmpty,
+      extrasTypeValid,
+      extrasTypeInvalid,
+      extrasTypeMaximum;
   private boolean factionsAllowTradeInEnemyTerritory, worldguardTradingFlag;
-
-  private boolean soundEffectsEnabled, soundOnChange, soundOnAccept, soundOnComplete, soundOnCountdown;
+  private boolean soundEffectsEnabled,
+      soundOnChange,
+      soundOnAccept,
+      soundOnComplete,
+      soundOnCountdown;
 
   private boolean excessChest;
   private String excessTitle;
-  private String typeEmpty, typeValid, typeInvalid, typeMaximum;
 
   private boolean debugMode;
 
@@ -85,21 +84,27 @@ public class TradePlusConfig {
 
   private ConfigMessage errorsCreative, errorsCreativeThem, errorsSameIp;
   private ConfigMessage errorsSameWorldRange, errorsCrossWorldRange, errorsNoCrossWorld;
-
   private ConfigMessage acceptSender, acceptReceiver;
   private ConfigMessage cancelled, expired;
-
-  private ConfigMessage errorsWaitForExpire, errorsPlayerNotFound, errorsSelfTrade, errorsInvalidUsage;
-  private ConfigMessage errorsNoPermsAccept, errorsNoPermsSend, errorsNoPermsReceive, errorsNoPermsAdmin;
-
+  private ConfigMessage errorsWaitForExpire,
+      errorsPlayerNotFound,
+      errorsSelfTrade,
+      errorsInvalidUsage;
+  private ConfigMessage errorsNoPermsAccept,
+      errorsNoPermsSend,
+      errorsNoPermsReceive,
+      errorsNoPermsAdmin;
   private ConfigMessage tradeComplete, forcedTrade;
   private ConfigMessage theyDenied, youDenied;
 
   private ConfigMessage spectateMessage;
   private ConfigMessage discrepancyDetected;
 
-  private ConfigMessage adminConfigReloaded, adminInvalidPlayers, adminForcedTrade, adminPlayersOnly, adminNoTrade;
-
+  private ConfigMessage adminConfigReloaded,
+      adminInvalidPlayers,
+      adminForcedTrade,
+      adminPlayersOnly,
+      adminNoTrade;
   private ConfigMessage factionsEnemyTerritory, worldguardTradingNotAllowed;
 
   public TradePlusConfig(TradePlus plugin) {
@@ -110,6 +115,7 @@ public class TradePlusConfig {
     try {
       config.save(configFile);
       lang.save(langFile);
+      gui.save(guiFile);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -123,14 +129,16 @@ public class TradePlusConfig {
 
     excessChest = config.getBoolean("excess-chest.enabled", true);
     excessTitle =
-            ChatColor.translateAlternateColorCodes(
-                    '&', config.getString("excess-chest.title", "&7Your inventory is full!"));
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("excess-chest.title", "&7Your inventory is full!"));
 
     tradeLogs = config.getBoolean("trade-logs", false);
     allowSameIpTrade = config.getBoolean("allow-same-ip-trade", true);
 
-    permissionsRequired = config.getBoolean("permissions.required", config.getBoolean("permissionrequired", false));
-    sendPermission = config.getString("permissions.send", config.getString("permissionnode", "tradeplus.send"));
+    permissionsRequired =
+        config.getBoolean("permissions.required", config.getBoolean("permissionrequired", false));
+    sendPermission =
+        config.getString("permissions.send", config.getString("permissionnode", "tradeplus.send"));
     acceptPermission = config.getString("permissions.accept", "tradeplus.accept");
 
     requestCooldownSeconds = config.getInt("requestcooldownseconds", 20);
@@ -155,40 +163,31 @@ public class TradePlusConfig {
     spectateEnabled = config.getBoolean("spectate.enabled", true);
     spectateBroadcast = config.getBoolean("spectate.broadcast", true);
 
-    guiTitle = ChatColor.translateAlternateColorCodes('&', config.getString("gui.title", "Your Items <|     |> Their Items"));
-    spectatorTitle = ChatColor.translateAlternateColorCodes('&', config.getString("gui.spectator-title", "Player 1 <|          |> Player 2"));
+    guiTitle =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("gui.title", "Your Items <|     |> Their Items"));
+    spectatorTitle =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("gui.spectator-title", "Player 1 <|          |> Player 2"));
 
-    guiHeadDisplayName = ChatColor.translateAlternateColorCodes('&', config.getString("gui.head", "&7You are trading with: &3&l%PLAYER%"));
-    showHead = config.getBoolean("gui.showhead", !config.contains("showhead") || config.getBoolean("showhead"));
+    extrasTypePrefix =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("extras.type.prefix", "&6&l!!&6> "));
+    extrasTypeEmpty =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
+    extrasTypeValid =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("extras.type.valid", "&aClick output slot to submit offer."));
+    extrasTypeInvalid =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("extras.type.invalid", "&cInvalid amount entered!"));
+    extrasTypeMaximum =
+        ChatColor.translateAlternateColorCodes(
+            '&', config.getString("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%"));
 
-    guiAcceptDisplay = ChatColor.translateAlternateColorCodes('&', config.getString("gui.accept.display", "&a&lClick to accept the trade"));
-    guiCancelDisplay = ChatColor.translateAlternateColorCodes('&', config.getString("gui.cancel.display", "&c&lClick to cancel the trade"));
-
-    showAccept = config.getBoolean("gui.showaccept", true);
-
-    guiTheirAcceptDisplay = ChatColor.translateAlternateColorCodes('&', config.getString("gui.accept.theirdisplay", " "));
-    guiTheirCancelDisplay = ChatColor.translateAlternateColorCodes('&', config.getString("gui.cancel.theirdisplay", " "));
-
-    guiAcceptType = config.getString("gui.accept.type", "emerald");
-    guiCancelType = config.getString("gui.cancel.type", "redstone");
-    guiSeparatorType = config.getString("gui.separator.type", Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "THIN_GLASS");
-
-    guiForceEnabled = config.getBoolean("gui.force.enabled", true);
-    guiForceType = config.getString("gui.force.type");
-    guiForceName = ChatColor.translateAlternateColorCodes('&', config.getString("gui.force.name", "&4&lForce Trade"));
-    guiForceLore = config.getStringList("gui.force.lore");
-
-    guiAcceptModelData = config.getInt("gui.accept.customModelData", 0);
-    guiCancelModelData = config.getInt("gui.cancel.customModelData", 0);
-    guiSeparatorModelData = config.getInt("gui.separator.customModelData", 0);
-
-    extrasTypePrefix = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.prefix", "&6&l!!&6> "));
-    extrasTypeEmpty = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
-    extrasTypeValid = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.valid", "&aClick output slot to submit offer."));
-    extrasTypeInvalid = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.invalid", "&cInvalid amount entered!"));
-    extrasTypeMaximum = ChatColor.translateAlternateColorCodes('&', config.getString("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%"));
-
-    factionsAllowTradeInEnemyTerritory = config.getBoolean("hooks.factions.allow-trades-in-enemy-territory", false);
+    factionsAllowTradeInEnemyTerritory =
+        config.getBoolean("hooks.factions.allow-trades-in-enemy-territory", false);
     worldguardTradingFlag = config.getBoolean("hooks.worldguard.trading-flag", true);
 
     soundEffectsEnabled = config.getBoolean("soundeffects.enabled", true);
@@ -197,52 +196,150 @@ public class TradePlusConfig {
     soundOnComplete = config.getBoolean("soundeffects.oncomplete", true);
     soundOnCountdown = config.getBoolean("soundeffects.oncountdown", true);
 
-    requestSent = new ConfigMessage(lang, "request.sent", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
-    requestReceived = new ConfigMessage(lang, "request.received", "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
+    requestSent =
+        new ConfigMessage(
+            lang, "request.sent", "&6&l(!) &r&6You sent a trade request to &e%PLAYER%");
+    requestReceived =
+        new ConfigMessage(
+            lang,
+            "request.received",
+            "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
 
-    errorsCreative = new ConfigMessage(lang, "errors.creative", "&4&l(!) &r&4You can't trade in creative mode!");
-    errorsCreativeThem = new ConfigMessage(lang, "errors.creative-them", "&4&l(!) &r&4That player is in creative mode!");
-    errorsSameIp = new ConfigMessage(lang, "errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
+    errorsCreative =
+        new ConfigMessage(lang, "errors.creative", "&4&l(!) &r&4You can't trade in creative mode!");
+    errorsCreativeThem =
+        new ConfigMessage(
+            lang, "errors.creative-them", "&4&l(!) &r&4That player is in creative mode!");
+    errorsSameIp =
+        new ConfigMessage(
+            lang, "errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
 
-    errorsSameWorldRange = new ConfigMessage(lang, "errors.within-range.same-world", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them");
-    errorsCrossWorldRange = new ConfigMessage(lang, "errors.within-range.cross-world", "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!");
-    errorsNoCrossWorld = new ConfigMessage(lang, "errors.no-cross-world", "&4&l(!) &r&4You must be in the same world as a player to trade with them!");
+    errorsSameWorldRange =
+        new ConfigMessage(
+            lang,
+            "errors.within-range.same-world",
+            "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player to trade with them");
+    errorsCrossWorldRange =
+        new ConfigMessage(
+            lang,
+            "errors.within-range.cross-world",
+            "&4&l(!) &r&4You must be within %AMOUNT% blocks of a player%NEWLINE%&4&l(!) &r&4in a different world to trade with them!");
+    errorsNoCrossWorld =
+        new ConfigMessage(
+            lang,
+            "errors.no-cross-world",
+            "&4&l(!) &r&4You must be in the same world as a player to trade with them!");
 
-    acceptSender = new ConfigMessage(lang, "accept.sender", "&6&l(!) &r&e%PLAYER% &6accepted your trade request");
-    acceptReceiver = new ConfigMessage(lang, "accept.receiver", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request");
+    acceptSender =
+        new ConfigMessage(
+            lang, "accept.sender", "&6&l(!) &r&e%PLAYER% &6accepted your trade request");
+    acceptReceiver =
+        new ConfigMessage(
+            lang, "accept.receiver", "&6&l(!) &r&6You accepted &e%PLAYER%'s &6trade request");
     cancelled = new ConfigMessage(lang, "cancelled", "&4&l(!) &r&4The trade was cancelled");
     expired = new ConfigMessage(lang, "expired", "&4&l(!) &r&4Your last trade request expired");
 
-    errorsWaitForExpire = new ConfigMessage(lang, "errors.wait-for-expire", "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
-    errorsPlayerNotFound = new ConfigMessage(lang, "errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
-    errorsSelfTrade = new ConfigMessage(lang, "errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
-    errorsInvalidUsage = new ConfigMessage(lang, "errors.invalid-usage", "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
-            + "    &c- /trade <player name>%NEWLINE%"
-            + "    &c- /trade deny");
-    errorsNoPermsAccept = new ConfigMessage(lang, "errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
-    errorsNoPermsSend = new ConfigMessage(lang, "errors.no-perms.send", "&4&l(!) &r&4You do not have permission to send a trade");
-    errorsNoPermsReceive = new ConfigMessage(lang, "errors.no-perms.receive", "&4&l(!) &r&4That player does not have permission to accept a trade");
-    errorsNoPermsAdmin = new ConfigMessage(lang, "errors.no-perms.admin", "&4&l(!) &r&4You do not have permission to use this command");
+    errorsWaitForExpire =
+        new ConfigMessage(
+            lang,
+            "errors.wait-for-expire",
+            "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
+    errorsPlayerNotFound =
+        new ConfigMessage(
+            lang, "errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
+    errorsSelfTrade =
+        new ConfigMessage(lang, "errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
+    errorsInvalidUsage =
+        new ConfigMessage(
+            lang,
+            "errors.invalid-usage",
+            "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
+                + "    &c- /trade <player name>%NEWLINE%"
+                + "    &c- /trade deny");
+    errorsNoPermsAccept =
+        new ConfigMessage(
+            lang, "errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
+    errorsNoPermsSend =
+        new ConfigMessage(
+            lang, "errors.no-perms.send", "&4&l(!) &r&4You do not have permission to send a trade");
+    errorsNoPermsReceive =
+        new ConfigMessage(
+            lang,
+            "errors.no-perms.receive",
+            "&4&l(!) &r&4That player does not have permission to accept a trade");
+    errorsNoPermsAdmin =
+        new ConfigMessage(
+            lang,
+            "errors.no-perms.admin",
+            "&4&l(!) &r&4You do not have permission to use this command");
 
-    tradeComplete = new ConfigMessage(lang, "trade-complete", "&6&l(!) &r&6The trade was successful!");
-    forcedTrade = new ConfigMessage(lang, "forced-trade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
+    tradeComplete =
+        new ConfigMessage(lang, "trade-complete", "&6&l(!) &r&6The trade was successful!");
+    forcedTrade =
+        new ConfigMessage(
+            lang, "forced-trade", "&6&l(!) &r&6You've been forced into a trade with &e%PLAYER%");
 
-    theyDenied = new ConfigMessage(lang, "denied.them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
-    youDenied = new ConfigMessage(lang, "denied.you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
+    theyDenied =
+        new ConfigMessage(
+            lang, "denied.them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
+    youDenied =
+        new ConfigMessage(
+            lang, "denied.you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
 
-    spectateMessage = new ConfigMessage(lang, "spectate", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
-    discrepancyDetected = new ConfigMessage(lang, "antiscam.discrepancy", "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
+    spectateMessage =
+        new ConfigMessage(
+            lang,
+            "spectate",
+            "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
+    discrepancyDetected =
+        new ConfigMessage(
+            lang,
+            "antiscam.discrepancy",
+            "&4&l(!) &r&4A discrepancy was detected in the traded items.%NEWLINE%&4&l(!) &4The trade has been cancelled.");
 
-    adminConfigReloaded = new ConfigMessage(lang, "admin.configs-reloaded", "&6&l(!) &6Configs reloaded!");
-    adminInvalidPlayers = new ConfigMessage(lang, "admin.invalid-players", "&4&l(!) &4Invalid players!");
-    adminForcedTrade = new ConfigMessage(lang, "admin.forced-trade", "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
-    adminPlayersOnly = new ConfigMessage(lang, "admin.players-only", "&4&l(!) &4This command is for players only.");
-    adminNoTrade = new ConfigMessage(lang, "admin.no-trade", "&4&l(!) &4This command is for players only.");
+    adminConfigReloaded =
+        new ConfigMessage(lang, "admin.configs-reloaded", "&6&l(!) &6Configs reloaded!");
+    adminInvalidPlayers =
+        new ConfigMessage(lang, "admin.invalid-players", "&4&l(!) &4Invalid players!");
+    adminForcedTrade =
+        new ConfigMessage(
+            lang,
+            "admin.forced-trade",
+            "&6&l(!) &6You forced a trade between &e%PLAYER1% &6and &e%PLAYER2%");
+    adminPlayersOnly =
+        new ConfigMessage(
+            lang, "admin.players-only", "&4&l(!) &4This command is for players only.");
+    adminNoTrade =
+        new ConfigMessage(lang, "admin.no-trade", "&4&l(!) &4This command is for players only.");
 
-    factionsEnemyTerritory = new ConfigMessage(lang, "hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
-    worldguardTradingNotAllowed = new ConfigMessage(lang, "hooks.worldguard.trading-not-allowed", "&4&l(!) &4You can't trade in this area.");
+    factionsEnemyTerritory =
+        new ConfigMessage(
+            lang,
+            "hooks.factions.enemy-territory",
+            "&4&l(!) &4You can't trade in enemy territory!");
+    worldguardTradingNotAllowed =
+        new ConfigMessage(
+            lang,
+            "hooks.worldguard.trading-not-allowed",
+            "&4&l(!) &4You can't trade in this area.");
 
     debugMode = config.getBoolean("debug-mode", false);
+
+    headEnabled = gui.getBoolean("head.enabled", true);
+    headDisplayName = gui.getString("head.display-name", "&7You are trading with: &3&l%PLAYER%");
+
+    acceptEnabled = gui.getBoolean("accept-enabled", true);
+
+    accept = new ItemFactory(gui, "accept");
+    cancel = new ItemFactory(gui, "cancel");
+
+    theirAccept = new ItemFactory(gui, "their-accept");
+    theirCancel = new ItemFactory(gui, "their-cancel");
+
+    separator = new ItemFactory(gui, "separator");
+
+    forceEnabled = gui.getBoolean("force-enabled", config.getBoolean("gui.force.enabled", true));
+    force = new ItemFactory(gui, "force");
   }
 
   public void load() {
@@ -253,6 +350,9 @@ public class TradePlusConfig {
 
     langFile = new File(plugin.getDataFolder(), "lang.yml");
     loadLang();
+
+    guiFile = new File(plugin.getDataFolder(), "gui.yml");
+    loadGui();
 
     save();
   }
@@ -308,42 +408,6 @@ public class TradePlusConfig {
       config.set("spectate.enabled", true);
       config.set("spectate.broadcast", true);
 
-      config.set("gui.title", "Your Items <|     |> Their Items");
-      config.set("gui.spectator-title", "Player 1 <|          |> Player 2");
-      config.set("gui.head", "&7You are trading with: &3&l%PLAYER%");
-      config.set("gui.showhead", !config.contains("showhead") || config.getBoolean("showhead"));
-
-      config.set("gui.accept.display", "&a&lClick to accept the trade");
-      config.set("gui.cancel.display", "&c&lClick to cancel the trade");
-      config.set("gui.showaccept", true);
-      config.set("gui.accept.theirdisplay", " ");
-      config.set("gui.cancel.theirdisplay", " ");
-
-      if (Sounds.version < 113) {
-        config.set("gui.accept.type", "stained_glass_pane:13");
-        config.set("gui.cancel.type", "stained_glass_pane:14");
-        config.set("gui.separator.type", "stained_glass_pane:15");
-      } else {
-        config.set("gui.accept.type", "green_stained_glass_pane");
-        config.set("gui.cancel.type", "red_stained_glass_pane");
-        config.set("gui.separator.type", "black_stained_glass_pane");
-      }
-      config.set("gui.force.enabled", true);
-      if (Sounds.version < 113) {
-        config.set("gui.force.type", "watch");
-      } else {
-        config.set("gui.force.type", "clock");
-      }
-      config.set("gui.force.name", "&4&lForce Trade");
-      config.set(
-          "gui.force.lore",
-          Arrays.asList(
-              "&cClick here to force", "&cacceptance.", "", "&cThis shows only for admins."));
-
-      config.set("gui.separator.customModelData", 0);
-      config.set("gui.accept.customModelData", 0);
-      config.set("gui.cancel.customModelData", 0);
-
       config.set("extras.type.prefix", "&6&l!!&6> ");
       config.set("extras.type.empty", "&eHow much %EXTRA% to offer?");
       config.set("extras.type.valid", "&aClick output slot to submit offer.");
@@ -365,7 +429,8 @@ public class TradePlusConfig {
       config.set("extras.experience.name", "experience points");
       config.set(
           "extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
-      config.set("extras.experience.display", "&aYour current XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
+      config.set(
+          "extras.experience.display", "&aYour current XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
       config.set(
           "extras.experience.theirdisplay",
           "&aTheir current XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
@@ -533,7 +598,8 @@ public class TradePlusConfig {
       lang.set("denied.them", "&4&l(!) &r&4Your trade request to &c%PLAYER% &4was denied");
       lang.set("denied.you", "&4&l(!) &r&4Any recent incoming trade requests have been denied.");
       lang.set(
-              "spectate.text", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
+          "spectate.text",
+          "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate");
       lang.set("spectate.hover", "&6&lClick here to spectate this trade");
       lang.set(
           "antiscam.discrepancy",
@@ -547,6 +613,85 @@ public class TradePlusConfig {
       lang.set("admin.no-trade", "&4&l(!) &4No trade was found with those arguments.");
       lang.set("hooks.factions.enemy-territory", "&4&l(!) &4You can't trade in enemy territory!");
       lang.set("hooks.worldguard.trading-not-allowed", "&4&l(!) &4You can't trade in this area.");
+    }
+  }
+
+  public void loadGui() {
+    if (guiFile.exists()) {
+      gui = YamlConfiguration.loadConfiguration(guiFile);
+    } else {
+      try {
+        guiFile.createNewFile();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      gui = YamlConfiguration.loadConfiguration(guiFile);
+
+      gui.set("head.enabled", true);
+      gui.set("head.display-name", "&7You are trading with: &3&l%PLAYER%");
+
+      new ItemFactory(Material.getMaterial(Sounds.version > 112 ? "CLOCK" : "WATCH"))
+          .display(("&4&lForce Trade"))
+          .lore(
+              Arrays.asList(
+                  "&7Click to force the trade", "&7to countdown and accept as", "&7it stands now."))
+          .flag("HIDE_ATTRIBUTES")
+          .save(gui, "force");
+
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
+          .display("&aClick to Accept")
+          .lore(
+              Arrays.asList(
+                  "&7If either of you change",
+                  "&7your offers during the countdown,",
+                  "&7you will have to accept",
+                  "&7the trade again."))
+          .flag("HIDE_ATTRIBUTES")
+          .save(gui, "accept");
+      gui.set("accept-enabled", true);
+
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
+          .display("&cClick to Cancel")
+          .flag("HIDE_ATTRIBUTES")
+          .save(gui, "cancel");
+
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
+          .display("&aThey've accepted your offer.")
+          .lore(
+              Arrays.asList(
+                  "&7If you're satisfied with the",
+                  "&7trade as shown right now,",
+                  "&7click your accept button!"))
+          .flag("HIDE_ATTRIBUTES")
+          .save(gui, "their-accept");
+
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
+          .display("&aYour partner is still considering.")
+          .lore(
+              Arrays.asList(
+                  "&7Click your accept button to",
+                  "&7signal that you like the trade",
+                  "&7as it is now, or wait",
+                  "&7for them to offer more!"))
+          .flag("HIDE_ATTRIBUTES")
+          .save(gui, "their-cancel");
+
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "IRON_FENCE"))
+          .display(" ")
+          .flag("HIDE_ATTRIBUTES")
+          .save(gui, "separator");
+
+      forceEnabled = gui.getBoolean("force-enabled", config.getBoolean("gui.force.enabled", true));
     }
   }
 
@@ -1098,16 +1243,104 @@ public class TradePlusConfig {
 
     if (configVersion < 3.73) {
       lang.set(
-              "spectate.text",
-              lang.getString("spectate.message", "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate"));
-      if (!lang.isString("errors.same-ip")) lang.set("errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
+          "spectate.text",
+          lang.getString(
+              "spectate.message",
+              "&6&l(!) &e%PLAYER1% &6and &e%PLAYER2% &6have started a trade %NEWLINE%&6&l(!) &6Type &e/tradeplus spectate %PLAYER1% %PLAYER2% &6to spectate"));
+      if (!lang.isString("errors.same-ip"))
+        lang.set("errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
     }
 
     if (configVersion < 3.74) {
-      String xpDisplay = config.getString("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
+      String xpDisplay =
+          config.getString("extras.experience.display", "&aYour current XP offer is &2%AMOUNT%");
       if (!xpDisplay.contains("%LEVELS%")) {
         config.set("extras.experience.display", xpDisplay + " &c(%LEVELS% levels)");
       }
+    }
+
+    if (configVersion < 3.75) {
+      String guiHeadDisplayName =
+          config.getString("gui.head", "&7You are trading with: &3&l%PLAYER%");
+      boolean showHead =
+          config.getBoolean(
+              "gui.showhead", !config.contains("showhead") || config.getBoolean("showhead"));
+
+      String guiAcceptDisplay =
+          config.getString("gui.accept.display", "&a&lClick to accept the trade");
+      String guiCancelDisplay =
+          config.getString("gui.cancel.display", "&c&lClick to cancel the trade");
+
+      boolean showAccept = config.getBoolean("gui.showaccept", true);
+
+      String guiTheirAcceptDisplay = config.getString("gui.accept.theirdisplay", " ");
+      String guiTheirCancelDisplay = config.getString("gui.cancel.theirdisplay", " ");
+
+      String guiAcceptType = config.getString("gui.accept.type", "emerald");
+      String guiCancelType = config.getString("gui.cancel.type", "redstone");
+      String guiSeparatorType =
+          config.getString(
+              "gui.separator.type",
+              Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "THIN_GLASS");
+
+      boolean guiForceEnabled = config.getBoolean("gui.force-enabled", true);
+      String guiForceType = config.getString("gui.force.type");
+      String guiForceName = config.getString("gui.force.name", "&4&lForce Trade");
+      List<String> guiForceLore = config.getStringList("gui.force.lore");
+
+      int guiAcceptModelData = config.getInt("gui.accept.customModelData", 0);
+      int guiCancelModelData = config.getInt("gui.cancel.customModelData", 0);
+      int guiSeparatorModelData = config.getInt("gui.separator.customModelData", 0);
+
+      ItemFactory placeHolder =
+          new ItemFactory(guiSeparatorType)
+              .display(" ")
+              .customModelData(guiSeparatorModelData)
+              .flag("HIDE_ATTRIBUTES");
+      ItemFactory acceptTrade =
+          new ItemFactory(guiCancelType, Material.EMERALD)
+              .display(guiAcceptDisplay)
+              .customModelData(guiAcceptModelData)
+              .flag("HIDE_ATTRIBUTES");
+      ItemFactory cancelTrade =
+          new ItemFactory(guiAcceptType, Material.REDSTONE)
+              .display(guiCancelDisplay)
+              .customModelData(guiCancelModelData)
+              .flag("HIDE_ATTRIBUTES");
+      ItemFactory theyAccepted =
+          new ItemFactory(guiAcceptType, Material.EMERALD)
+              .display(guiTheirAcceptDisplay)
+              .customModelData(guiAcceptModelData)
+              .flag("HIDE_ATTRIBUTES");
+      ItemFactory theyCancelled =
+          new ItemFactory(guiCancelType, Material.REDSTONE)
+              .display(guiTheirCancelDisplay)
+              .customModelData(guiCancelModelData)
+              .flag("HIDE_ATTRIBUTES");
+      ItemFactory force =
+          new ItemFactory(
+                  guiForceType,
+                  Sounds.version < 113
+                      ? Material.getMaterial("WATCH")
+                      : Material.getMaterial("CLOCK"))
+              .display(guiForceName)
+              .lore(guiForceLore)
+              .flag("HIDE_ATTRIBUTES");
+
+      gui.set("head.enabled", showHead);
+      gui.set("head.display-name", guiHeadDisplayName);
+
+      gui.set("accept-enabled", showAccept);
+
+      acceptTrade.save(gui, "accept");
+      cancelTrade.save(gui, "cancel");
+      theyAccepted.save(gui, "their-accept");
+      theyCancelled.save(gui, "their-cancel");
+
+      placeHolder.save(gui, "separator");
+
+      gui.set("force.enabled", guiForceEnabled);
+      force.save(gui, "force");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

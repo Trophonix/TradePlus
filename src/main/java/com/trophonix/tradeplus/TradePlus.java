@@ -125,5 +125,4 @@ public class TradePlus extends JavaPlugin {
   public Logs getLogs() {
     return logs;
   }
-
 }

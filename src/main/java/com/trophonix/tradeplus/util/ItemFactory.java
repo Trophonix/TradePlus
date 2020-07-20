@@ -2,9 +2,9 @@ package com.trophonix.tradeplus.util;
 
 import com.google.common.base.Preconditions;
 import com.trophonix.tradeplus.TradePlus;
-import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,22 +16,15 @@ import java.util.stream.Collectors;
 
 public class ItemFactory {
 
-  private short damage = 0;
-  private Material material;
-  @Getter private int amount = 1;
-  private byte data = 0;
-  private String display;
-  private List<String> lore;
-  private List flags;
-  private int customModelData;
+  private ItemStack stack;
 
   public ItemFactory(Material material) {
-    this.material = material;
+    this.stack = new ItemStack(material);
   }
 
   public ItemFactory(String parsable, Material fallback) {
     if (parsable == null) {
-      this.material = fallback;
+      this.stack = new ItemStack(fallback);
     } else {
       byte data = -1;
       if (parsable.contains(":")) {
@@ -56,44 +49,71 @@ public class ItemFactory {
                         : ""));
       }
 
-      this.material = mat;
-      this.data = data;
+      if (data > 0) {
+        this.stack = new ItemStack(mat, 1, data, data);
+      } else {
+        this.stack = new ItemStack(mat);
+      }
     }
   }
 
   public ItemFactory(String parsable) {
-    Preconditions.checkNotNull(parsable, "Material cannot be null.");
-    byte data = -1;
-    if (parsable.contains(":")) {
-      String[] split = parsable.split(":");
-      data = Byte.parseByte(split[1]);
-      parsable = split[0];
-    }
-    parsable = parsable.toUpperCase().replace(" ", "_");
-    Material mat = Material.getMaterial(parsable);
-    this.material = Preconditions.checkNotNull(mat, "Unknown material [%s]", parsable);
-    ;
-    this.data = data;
+    this(parsable, Material.PAPER);
+    //    Preconditions.checkNotNull(parsable, "Material cannot be null.");
+    //    byte data = -1;
+    //    if (parsable.contains(":")) {
+    //      String[] split = parsable.split(":");
+    //      data = Byte.parseByte(split[1]);
+    //      parsable = split[0];
+    //    }
+    //    parsable = parsable.toUpperCase().replace(" ", "_");
+    //    Material mat = Material.getMaterial(parsable);
+    //    this.material = Preconditions.checkNotNull(mat, "Unknown material [%s]", parsable);
+    //    ;
+    //    this.data = data;
   }
 
   public ItemFactory(ItemStack stack) {
-    damage = stack.getDurability();
-    material = stack.getType();
-    amount = stack.getAmount();
-    data = stack.getData().getData();
+    this.stack = stack.clone();
+  }
+
+  public ItemFactory(ConfigurationSection yml, String key) {
+    this.stack = yml.getItemStack(key);
     if (stack.hasItemMeta()) {
       ItemMeta meta = stack.getItemMeta();
+      String displayName = null;
+      List<String> lore = null;
+
       if (meta.hasDisplayName()) {
-        display = meta.getDisplayName();
+        displayName = ChatColor.translateAlternateColorCodes('&', meta.getDisplayName());
       }
+
       if (meta.hasLore()) {
-        lore = meta.getLore();
+        lore = meta.getLore().stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).collect(Collectors.toList());
       }
-      if (Sounds.version != 17) flags = new ArrayList<>(meta.getItemFlags());
+
+      meta.setDisplayName(displayName);
+      meta.setLore(lore);
+
+      stack.setItemMeta(meta);
     }
-    if (Sounds.version > 113) {
-      customModelData = ItemUtils1_14.getCustomModelData(stack);
+  }
+
+  public ItemFactory save(ConfigurationSection yml, String key) {
+    ItemStack stack = this.stack.clone();
+    if (stack.hasItemMeta()) {
+      ItemMeta meta = stack.getItemMeta();
+      if (meta.hasDisplayName())
+        meta.setDisplayName(meta.getDisplayName().replace(ChatColor.COLOR_CHAR, '&'));
+      if (meta.hasLore())
+        meta.setLore(
+            meta.getLore().stream()
+                .map(s -> s.replace(ChatColor.COLOR_CHAR, '&'))
+                .collect(Collectors.toList()));
+      stack.setItemMeta(meta);
     }
+    yml.set(key, stack);
+    return this;
   }
 
   static ItemStack getPlayerSkull(Player player, String displayName) {
@@ -140,70 +160,53 @@ public class ItemFactory {
   }
 
   public ItemFactory replace(String... replace) {
-    for (int i = 0; i < replace.length - 1; i += 2) {
-      display = display.replace(replace[i], replace[i + 1]);
-      if (lore != null) {
-        int n = i;
-        lore =
-            lore.stream()
-                .map(str -> str.replace(replace[n], replace[n + 1]))
-                .collect(Collectors.toList());
+    if (stack.hasItemMeta()) {
+      ItemMeta meta = stack.getItemMeta();
+      String display = meta.getDisplayName();
+      List<String> lore = meta.getLore();
+      for (int i = 0; i < replace.length - 1; i += 2) {
+        if (display != null) display = display.replace(replace[i], replace[i + 1]);
+        if (lore != null) {
+          int n = i;
+          lore =
+              lore.stream()
+                  .map(str -> str.replace(replace[n], replace[n + 1]))
+                  .collect(Collectors.toList());
+        }
       }
+      meta.setDisplayName(display);
+      meta.setLore(lore);
+      stack.setItemMeta(meta);
     }
     return this;
   }
 
   public ItemStack build() {
-    ItemStack itemStack;
-    if (Sounds.version < 113 && data != (byte) 0) {
-      itemStack = new ItemStack(material, amount, damage, data);
-    } else {
-      itemStack = new ItemStack(material, amount, damage);
-    }
-    ItemMeta itemMeta = itemStack.getItemMeta();
-    if (display != null) {
-      itemMeta.setDisplayName(display);
-    }
-    itemMeta.setLore(lore);
-    if (flags != null)
-      itemMeta.addItemFlags(
-          ((List<org.bukkit.inventory.ItemFlag>) flags)
-              .toArray(new org.bukkit.inventory.ItemFlag[0]));
-    if (Sounds.version > 113) {
-      ItemUtils1_14.applyCustomModelData(itemMeta, customModelData);
-    }
-    itemStack.setItemMeta(itemMeta);
-    return itemStack;
+    return stack.clone();
   }
 
   public ItemFactory copy() {
-    ItemFactory copy = new ItemFactory(material);
-    copy.damage = damage;
-    copy.amount = amount;
-    copy.data = data;
-    copy.display = display;
-    copy.lore = lore;
-    copy.flags = new ArrayList(flags);
-    copy.customModelData = customModelData;
-    return copy;
+    return new ItemFactory(stack);
   }
 
   public ItemFactory amount(int amount) {
-    this.amount = amount;
+    this.stack.setAmount(amount);
     return this;
   }
 
   public ItemFactory display(String display) {
+    ItemMeta meta = stack.getItemMeta();
     if (display.contains("%NEWLINE%")) {
       String[] split = display.split("%NEWLINE%");
-      this.display = split[0];
+      display = split[0];
       List<String> lore = new ArrayList<>();
       for (int i = 1; i < split.length; i++) {
         lore.add(split[i]);
       }
-      return this.lore(lore);
+      this.lore(lore);
     }
-    this.display = display;
+    meta.setDisplayName(display);
+    stack.setItemMeta(meta);
     return this;
   }
 
@@ -212,8 +215,12 @@ public class ItemFactory {
   }
 
   public ItemFactory lore(List<String> lore) {
-    if (this.lore == null) this.lore = new ArrayList<>();
-    this.lore.addAll(lore);
+    ItemMeta meta = stack.getItemMeta();
+    List<String> current = meta.getLore();
+    if (current == null) current = new ArrayList<>();
+    current.addAll(lore);
+    meta.setLore(current);
+    stack.setItemMeta(meta);
     return this;
   }
 
@@ -229,13 +236,21 @@ public class ItemFactory {
 
   public ItemFactory flag(String flag) {
     if (Sounds.version == 17) return this;
-    if (flags == null) flags = new ArrayList<org.bukkit.inventory.ItemFlag>();
-    flags.add(org.bukkit.inventory.ItemFlag.valueOf(flag));
+    ItemMeta meta = stack.getItemMeta();
+    meta.addItemFlags(org.bukkit.inventory.ItemFlag.valueOf(flag));
+    stack.setItemMeta(meta);
     return this;
   }
 
   public ItemFactory customModelData(int customModelData) {
-    this.customModelData = customModelData;
+    if (Sounds.version < 114) return this;
+    ItemMeta meta = stack.getItemMeta();
+    ItemUtils1_14.applyCustomModelData(meta, customModelData);
+    stack.setItemMeta(meta);
     return this;
+  }
+
+  public int getAmount() {
+    return stack.getAmount();
   }
 }

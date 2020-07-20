@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -223,16 +222,6 @@ public class Trade implements Listener {
       // with a cancelled trade window
       if (cancelled) {
         event.setCancelled(true);
-        player.closeInventory();
-        return;
-      }
-      // item in slot 49 is set to nothing
-      // when trade ends as an extra
-      // precaution
-      ItemStack item49 = inv.getItem(49);
-      if (item49 == null || item49.getType().equals(Material.AIR)) {
-        event.setCancelled(true);
-        event.setResult(InventoryClickEvent.Result.DENY);
         return;
       }
       if (click.equals(ClickType.DOUBLE_CLICK)) {
@@ -267,7 +256,8 @@ public class Trade implements Listener {
         ItemStack item = inv.getItem(slot);
         if (item != null) {
           // toggle button
-          if (item.isSimilar(InvUtils.acceptTrade) || item.isSimilar(InvUtils.cancelTrade)) {
+          if (item.isSimilar(pl.getTradeConfig().getAccept().build())
+              || item.isSimilar(pl.getTradeConfig().getCancel().build())) {
             if (!forced) {
               if (player.equals(player1)) {
                 accept1 = !accept1;
@@ -278,21 +268,19 @@ public class Trade implements Listener {
               checkAcceptance();
             }
             // force trade button
-          } else if (slot == 49) {
-            if (item.isSimilar(InvUtils.force)) {
-              if (forced) {
-                forced = false;
-                accept1 = false;
-                accept2 = false;
-                updateAcceptance();
-                checkAcceptance();
-              } else {
-                forced = true;
-                accept1 = true;
-                accept2 = true;
-                updateAcceptance();
-                checkAcceptance();
-              }
+          } else if (slot == 49 && player.hasPermission("tradeplus.admin")) {
+            if (forced) {
+              forced = false;
+              accept1 = false;
+              accept2 = false;
+              updateAcceptance();
+              checkAcceptance();
+            } else {
+              forced = true;
+              accept1 = true;
+              accept2 = true;
+              updateAcceptance();
+              checkAcceptance();
             }
             // extras, or cancel
           } else {
@@ -425,7 +413,22 @@ public class Trade implements Listener {
 
       giveOnCursor((Player) event.getPlayer());
 
-      if (cancelled || closed.getItem(49) == null) {
+      // Return items to them
+      giveItemsOnLeft(closed, (Player) event.getPlayer());
+
+      Bukkit.getScheduler()
+          .runTaskLater(
+              pl,
+              () -> {
+                if (inv1.getViewers().isEmpty()
+                    && inv2.getViewers().isEmpty()
+                    && spectatorInv.getViewers().isEmpty()) {
+                  HandlerList.unregisterAll(this);
+                }
+              },
+              1L);
+
+      if (cancelled) {
         return;
       }
 
@@ -437,16 +440,20 @@ public class Trade implements Listener {
         task = null;
       }
 
-      player1.closeInventory();
-      player2.closeInventory();
-
-      // Return items to them
-      giveItemsOnLeft(inv1, player1);
-      giveItemsOnLeft(inv2, player2);
-
       pl.getTradeConfig().getCancelled().send(player1, "%PLAYER%", player2.getName());
       pl.getTradeConfig().getCancelled().send(player2, "%PLAYER%", player1.getName());
-      new ArrayList<>(spectatorInv.getViewers()).forEach(HumanEntity::closeInventory);
+    } else if (closed.equals(spectatorInv) || spectatorInv.getViewers().contains(event.getPlayer())) {
+      Bukkit.getScheduler()
+              .runTaskLater(
+                      pl,
+                      () -> {
+                        if (inv1.getViewers().isEmpty()
+                                && inv2.getViewers().isEmpty()
+                                && spectatorInv.getViewers().isEmpty()) {
+                          HandlerList.unregisterAll(this);
+                        }
+                      },
+                      1L);
     }
   }
 
@@ -593,15 +600,16 @@ public class Trade implements Listener {
 
   public void updateExtras() {
     int slot1 = 0, slot2a = 0, slot2b = 0;
+    ItemStack separator = pl.getTradeConfig().getSeparator().build();
     for (int i = 0; i < extraSlots.size(); i++) {
       if (i >= extras.size()) {
         break;
       }
       int slot = extraSlots.get(i);
-      inv1.setItem(slot, InvUtils.placeHolder);
-      inv1.setItem(getRight(slot), InvUtils.placeHolder);
-      inv2.setItem(slot, InvUtils.placeHolder);
-      inv2.setItem(getRight(slot), InvUtils.placeHolder);
+      inv1.setItem(slot, separator);
+      inv1.setItem(getRight(slot), separator);
+      inv2.setItem(slot, separator);
+      inv2.setItem(getRight(slot), separator);
     }
     placedExtras.clear();
     for (Extra extra : extras) {
@@ -625,17 +633,43 @@ public class Trade implements Listener {
   }
 
   private void updateAcceptance() {
-    if (pl.getTradeConfig().isShowAccept()) {
-      inv1.setItem(0, accept1 ? InvUtils.cancelTrade : InvUtils.acceptTrade);
-      inv1.setItem(8, accept2 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
-      inv2.setItem(0, accept2 ? InvUtils.cancelTrade : InvUtils.acceptTrade);
-      inv2.setItem(8, accept1 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
-      spectatorInv.setItem(4, accept1 && accept2 ? InvUtils.theyAccepted : InvUtils.theyCancelled);
+    if (pl.getTradeConfig().isAcceptEnabled()) {
+      inv1.setItem(
+          0,
+          accept1
+              ? pl.getTradeConfig().getCancel().build()
+              : pl.getTradeConfig().getAccept().build());
+      inv1.setItem(
+          8,
+          accept2
+              ? pl.getTradeConfig().getTheirAccept().build()
+              : pl.getTradeConfig().getTheirCancel().build());
+      inv2.setItem(
+          0,
+          accept2
+              ? pl.getTradeConfig().getCancel().build()
+              : pl.getTradeConfig().getAccept().build());
+      inv2.setItem(
+          8,
+          accept1
+              ? pl.getTradeConfig().getTheirAccept().build()
+              : pl.getTradeConfig().getTheirCancel().build());
+
+      inv1.getItem(0).setAmount(pl.getTradeConfig().getAntiscamCountdown());
+      inv1.getItem(8).setAmount(pl.getTradeConfig().getAntiscamCountdown());
+      inv2.getItem(0).setAmount(pl.getTradeConfig().getAntiscamCountdown());
+      inv2.getItem(8).setAmount(pl.getTradeConfig().getAntiscamCountdown());
+
+      spectatorInv.setItem(
+          4,
+          accept1 && accept2
+              ? pl.getTradeConfig().getTheirAccept().build()
+              : pl.getTradeConfig().getTheirCancel().build());
     }
   }
 
   private void checkAcceptance() {
-    if (pl.getTradeConfig().isShowAccept()) {
+    if (pl.getTradeConfig().isAcceptEnabled()) {
       if (accept1 && accept2) {
         if (task != null) {
           return;
@@ -682,11 +716,6 @@ public class Trade implements Listener {
                           task.cancel();
                           task = null;
 
-                          cancel();
-
-                          player1.closeInventory();
-                          player2.closeInventory();
-
                           if (pl.getTradeConfig().isDiscrepancyDetection()) {
                             boolean discrepancy = false;
                             int i = 0;
@@ -709,6 +738,7 @@ public class Trade implements Listener {
                             }
 
                             if (discrepancy) {
+                              cancelled = true;
                               pl.log(
                                   "Found discrepancy in trade between "
                                       + player1.getName()
@@ -722,17 +752,19 @@ public class Trade implements Listener {
                                   .send(player2, "%PLAYER%", player1.getName());
                               giveItemsOnLeft(inv1, player1);
                               giveItemsOnLeft(inv2, player2);
+                              player1.closeInventory();
+                              player2.closeInventory();
                               return;
                             }
                           }
 
-                          pl.log(
-                              "Giving " + player2.getName() + " items from " + player1.getName());
-                          giveItemsOnLeft(inv1, player2);
+                          for (int leftSlot : InvUtils.leftSlots) {
+                            int rightSlot = getRight(leftSlot);
+                            inv1.setItem(leftSlot, inv1.getItem(rightSlot));
+                            inv2.setItem(leftSlot, inv2.getItem(rightSlot));
+                          }
 
-                          pl.log(
-                              "Giving " + player1.getName() + " items from " + player2.getName());
-                          giveItemsOnLeft(inv2, player1);
+                          cancel();
 
                           for (Extra extra : extras) {
                             extra.onTradeEnd();
@@ -750,7 +782,6 @@ public class Trade implements Listener {
                             viewers.forEach(
                                 p -> {
                                   Sounds.levelUp(p, 1);
-                                  p.closeInventory();
                                 });
                           }
 
@@ -972,18 +1003,11 @@ public class Trade implements Listener {
   }
 
   private void cancel() {
-    inv1.setItem(49, null);
-    inv2.setItem(49, null);
+    for (int leftSlot : InvUtils.leftSlots) {
+      int rightSlot = getRight(leftSlot);
+      inv1.setItem(rightSlot, pl.getTradeConfig().getSeparator().build());
+      inv2.setItem(rightSlot, pl.getTradeConfig().getSeparator().build());
+    }
     cancelled = true;
-    Bukkit.getScheduler()
-        .runTaskLater(
-            pl,
-            () -> {
-              new ArrayList<>(inv1.getViewers()).forEach(HumanEntity::closeInventory);
-              new ArrayList<>(inv2.getViewers()).forEach(HumanEntity::closeInventory);
-              new ArrayList<>(spectatorInv.getViewers()).forEach(HumanEntity::closeInventory);
-              HandlerList.unregisterAll(this);
-            },
-            200L);
   }
 }

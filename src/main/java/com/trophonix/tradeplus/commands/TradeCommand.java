@@ -85,7 +85,9 @@ public class TradeCommand extends Command {
                 if (req.receiver == player) {
                   requests.remove(req);
                   if (req.sender.isOnline()) {
-                    pl.getTradeConfig().getTheyDenied().send(req.sender, "%PLAYER%", player.getName());
+                    pl.getTradeConfig()
+                        .getTheyDenied()
+                        .send(req.sender, "%PLAYER%", player.getName());
                   }
                 }
               });
@@ -126,7 +128,9 @@ public class TradeCommand extends Command {
         double amount = pl.getTradeConfig().getSameWorldRange();
         if (amount != 0.0
             && player.getLocation().distanceSquared(receiver.getLocation()) > Math.pow(amount, 2)) {
-          pl.getTradeConfig().getErrorsSameWorldRange().send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
+          pl.getTradeConfig()
+              .getErrorsSameWorldRange()
+              .send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
           return;
         }
       } else {
@@ -135,7 +139,9 @@ public class TradeCommand extends Command {
           Location test = receiver.getLocation().clone();
           test.setWorld(player.getWorld());
           if (amount != 0.0 && player.getLocation().distanceSquared(test) > amount) {
-            pl.getTradeConfig().getErrorsCrossWorldRange().send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
+            pl.getTradeConfig()
+                .getErrorsCrossWorldRange()
+                .send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
             return;
           }
         } else {
@@ -172,10 +178,11 @@ public class TradeCommand extends Command {
           }
         }
 
-        String acceptPermission =
-            pl.getTradeConfig().getAcceptPermission();
+        String acceptPermission = pl.getTradeConfig().getAcceptPermission();
         if (permissionRequired && !receiver.hasPermission(acceptPermission)) {
-          pl.getTradeConfig().getErrorsNoPermsReceive().send(player, "%PLAYER%", receiver.getName());
+          pl.getTradeConfig()
+              .getErrorsNoPermsReceive()
+              .send(player, "%PLAYER%", receiver.getName());
           return;
         }
 
@@ -185,7 +192,10 @@ public class TradeCommand extends Command {
         final TradeRequest request = new TradeRequest(player, receiver);
         requests.add(request);
         pl.getTradeConfig().getRequestSent().send(player, "%PLAYER%", receiver.getName());
-        pl.getTradeConfig().getRequestReceived().setOnClick("/trade " + player.getName()).send(receiver, "%PLAYER%", player.getName());
+        pl.getTradeConfig()
+            .getRequestReceived()
+            .setOnClick("/trade " + player.getName())
+            .send(receiver, "%PLAYER%", player.getName());
         Bukkit.getScheduler()
             .runTaskLater(
                 pl,

@@ -38,8 +38,7 @@ public class TradePlusCommand extends Command {
         }
         break;
       case 2:
-        if (pl.getTradeConfig().isSpectateEnabled()
-            && args[0].equalsIgnoreCase("spectate")) {
+        if (pl.getTradeConfig().isSpectateEnabled() && args[0].equalsIgnoreCase("spectate")) {
           Player player = Bukkit.getPlayer(args[1]);
           if (player == null || !player.isOnline()) {
             pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
@@ -62,7 +61,9 @@ public class TradePlusCommand extends Command {
             pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
             return;
           }
-          pl.getTradeConfig().getAdminForcedTrade().send(sender, "%PLAYER1%", p1.getName(), "%PLAYER2%", p2.getName());
+          pl.getTradeConfig()
+              .getAdminForcedTrade()
+              .send(sender, "%PLAYER1%", p1.getName(), "%PLAYER2%", p2.getName());
           pl.getTradeConfig().getForcedTrade().send(p1, "%PLAYER%", p2.getName());
           pl.getTradeConfig().getForcedTrade().send(p2, "%PLAYER%", p1.getName());
           Trade trade = new Trade(p1, p2);

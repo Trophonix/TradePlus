@@ -6,7 +6,6 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
-import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -116,7 +115,8 @@ public abstract class Extra implements Listener {
 
                       @Override
                       public String getPromptText(ConversationContext conversationContext) {
-                        return pl.getTradeConfig().getExtrasTypeMaximum()
+                        return pl.getTradeConfig()
+                            .getExtrasTypeMaximum()
                             .replace("%BALANCE%", decimalFormat.format(getMax(player)))
                             .replace("%EXTRA%", displayName);
                       }
@@ -133,7 +133,8 @@ public abstract class Extra implements Listener {
 
                 @Override
                 public String getPromptText(ConversationContext conversationContext) {
-                  return pl.getTradeConfig().getExtrasTypeEmpty()
+                  return pl.getTradeConfig()
+                      .getExtrasTypeEmpty()
                       .replace("%BALANCE%", decimalFormat.format(getMax(player)))
                       .replace("%AMOUNT%", decimalFormat.format(offer))
                       .replace("%EXTRA%", displayName);

@@ -1,6 +1,7 @@
 package com.trophonix.tradeplus.trade;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.events.TradeCompleteEvent;
 import com.trophonix.tradeplus.extras.*;
 import com.trophonix.tradeplus.logging.TradeLog;
 import com.trophonix.tradeplus.util.InvUtils;
@@ -774,15 +775,11 @@ public class Trade implements Listener {
                               && pl.getTradeConfig().isSoundOnComplete()) {
                             Sounds.levelUp(player1, 1);
                             Sounds.levelUp(player2, 1);
-                            List<Player> viewers =
-                                spectatorInv.getViewers().stream()
-                                    .filter(Player.class::isInstance)
-                                    .map(Player.class::cast)
-                                    .collect(Collectors.toList());
-                            viewers.forEach(
-                                p -> {
-                                  Sounds.levelUp(p, 1);
-                                });
+                            spectatorInv.getViewers().stream()
+                                .filter(Player.class::isInstance)
+                                .map(Player.class::cast)
+                                .forEach(
+                            p -> Sounds.levelUp(p, 1));
                           }
 
                           pl.getTradeConfig()
@@ -794,25 +791,29 @@ public class Trade implements Listener {
 
                           if (pl.getLogs() != null) {
                             try {
-                              pl.getLogs()
-                                  .log(
-                                      new TradeLog(
-                                          player1,
-                                          player2,
-                                          combine(accepted1).stream()
+                              TradeLog trade = new TradeLog(
+                                      player1,
+                                      player2,
+                                      combine(accepted1).stream()
                                               .map(ItemFactory::new)
                                               .collect(Collectors.toList()),
-                                          combine(accepted2).stream()
+                                      combine(accepted2).stream()
                                               .map(ItemFactory::new)
                                               .collect(Collectors.toList()),
-                                          extras.stream()
+                                      extras.stream()
                                               .filter(e -> e.value1 > 0)
                                               .map(e -> new TradeLog.ExtraOffer(e.name, e.value1))
                                               .collect(Collectors.toList()),
-                                          extras.stream()
+                                      extras.stream()
                                               .filter(e -> e.value2 > 0)
                                               .map(e -> new TradeLog.ExtraOffer(e.name, e.value2))
-                                              .collect(Collectors.toList())));
+                                              .collect(Collectors.toList()));
+
+                              TradeCompleteEvent completeEvent = new TradeCompleteEvent(trade, player1, player2);
+                              Bukkit.getPluginManager().callEvent(completeEvent);
+
+                              pl.getLogs()
+                                  .log(trade);
                               pl.getLogs().save();
                             } catch (Exception ex) {
                               pl.log("Failed to save trade log. " + ex.getMessage());

@@ -64,8 +64,6 @@ public class TradeLog implements PostProcessor {
     private String id;
     private double value;
 
-    // I think gson needs this
-    // so it can construct them from json
     public ExtraOffer() {}
 
     public ExtraOffer(String id, double value) {

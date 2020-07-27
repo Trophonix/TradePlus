@@ -156,6 +156,7 @@ public class TradePlusConfig {
     blockedWorlds = config.getStringList("ranges.blocked-worlds");
 
     antiscamCountdown = config.getInt("antiscam.countdown", 10);
+
     antiscamCancelOnChange = config.getBoolean("antiscam.cancelonchange", true);
     preventChangeOnAccept = config.getBoolean("antiscam.preventchangeonaccept", true);
     discrepancyDetection = config.getBoolean("antiscam.discrepancy-detection", true);
@@ -165,10 +166,10 @@ public class TradePlusConfig {
 
     guiTitle =
         ChatColor.translateAlternateColorCodes(
-            '&', config.getString("gui.title", "Your Items <|     |> Their Items"));
+            '&', gui.getString("title", "Your Items <|     |> Their Items"));
     spectatorTitle =
         ChatColor.translateAlternateColorCodes(
-            '&', config.getString("gui.spectator-title", "Player 1 <|          |> Player 2"));
+            '&', gui.getString("spectator-title", "Player 1 <|          |> Player 2"));
 
     extrasTypePrefix =
         ChatColor.translateAlternateColorCodes(
@@ -1341,6 +1342,11 @@ public class TradePlusConfig {
 
       gui.set("force.enabled", guiForceEnabled);
       force.save(gui, "force");
+    }
+
+    if (configVersion < 3.76) {
+      gui.set("title", config.getString("gui.title", "Your Items <|     |> Their Items"));
+      gui.set("spectator-title", config.getString("gui.spectator-title", "Player 1 <|         |> Player 2"));
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

@@ -628,6 +628,9 @@ public class TradePlusConfig {
       }
       gui = YamlConfiguration.loadConfiguration(guiFile);
 
+      gui.set("title", "Your Items <|     |> Their Items");
+      gui.set("spectator-title", "Player 1 <|         |> Player 2");
+
       gui.set("head.enabled", true);
       gui.set("head.display-name", "&7You are trading with: &3&l%PLAYER%");
 

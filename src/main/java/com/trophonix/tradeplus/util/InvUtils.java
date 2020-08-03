@@ -12,12 +12,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InvUtils {
+//  public static final List<Integer> leftSlots =
+//          new LinkedList<>(
+//                  Arrays.asList(0,
+//                          1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47,
+//                          48));
 
-  public static final List<Integer> leftSlots =
-      new LinkedList<>(
-          Arrays.asList(
-              1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47,
-              48));
 
   private static TradePlus pl;
 
@@ -38,8 +38,8 @@ public class InvUtils {
           && player1.hasPermission("tradeplus.admin"))
         inv.setItem(49, pl.getTradeConfig().getForce().build());
     } else {
-      inv.setItem(0, separator);
-      inv.setItem(8, separator);
+      inv.setItem(pl.getTradeConfig().getAcceptSlot(), separator);
+      inv.setItem(pl.getTradeConfig().getTheirAcceptSlot(), separator);
     }
     if (pl.getTradeConfig().isHeadEnabled())
       inv.setItem(
@@ -59,9 +59,10 @@ public class InvUtils {
     ItemStack separator = pl.getTradeConfig().getSeparator().build();
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, separator);
     for (int i = 45; i <= 53; i++) inv.setItem(i, separator);
-    inv.setItem(0, ItemFactory.getPlayerSkull(player1, "&f" + player1.getName()));
-    inv.setItem(8, ItemFactory.getPlayerSkull(player2, "&f" + player2.getName()));
+    inv.setItem(pl.getTradeConfig().getAcceptSlot(), ItemFactory.getPlayerSkull(player1, "&f" + player1.getName()));
+    inv.setItem(pl.getTradeConfig().getTheirAcceptSlot(), ItemFactory.getPlayerSkull(player2, "&f" + player2.getName()));
     inv.setItem(4, pl.getTradeConfig().getTheirCancel().build());
+
     return inv;
   }
 }

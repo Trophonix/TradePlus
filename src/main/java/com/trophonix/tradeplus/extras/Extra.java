@@ -9,10 +9,7 @@ import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.conversations.ConversationContext;
-import org.bukkit.conversations.ConversationFactory;
-import org.bukkit.conversations.NumericPrompt;
-import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
@@ -26,6 +23,7 @@ public abstract class Extra implements Listener {
   public final String name;
   final ItemStack icon;
   final Player player1;
+  private Conversation convo1, convo2;
   final Player player2;
   final double increment;
   final ItemStack theirIcon;
@@ -42,6 +40,7 @@ public abstract class Extra implements Listener {
   private Trade trade;
 
   Extra(String name, Player player1, Player player2, TradePlus pl, Trade trade) {
+    pl.getServer().getPluginManager().registerEvents(this, pl);
     this.pl = pl;
     this.name = name;
     ConfigurationSection section =
@@ -84,7 +83,7 @@ public abstract class Extra implements Listener {
     if (mode.equals("chat")) {
       trade.setCancelOnClose(player, false);
       player.closeInventory();
-      new ConversationFactory(pl)
+      Conversation convo = new ConversationFactory(pl)
           .withPrefix(
               conversationContext ->
                   ChatColor.translateAlternateColorCodes(
@@ -149,8 +148,13 @@ public abstract class Extra implements Listener {
                 trade.updateExtras();
                 trade.setCancelOnClose(player, true);
               })
-          .buildConversation(player)
-          .begin();
+          .buildConversation(player);
+      if (player.equals(player1)) {
+        convo1 = convo;
+      } else {
+        convo2 = convo;
+      }
+      convo.begin();
     } else {
       if (click.isLeftClick()) {
         if (click.isShiftClick()) {
@@ -213,6 +217,11 @@ public abstract class Extra implements Listener {
   protected abstract double getMax(Player player);
 
   public abstract void onTradeEnd();
+
+  public void onCancel() {
+    if (convo1 != null && player1.isConversing()) player1.abandonConversation(convo1);
+    if (convo2 != null && player2.isConversing()) player2.abandonConversation(convo2);
+  }
 
   public ItemStack getIcon(Player player) {
     return ItemFactory.replaceInMeta(

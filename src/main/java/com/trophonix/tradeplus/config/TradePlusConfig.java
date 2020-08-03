@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 public class TradePlusConfig {
@@ -58,7 +60,10 @@ public class TradePlusConfig {
   private String guiTitle;
   private String spectatorTitle;
 
+  private List<Integer> mySlots, theirSlots;
+
   private ItemFactory force, accept, cancel, theirAccept, theirCancel, separator;
+  private int forceSlot, acceptSlot, theirAcceptSlot;
   private boolean forceEnabled, acceptEnabled, headEnabled;
   private String headDisplayName;
 
@@ -170,6 +175,9 @@ public class TradePlusConfig {
     spectatorTitle =
         ChatColor.translateAlternateColorCodes(
             '&', gui.getString("spectator-title", "Player 1 <|          |> Player 2"));
+
+    mySlots = gui.getStringList("my-slots").stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+    theirSlots = gui.getStringList("their-slots").stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
 
     extrasTypePrefix =
         ChatColor.translateAlternateColorCodes(
@@ -329,18 +337,21 @@ public class TradePlusConfig {
     headEnabled = gui.getBoolean("head.enabled", true);
     headDisplayName = gui.getString("head.display-name", "&7You are trading with: &3&l%PLAYER%");
 
-    acceptEnabled = gui.getBoolean("accept-enabled", true);
+    acceptEnabled = gui.getBoolean("accept.enabled", true);
+    acceptSlot = gui.getInt("accept.my-slot", 0);
+    theirAcceptSlot = gui.getInt("accept.their-slot", 8);
 
-    accept = new ItemFactory(gui, "accept");
-    cancel = new ItemFactory(gui, "cancel");
+    accept = new ItemFactory(gui, "accept.my-icon");
+    cancel = new ItemFactory(gui, "accept.my-cancel");
 
-    theirAccept = new ItemFactory(gui, "their-accept");
-    theirCancel = new ItemFactory(gui, "their-cancel");
+    theirAccept = new ItemFactory(gui, "accept.their-icon");
+    theirCancel = new ItemFactory(gui, "accept.their-cancel");
 
     separator = new ItemFactory(gui, "separator");
 
-    forceEnabled = gui.getBoolean("force-enabled", config.getBoolean("gui.force.enabled", true));
-    force = new ItemFactory(gui, "force");
+    forceEnabled = gui.getBoolean("force.enabled", config.getBoolean("gui.force.enabled", true));
+    forceSlot = gui.getInt("force.slot", 49);
+    force = new ItemFactory(gui, "force.icon");
   }
 
   public void load() {
@@ -418,8 +429,8 @@ public class TradePlusConfig {
       config.set("extras.economy.enabled", true);
       config.set("extras.economy.name", "money");
       config.set("extras.economy.material", "gold_ingot");
-      config.set("extras.economy.display", "&eYour current money offer is &6%AMOUNT%");
-      config.set("extras.economy.theirdisplay", "&eTheir current money offer is &6%AMOUNT%");
+      config.set("extras.economy.display", "&eYour money offer is &6%AMOUNT%");
+      config.set("extras.economy.theirdisplay", "&eTheir money offer is &6%AMOUNT%");
       config.set("extras.economy.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.economy.customModelData", 0);
       config.set("extras.economy.increment", 10.0);
@@ -431,10 +442,10 @@ public class TradePlusConfig {
       config.set(
           "extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
       config.set(
-          "extras.experience.display", "&aYour current XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
+          "extras.experience.display", "&aYour XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
       config.set(
           "extras.experience.theirdisplay",
-          "&aTheir current XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
+          "&aTheir XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
       config.set(
           "extras.experience.lore",
           Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% XP."));
@@ -447,9 +458,9 @@ public class TradePlusConfig {
       config.set("extras.playerpoints.enabled", true);
       config.set("extras.playerpoints.name", "player points");
       config.set("extras.playerpoints.material", "diamond");
-      config.set("extras.playerpoints.display", "&bYour current PlayerPoints offer is &3%AMOUNT%");
+      config.set("extras.playerpoints.display", "&bYour PlayerPoints offer is &3%AMOUNT%");
       config.set(
-          "extras.playerpoints.theirdisplay", "&bTheir current PlayerPoints offer is &3%AMOUNT%");
+          "extras.playerpoints.theirdisplay", "&bTheir PlayerPoints offer is &3%AMOUNT%");
       config.set(
           "extras.playerpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.playerpoints.customModelData", 0);
@@ -462,10 +473,10 @@ public class TradePlusConfig {
       config.set(
           "extras.griefprevention.material", Sounds.version > 112 ? "golden_shovel" : "gold_spade");
       config.set(
-          "extras.griefprevention.display", "&eYour current GriefPrevention offer is &6%AMOUNT%");
+          "extras.griefprevention.display", "&eYour GriefPrevention offer is &6%AMOUNT%");
       config.set(
           "extras.griefprevention.theirdisplay",
-          "&eTheir current GriefPrevention offer is &6%AMOUNT%");
+          "&eTheir GriefPrevention offer is &6%AMOUNT%");
       config.set(
           "extras.griefprevention.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.griefprevention.customModelData", 0);
@@ -476,9 +487,9 @@ public class TradePlusConfig {
       config.set("extras.enjinpoints.enabled", false);
       config.set("extras.enjinpoints.name", "enjin points");
       config.set("extras.enjinpoints.material", "emerald");
-      config.set("extras.enjinpoints.display", "&eYour current EnjinPoints offer is &6%AMOUNT%");
+      config.set("extras.enjinpoints.display", "&eYour EnjinPoints offer is &6%AMOUNT%");
       config.set(
-          "extras.enjinpoints.theirdisplay", "&eTheir current EnjinPoints offer is &6%AMOUNT%");
+          "extras.enjinpoints.theirdisplay", "&eTheir EnjinPoints offer is &6%AMOUNT%");
       config.set(
           "extras.enjinpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.enjinpoints.customModelData", 0);
@@ -490,10 +501,10 @@ public class TradePlusConfig {
       config.set("extras.tokenenchant.name", "token enchant points");
       config.set("extras.tokenenchant.material", "enchanted_book");
       config.set(
-          "extras.tokenenchant.display", "&eYour current TokenEnchant tokens offer is &6%AMOUNT%");
+          "extras.tokenenchant.display", "&eYour TokenEnchant tokens offer is &6%AMOUNT%");
       config.set(
           "extras.tokenenchant.theirdisplay",
-          "&eTheir current TokenEnchants tokens offer is &6%AMOUNT%");
+          "&eTheir TokenEnchants tokens offer is &6%AMOUNT%");
       config.set(
           "extras.tokenenchant.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenenchant.customModelData", 0);
@@ -504,10 +515,10 @@ public class TradePlusConfig {
       config.set("extras.tokenmanager.enabled", true);
       config.set("extras.tokenmanager.name", "tokens");
       config.set("extras.tokenmanager.material", "emerald");
-      config.set("extras.tokenmanager.display", "&eYour current tokens offer is &6%AMOUNT%");
+      config.set("extras.tokenmanager.display", "&eYour tokens offer is &6%AMOUNT%");
       config.set(
           "extras.tokenmanager.theirdisplay",
-          "&eTheir current TokenManager tokens offer is &6%AMOUNT%");
+          "&eTheir TokenManager tokens offer is &6%AMOUNT%");
       config.set(
           "extras.tokenmanager.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenmanager.customModelData", 0);
@@ -518,9 +529,9 @@ public class TradePlusConfig {
       config.set("extras.votingplugin.name", "vote points");
       config.set("extras.votingplugin.enabled", false);
       config.set("extras.votingplugin.material", "sunflower");
-      config.set("extras.votingplugin.display", "&7Your current vote points offer is &b%AMOUNT%");
+      config.set("extras.votingplugin.display", "&7Your vote points offer is &b%AMOUNT%");
       config.set(
-          "extras.votingplugin.theirdisplay", "&7Their current vote points offer is &b%AMOUNT%");
+          "extras.votingplugin.theirdisplay", "&7Their vote points offer is &b%AMOUNT%");
       config.set("extras.votingplugin.lore", Arrays.asList("&fClick to edit your offer!"));
       config.set("extras.votingplugin.taxpercent", 0);
 
@@ -631,20 +642,33 @@ public class TradePlusConfig {
       gui.set("title", "Your Items <|     |> Their Items");
       gui.set("spectator-title", "Player 1 <|         |> Player 2");
 
+      gui.set(
+          "my-slots",
+          Stream.of(
+              1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47,
+              48).map(i -> Integer.toString(i)).collect(Collectors.toList()));
+      gui.set("their-slots", Stream.of(
+              5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51, 52,
+              53).map(i -> Integer.toString(i)).collect(Collectors.toList()));
+
       gui.set("head.enabled", true);
       gui.set("head.display-name", "&7You are trading with: &3&l%PLAYER%");
 
+      gui.set("force.enabled", true);
+      gui.set("force.slot", 49);
       new ItemFactory(Material.getMaterial(Sounds.version > 112 ? "CLOCK" : "WATCH"))
           .display(("&4&lForce Trade"))
           .lore(
               Arrays.asList(
                   "&7Click to force the trade", "&7to countdown and accept as", "&7it stands now."))
           .flag("HIDE_ATTRIBUTES")
-          .save(gui, "force");
+          .save(gui, "force.icon");
 
+      gui.set("accept.enabled", true);
+      gui.set("accept.my-slot", 0);
+      gui.set("accept.their-slot", 8);
       new ItemFactory(
-              Material.getMaterial(
-                  Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
+              Material.getMaterial(Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
           .display("&aClick to Accept")
           .lore(
               Arrays.asList(
@@ -653,19 +677,16 @@ public class TradePlusConfig {
                   "&7you will have to accept",
                   "&7the trade again."))
           .flag("HIDE_ATTRIBUTES")
-          .save(gui, "accept");
-      gui.set("accept-enabled", true);
+          .save(gui, "accept.my-icon");
 
       new ItemFactory(
-              Material.getMaterial(
-                  Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
+              Material.getMaterial(Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
           .display("&cClick to Cancel")
           .flag("HIDE_ATTRIBUTES")
-          .save(gui, "cancel");
+          .save(gui, "accept.my-cancel");
 
       new ItemFactory(
-              Material.getMaterial(
-                  Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
+              Material.getMaterial(Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
           .display("&aThey've accepted your offer.")
           .lore(
               Arrays.asList(
@@ -673,11 +694,10 @@ public class TradePlusConfig {
                   "&7trade as shown right now,",
                   "&7click your accept button!"))
           .flag("HIDE_ATTRIBUTES")
-          .save(gui, "their-accept");
+          .save(gui, "accept.their-icon");
 
       new ItemFactory(
-              Material.getMaterial(
-                  Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
+              Material.getMaterial(Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
           .display("&aYour partner is still considering.")
           .lore(
               Arrays.asList(
@@ -686,7 +706,7 @@ public class TradePlusConfig {
                   "&7as it is now, or wait",
                   "&7for them to offer more!"))
           .flag("HIDE_ATTRIBUTES")
-          .save(gui, "their-cancel");
+          .save(gui, "accept.their-cancel");
 
       new ItemFactory(
               Material.getMaterial(
@@ -694,16 +714,12 @@ public class TradePlusConfig {
           .display(" ")
           .flag("HIDE_ATTRIBUTES")
           .save(gui, "separator");
-
-      forceEnabled = gui.getBoolean("force-enabled", config.getBoolean("gui.force.enabled", true));
     }
   }
 
   public void update() {
-    double configVersion =
-        config.contains("configversion") && config.isDouble("configversion")
-            ? config.getDouble("configversion")
-            : 0;
+    if (!config.isDouble("configversion")) return;
+    double configVersion = config.getDouble("configversion");
 
     if (configVersion < 1.11) {
       config.set(
@@ -728,7 +744,7 @@ public class TradePlusConfig {
     if (configVersion < 1.2) {
       config.set("economy.enabled", true);
       config.set("economy.clear", "&4&lClick to clear your money offer");
-      config.set("economy.offer", "&7Your current money offer is &3&l%MONEYAMOUNT% %CURRENCYNAME%");
+      config.set("economy.offer", "&7Your money offer is &3&l%MONEYAMOUNT% %CURRENCYNAME%");
       config.set(
           "economy.theiroffer", "&7Their current money offer is &3&l%MONEYAMOUNT% %CURRENCYNAME%");
       config.set(
@@ -787,7 +803,7 @@ public class TradePlusConfig {
       config.set("hooks.economy.material", "gold_ingot");
       config.set(
           "hooks.economy.youroffer",
-          config.getString("economy.offer", "&7Your current money offer is &e%MONEYAMOUNT%"));
+          config.getString("economy.offer", "&7Your money offer is &e%MONEYAMOUNT%"));
       config.set(
           "hooks.economy.theiroffer",
           config.getString("economy.theiroffer", "&7Their current money offer is &e%MONEYAMOUNT%"));
@@ -1349,7 +1365,47 @@ public class TradePlusConfig {
 
     if (configVersion < 3.76) {
       gui.set("title", config.getString("gui.title", "Your Items <|     |> Their Items"));
-      gui.set("spectator-title", config.getString("gui.spectator-title", "Player 1 <|         |> Player 2"));
+      gui.set(
+          "spectator-title",
+          config.getString("gui.spectator-title", "Player 1 <|         |> Player 2"));
+    }
+
+    if (configVersion < 3.77) {
+      gui.set(
+              "my-slots",
+              Stream.of(
+                      1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47,
+                      48).map(i -> Integer.toString(i)).collect(Collectors.toList()));
+      gui.set("their-slots", Stream.of(
+              5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51, 52,
+              53).map(i -> Integer.toString(i)).collect(Collectors.toList()));
+
+      ItemFactory acceptIcon = new ItemFactory(gui, "accept");
+      ItemFactory cancelIcon = new ItemFactory(gui, "cancel");
+      ItemFactory theirAcceptIcon = new ItemFactory(gui, "their-accept");
+      ItemFactory theirCancelIcon = new ItemFactory(gui, "their-cancel");
+
+      gui.set("accept", null);
+      gui.set("cancel", null);
+      gui.set("their-accept", null);
+      gui.set("their-cancel", null);
+
+      gui.set("accept.enabled", gui.getBoolean("accept-enabled"));
+      gui.set("accept-enabled", null);
+
+      gui.set("accept.my-slot", 0);
+      gui.set("accept.their-slot", 8);
+
+      acceptIcon.save(gui, "accept.my-icon");
+      theirAcceptIcon.save(gui, "accept.their-icon");
+      cancelIcon.save(gui, "accept.my-cancel");
+      theirCancelIcon.save(gui, "accept.their-cancel");
+
+      ItemFactory forceIcon = new ItemFactory(gui, "force");
+      gui.set("force", null);
+      gui.set("force.enabled", gui.getBoolean("force-enabled", true));
+      gui.set("force.slot", 49);
+      forceIcon.save(gui, "force.icon");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

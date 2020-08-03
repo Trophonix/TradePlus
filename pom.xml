@@ -6,11 +6,11 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.76</version>
+    <version>3.77</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
-        <revision>3.76.1</revision>
+        <revision>3.77</revision>
     </properties>
 
     <repositories>

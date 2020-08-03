@@ -68,13 +68,12 @@ public class TradePlus extends JavaPlugin {
         .newChain()
         .async(tradeConfig::load)
         .async(tradeConfig::update)
+        .async(tradeConfig::save)
         .sync(
             () -> {
               excessChests = new ArrayList<>();
               setupCommands();
               reload();
-              tradeConfig.save();
-              InvUtils.reloadItems(this);
               if (Sounds.version > 17) {
                 getServer().getPluginManager().registerEvents(new InteractListener(this), this);
               }

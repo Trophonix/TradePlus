@@ -61,7 +61,6 @@ public class TradePlusConfig {
   private String spectatorTitle;
 
   private List<Integer> mySlots, theirSlots;
-
   private ItemFactory force, accept, cancel, theirAccept, theirCancel, separator;
   private int forceSlot, acceptSlot, theirAcceptSlot;
   private boolean forceEnabled, acceptEnabled, headEnabled;
@@ -176,8 +175,14 @@ public class TradePlusConfig {
         ChatColor.translateAlternateColorCodes(
             '&', gui.getString("spectator-title", "Player 1 <|          |> Player 2"));
 
-    mySlots = gui.getStringList("my-slots").stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
-    theirSlots = gui.getStringList("their-slots").stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+    mySlots =
+        gui.getStringList("my-slots").stream()
+            .map(s -> Integer.valueOf(s))
+            .collect(Collectors.toList());
+    theirSlots =
+        gui.getStringList("their-slots").stream()
+            .map(s -> Integer.valueOf(s))
+            .collect(Collectors.toList());
 
     extrasTypePrefix =
         ChatColor.translateAlternateColorCodes(
@@ -441,11 +446,9 @@ public class TradePlusConfig {
       config.set("extras.experience.name", "experience points");
       config.set(
           "extras.experience.material", Sounds.version < 113 ? "exp_bottle" : "experience_bottle");
+      config.set("extras.experience.display", "&aYour XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
       config.set(
-          "extras.experience.display", "&aYour XP offer is &2%AMOUNT% &c(%LEVELS% levels)");
-      config.set(
-          "extras.experience.theirdisplay",
-          "&aTheir XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
+          "extras.experience.theirdisplay", "&aTheir XP offer is &2%AMOUNT% &a(+%LEVELS% levels)");
       config.set(
           "extras.experience.lore",
           Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% XP."));
@@ -459,8 +462,7 @@ public class TradePlusConfig {
       config.set("extras.playerpoints.name", "player points");
       config.set("extras.playerpoints.material", "diamond");
       config.set("extras.playerpoints.display", "&bYour PlayerPoints offer is &3%AMOUNT%");
-      config.set(
-          "extras.playerpoints.theirdisplay", "&bTheir PlayerPoints offer is &3%AMOUNT%");
+      config.set("extras.playerpoints.theirdisplay", "&bTheir PlayerPoints offer is &3%AMOUNT%");
       config.set(
           "extras.playerpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.playerpoints.customModelData", 0);
@@ -472,11 +474,9 @@ public class TradePlusConfig {
       config.set("extras.griefprevention.name", "grief prevention");
       config.set(
           "extras.griefprevention.material", Sounds.version > 112 ? "golden_shovel" : "gold_spade");
+      config.set("extras.griefprevention.display", "&eYour GriefPrevention offer is &6%AMOUNT%");
       config.set(
-          "extras.griefprevention.display", "&eYour GriefPrevention offer is &6%AMOUNT%");
-      config.set(
-          "extras.griefprevention.theirdisplay",
-          "&eTheir GriefPrevention offer is &6%AMOUNT%");
+          "extras.griefprevention.theirdisplay", "&eTheir GriefPrevention offer is &6%AMOUNT%");
       config.set(
           "extras.griefprevention.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.griefprevention.customModelData", 0);
@@ -488,8 +488,7 @@ public class TradePlusConfig {
       config.set("extras.enjinpoints.name", "enjin points");
       config.set("extras.enjinpoints.material", "emerald");
       config.set("extras.enjinpoints.display", "&eYour EnjinPoints offer is &6%AMOUNT%");
-      config.set(
-          "extras.enjinpoints.theirdisplay", "&eTheir EnjinPoints offer is &6%AMOUNT%");
+      config.set("extras.enjinpoints.theirdisplay", "&eTheir EnjinPoints offer is &6%AMOUNT%");
       config.set(
           "extras.enjinpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.enjinpoints.customModelData", 0);
@@ -500,11 +499,9 @@ public class TradePlusConfig {
       config.set("extras.tokenenchant.enabled", true);
       config.set("extras.tokenenchant.name", "token enchant points");
       config.set("extras.tokenenchant.material", "enchanted_book");
+      config.set("extras.tokenenchant.display", "&eYour TokenEnchant tokens offer is &6%AMOUNT%");
       config.set(
-          "extras.tokenenchant.display", "&eYour TokenEnchant tokens offer is &6%AMOUNT%");
-      config.set(
-          "extras.tokenenchant.theirdisplay",
-          "&eTheir TokenEnchants tokens offer is &6%AMOUNT%");
+          "extras.tokenenchant.theirdisplay", "&eTheir TokenEnchants tokens offer is &6%AMOUNT%");
       config.set(
           "extras.tokenenchant.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenenchant.customModelData", 0);
@@ -517,8 +514,7 @@ public class TradePlusConfig {
       config.set("extras.tokenmanager.material", "emerald");
       config.set("extras.tokenmanager.display", "&eYour tokens offer is &6%AMOUNT%");
       config.set(
-          "extras.tokenmanager.theirdisplay",
-          "&eTheir TokenManager tokens offer is &6%AMOUNT%");
+          "extras.tokenmanager.theirdisplay", "&eTheir TokenManager tokens offer is &6%AMOUNT%");
       config.set(
           "extras.tokenmanager.lore", Collections.singletonList("&fClick to edit your offer!"));
       config.set("extras.tokenmanager.customModelData", 0);
@@ -530,8 +526,7 @@ public class TradePlusConfig {
       config.set("extras.votingplugin.enabled", false);
       config.set("extras.votingplugin.material", "sunflower");
       config.set("extras.votingplugin.display", "&7Your vote points offer is &b%AMOUNT%");
-      config.set(
-          "extras.votingplugin.theirdisplay", "&7Their vote points offer is &b%AMOUNT%");
+      config.set("extras.votingplugin.theirdisplay", "&7Their vote points offer is &b%AMOUNT%");
       config.set("extras.votingplugin.lore", Arrays.asList("&fClick to edit your offer!"));
       config.set("extras.votingplugin.taxpercent", 0);
 
@@ -645,11 +640,17 @@ public class TradePlusConfig {
       gui.set(
           "my-slots",
           Stream.of(
-              1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47,
-              48).map(i -> Integer.toString(i)).collect(Collectors.toList()));
-      gui.set("their-slots", Stream.of(
-              5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51, 52,
-              53).map(i -> Integer.toString(i)).collect(Collectors.toList()));
+                  1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46,
+                  47, 48)
+              .map(i -> Integer.toString(i))
+              .collect(Collectors.toList()));
+      gui.set(
+          "their-slots",
+          Stream.of(
+                  5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51,
+                  52, 53)
+              .map(i -> Integer.toString(i))
+              .collect(Collectors.toList()));
 
       gui.set("head.enabled", true);
       gui.set("head.display-name", "&7You are trading with: &3&l%PLAYER%");
@@ -1372,13 +1373,19 @@ public class TradePlusConfig {
 
     if (configVersion < 3.77) {
       gui.set(
-              "my-slots",
-              Stream.of(
-                      1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47,
-                      48).map(i -> Integer.toString(i)).collect(Collectors.toList()));
-      gui.set("their-slots", Stream.of(
-              5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51, 52,
-              53).map(i -> Integer.toString(i)).collect(Collectors.toList()));
+          "my-slots",
+          Stream.of(
+                  1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46,
+                  47, 48)
+              .map(i -> Integer.toString(i))
+              .collect(Collectors.toList()));
+      gui.set(
+          "their-slots",
+          Stream.of(
+                  5, 6, 7, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51,
+                  52, 53)
+              .map(i -> Integer.toString(i))
+              .collect(Collectors.toList()));
 
       ItemFactory acceptIcon = new ItemFactory(gui, "accept");
       ItemFactory cancelIcon = new ItemFactory(gui, "cancel");

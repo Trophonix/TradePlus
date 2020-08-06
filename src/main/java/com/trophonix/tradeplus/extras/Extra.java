@@ -83,72 +83,73 @@ public abstract class Extra implements Listener {
     if (mode.equals("chat")) {
       trade.setCancelOnClose(player, false);
       player.closeInventory();
-      Conversation convo = new ConversationFactory(pl)
-          .withPrefix(
-              conversationContext ->
-                  ChatColor.translateAlternateColorCodes(
-                      '&', pl.getTradeConfig().getExtrasTypePrefix()))
-          .withFirstPrompt(
-              new NumericPrompt() {
-                @Override
-                protected Prompt acceptValidatedInput(
-                    ConversationContext conversationContext, Number number) {
-                  if (trade.isCancelled()) return null;
-                  if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
-                    return new NumericPrompt() {
-                      @Override
-                      protected Prompt acceptValidatedInput(
-                          ConversationContext conversationContext, Number number) {
-                        if (trade.isCancelled()) return null;
-                        if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
-                          return this;
-                        }
-                        if (player1.equals(player)) {
-                          setValue1(number.doubleValue());
-                        } else if (player2.equals(player)) {
-                          setValue2(number.doubleValue());
-                        }
-                        updateMax(false);
-                        return null;
-                      }
+      Conversation convo =
+          new ConversationFactory(pl)
+              .withPrefix(
+                  conversationContext ->
+                      ChatColor.translateAlternateColorCodes(
+                          '&', pl.getTradeConfig().getExtrasTypePrefix()))
+              .withFirstPrompt(
+                  new NumericPrompt() {
+                    @Override
+                    protected Prompt acceptValidatedInput(
+                        ConversationContext conversationContext, Number number) {
+                      if (trade.isCancelled()) return null;
+                      if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
+                        return new NumericPrompt() {
+                          @Override
+                          protected Prompt acceptValidatedInput(
+                              ConversationContext conversationContext, Number number) {
+                            if (trade.isCancelled()) return null;
+                            if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
+                              return this;
+                            }
+                            if (player1.equals(player)) {
+                              setValue1(number.doubleValue());
+                            } else if (player2.equals(player)) {
+                              setValue2(number.doubleValue());
+                            }
+                            updateMax(false);
+                            return null;
+                          }
 
-                      @Override
-                      public String getPromptText(ConversationContext conversationContext) {
-                        return pl.getTradeConfig()
-                            .getExtrasTypeMaximum()
-                            .replace("%BALANCE%", decimalFormat.format(getMax(player)))
-                            .replace("%EXTRA%", displayName);
+                          @Override
+                          public String getPromptText(ConversationContext conversationContext) {
+                            return pl.getTradeConfig()
+                                .getExtrasTypeMaximum()
+                                .replace("%BALANCE%", decimalFormat.format(getMax(player)))
+                                .replace("%EXTRA%", displayName);
+                          }
+                        };
                       }
-                    };
-                  }
-                  if (player1.equals(player)) {
-                    setValue1(number.doubleValue());
-                  } else if (player2.equals(player)) {
-                    setValue2(number.doubleValue());
-                  }
-                  updateMax(false);
-                  return null;
-                }
+                      if (player1.equals(player)) {
+                        setValue1(number.doubleValue());
+                      } else if (player2.equals(player)) {
+                        setValue2(number.doubleValue());
+                      }
+                      updateMax(false);
+                      return null;
+                    }
 
-                @Override
-                public String getPromptText(ConversationContext conversationContext) {
-                  return pl.getTradeConfig()
-                      .getExtrasTypeEmpty()
-                      .replace("%BALANCE%", decimalFormat.format(getMax(player)))
-                      .replace("%AMOUNT%", decimalFormat.format(offer))
-                      .replace("%EXTRA%", displayName);
-                }
-              })
-          .withTimeout(30)
-          .addConversationAbandonedListener(
-              event -> {
-                if (trade.isCancelled()) return;
-                if (!event.gracefulExit()) Sounds.villagerHmm(player, 1f);
-                trade.open(player);
-                trade.updateExtras();
-                trade.setCancelOnClose(player, true);
-              })
-          .buildConversation(player);
+                    @Override
+                    public String getPromptText(ConversationContext conversationContext) {
+                      return pl.getTradeConfig()
+                          .getExtrasTypeEmpty()
+                          .replace("%BALANCE%", decimalFormat.format(getMax(player)))
+                          .replace("%AMOUNT%", decimalFormat.format(offer))
+                          .replace("%EXTRA%", displayName);
+                    }
+                  })
+              .withTimeout(30)
+              .addConversationAbandonedListener(
+                  event -> {
+                    if (trade.isCancelled()) return;
+                    if (!event.gracefulExit()) Sounds.villagerHmm(player, 1f);
+                    trade.open(player);
+                    trade.updateExtras();
+                    trade.setCancelOnClose(player, true);
+                  })
+              .buildConversation(player);
       if (player.equals(player1)) {
         convo1 = convo;
       } else {
@@ -225,7 +226,11 @@ public abstract class Extra implements Listener {
 
   public ItemStack getIcon(Player player) {
     return ItemFactory.replaceInMeta(
-        _getIcon(player), "%BALANCE%", decimalFormat.format(getMax(player)), "%EXTRA%", displayName);
+        _getIcon(player),
+        "%BALANCE%",
+        decimalFormat.format(getMax(player)),
+        "%EXTRA%",
+        displayName);
   }
 
   public ItemStack getTheirIcon(Player player) {

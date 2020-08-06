@@ -89,7 +89,10 @@ public class ItemFactory {
       }
 
       if (meta.hasLore()) {
-        lore = meta.getLore().stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).collect(Collectors.toList());
+        lore =
+            meta.getLore().stream()
+                .map(s -> ChatColor.translateAlternateColorCodes('&', s))
+                .collect(Collectors.toList());
       }
 
       meta.setDisplayName(displayName);
@@ -101,17 +104,6 @@ public class ItemFactory {
 
   public ItemFactory save(ConfigurationSection yml, String key) {
     ItemStack stack = this.stack.clone();
-    if (stack.hasItemMeta()) {
-      ItemMeta meta = stack.getItemMeta();
-      if (meta.hasDisplayName())
-        meta.setDisplayName(meta.getDisplayName().replace(ChatColor.COLOR_CHAR, '&'));
-      if (meta.hasLore())
-        meta.setLore(
-            meta.getLore().stream()
-                .map(s -> s.replace(ChatColor.COLOR_CHAR, '&'))
-                .collect(Collectors.toList()));
-      stack.setItemMeta(meta);
-    }
     yml.set(key, stack);
     return this;
   }

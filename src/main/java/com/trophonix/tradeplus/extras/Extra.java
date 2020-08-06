@@ -225,14 +225,14 @@ public abstract class Extra implements Listener {
 
   public ItemStack getIcon(Player player) {
     return ItemFactory.replaceInMeta(
-        _getIcon(player), "%BALANCE%", Double.toString(getMax(player)), "%EXTRA%", displayName);
+        _getIcon(player), "%BALANCE%", decimalFormat.format(getMax(player)), "%EXTRA%", displayName);
   }
 
   public ItemStack getTheirIcon(Player player) {
     return ItemFactory.replaceInMeta(
         _getTheirIcon(player),
         "%BALANCE%",
-        Double.toString(getMax(player1.equals(player) ? player2 : player1)),
+        decimalFormat.format(getMax(player1.equals(player) ? player2 : player1)),
         "%EXTRA%",
         displayName);
   }

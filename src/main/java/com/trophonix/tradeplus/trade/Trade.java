@@ -622,16 +622,16 @@ public class Trade implements Listener {
 
   public void updateExtras() {
     int slot1 = 0, slot2a = 0, slot2b = 0;
-    ItemStack separator = pl.getTradeConfig().getSeparator().build();
+    ItemStack placeholder = pl.getTradeConfig().getPlaceholder().copy().replace("%PLAYER%", player2.getName()).build();
     for (int i = 0; i < extraSlots.size(); i++) {
       if (i >= extras.size()) {
         break;
       }
       int slot = extraSlots.get(i);
-      inv1.setItem(slot, separator);
-      inv1.setItem(getRight(slot), separator);
-      inv2.setItem(slot, separator);
-      inv2.setItem(getRight(slot), separator);
+      inv1.setItem(slot, placeholder);
+      inv1.setItem(getRight(slot), placeholder);
+      inv2.setItem(slot, placeholder);
+      inv2.setItem(getRight(slot), placeholder);
     }
     placedExtras.clear();
     for (Extra extra : extras) {
@@ -1008,13 +1008,25 @@ public class Trade implements Listener {
   private void cancel() {
     if (inv1.getViewers().isEmpty()) player1.openInventory(inv1);
     if (inv2.getViewers().isEmpty()) player2.openInventory(inv2);
-    for (int slot : pl.getTradeConfig().getTheirSlots()) {
-      inv1.setItem(slot, pl.getTradeConfig().getSeparator().build());
-      inv2.setItem(slot, pl.getTradeConfig().getSeparator().build());
-    }
     for (Extra extra : extras) {
       extra.onCancel();
     }
     cancelled = true;
+    if (pl.getTradeConfig().isEndDisplayEnabled()) {
+      for (int slot : pl.getTradeConfig().getTheirSlots()) {
+        inv1.setItem(slot, pl.getTradeConfig().getPlaceholder().build());
+        inv2.setItem(slot, pl.getTradeConfig().getPlaceholder().build());
+      }
+
+      if (pl.getTradeConfig().getEndDisplayTimer() > 0) {
+        Bukkit.getScheduler().runTaskLater(pl, () -> {
+          player1.closeInventory();
+          player2.closeInventory();
+        }, 20 * pl.getTradeConfig().getEndDisplayTimer());
+      }
+    } else {
+      player1.closeInventory();
+      player2.closeInventory();
+    }
   }
 }

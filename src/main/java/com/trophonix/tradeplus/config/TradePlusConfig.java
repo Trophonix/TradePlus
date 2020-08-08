@@ -55,13 +55,17 @@ public class TradePlusConfig {
 
   private int antiscamCountdown;
   private boolean antiscamCancelOnChange, preventChangeOnAccept, discrepancyDetection;
+
+  private boolean endDisplayEnabled;
+  private int endDisplayTimer;
+
   private boolean spectateEnabled, spectateBroadcast;
 
   private String guiTitle;
   private String spectatorTitle;
 
   private List<Integer> mySlots, theirSlots;
-  private ItemFactory force, accept, cancel, theirAccept, theirCancel, separator;
+  private ItemFactory force, accept, cancel, theirAccept, theirCancel, separator, placeholder;
   private int forceSlot, acceptSlot, theirAcceptSlot;
   private boolean forceEnabled, acceptEnabled, headEnabled;
   private String headDisplayName;
@@ -164,6 +168,9 @@ public class TradePlusConfig {
     antiscamCancelOnChange = config.getBoolean("antiscam.cancelonchange", true);
     preventChangeOnAccept = config.getBoolean("antiscam.preventchangeonaccept", true);
     discrepancyDetection = config.getBoolean("antiscam.discrepancy-detection", true);
+
+    endDisplayEnabled = config.getBoolean("end-display.enabled", true);
+    endDisplayTimer = config.getInt("end-display.timer", 0);
 
     spectateEnabled = config.getBoolean("spectate.enabled", true);
     spectateBroadcast = config.getBoolean("spectate.broadcast", true);
@@ -353,6 +360,7 @@ public class TradePlusConfig {
     theirCancel = new ItemFactory(gui, "accept.their-cancel");
 
     separator = new ItemFactory(gui, "separator");
+    placeholder = new ItemFactory(gui, "placeholder");
 
     forceEnabled = gui.getBoolean("force.enabled", config.getBoolean("gui.force.enabled", true));
     forceSlot = gui.getInt("force.slot", 49);
@@ -421,6 +429,9 @@ public class TradePlusConfig {
       config.set("antiscam.cancelonchange", true);
       config.set("antiscam.preventchangeonaccept", true);
       config.set("antiscam.discrepancy-detection", true);
+
+      config.set("end-display.enabled", true);
+      config.set("end-display.timer", 0);
 
       config.set("spectate.enabled", true);
       config.set("spectate.broadcast", true);
@@ -669,7 +680,7 @@ public class TradePlusConfig {
       gui.set("accept.my-slot", 0);
       gui.set("accept.their-slot", 8);
       new ItemFactory(
-              Material.getMaterial(Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
+              Material.getMaterial(Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
           .display("&aClick to Accept")
           .lore(
               Arrays.asList(
@@ -678,16 +689,18 @@ public class TradePlusConfig {
                   "&7you will have to accept",
                   "&7the trade again."))
           .flag("HIDE_ATTRIBUTES")
+          .damage((short)14)
           .save(gui, "accept.my-icon");
 
       new ItemFactory(
-              Material.getMaterial(Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
+              Material.getMaterial(Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
           .display("&cClick to Cancel")
           .flag("HIDE_ATTRIBUTES")
+          .damage((short)13)
           .save(gui, "accept.my-cancel");
 
       new ItemFactory(
-              Material.getMaterial(Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "EMERALD"))
+              Material.getMaterial(Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
           .display("&aThey've accepted your offer.")
           .lore(
               Arrays.asList(
@@ -695,10 +708,11 @@ public class TradePlusConfig {
                   "&7trade as shown right now,",
                   "&7click your accept button!"))
           .flag("HIDE_ATTRIBUTES")
+          .damage((short)13)
           .save(gui, "accept.their-icon");
 
       new ItemFactory(
-              Material.getMaterial(Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "BARRIER"))
+              Material.getMaterial(Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
           .display("&aYour partner is still considering.")
           .lore(
               Arrays.asList(
@@ -707,14 +721,24 @@ public class TradePlusConfig {
                   "&7as it is now, or wait",
                   "&7for them to offer more!"))
           .flag("HIDE_ATTRIBUTES")
+          .damage((short)14)
           .save(gui, "accept.their-cancel");
 
       new ItemFactory(
               Material.getMaterial(
-                  Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "IRON_FENCE"))
+                  Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
           .display(" ")
           .flag("HIDE_ATTRIBUTES")
+          .damage((short)15)
           .save(gui, "separator");
+
+      new ItemFactory(
+              Material.getMaterial(
+                      Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display(" ")
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short)15)
+              .save(gui, "placeholder");
     }
   }
 
@@ -1413,6 +1437,18 @@ public class TradePlusConfig {
       gui.set("force.enabled", gui.getBoolean("force-enabled", true));
       gui.set("force.slot", 49);
       forceIcon.save(gui, "force.icon");
+    }
+
+    if (configVersion < 3.78) {
+      new ItemFactory(
+              Material.getMaterial(
+                      Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display(" ")
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short)15)
+              .save(gui, "placeholder");
+      config.set("end-display.enabled", true);
+      config.set("end-display.timer", 0);
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

@@ -57,6 +57,11 @@ public class ItemFactory {
     }
   }
 
+  public ItemFactory damage(short damage) {
+    stack.setDurability(damage);
+    return this;
+  }
+
   public ItemFactory(String parsable) {
     this(parsable, Material.PAPER);
     //    Preconditions.checkNotNull(parsable, "Material cannot be null.");

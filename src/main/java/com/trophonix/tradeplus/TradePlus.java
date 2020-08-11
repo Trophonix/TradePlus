@@ -14,6 +14,7 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,6 +59,7 @@ public class TradePlus extends JavaPlugin {
     } catch (Throwable ignored) {
       getLogger().info("Failed to hook into worldguard. Ignore this if you don't have worldguard.");
     }
+    Bukkit.getScheduler().runTaskTimer(this, () -> logs.save(), 5 * 60 * 20, 5 * 60 * 20);
   }
 
   @Override

@@ -522,14 +522,6 @@ public class Trade implements Listener {
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    Player p = event.getPlayer();
-    if (p.equals(player1) || p.equals(player2)) {
-      p.closeInventory();
-    }
-  }
-
-  @EventHandler
   public void onDisable(PluginDisableEvent event) {
     if (event.getPlugin().getName().equalsIgnoreCase("TradePlus")) {
       player1.closeInventory();
@@ -547,8 +539,13 @@ public class Trade implements Listener {
 
   private void giveItemsOnLeft(Inventory inv, Player player) {
     List<ItemStack> dropoff = new ArrayList<>();
-    getItemsOnLeft(inv)
-        .forEach(item -> player.getInventory().addItem(item).values().forEach(dropoff::add));
+    for (int slot : pl.getTradeConfig().getMySlots()) {
+      if (slot == pl.getTradeConfig().getAcceptSlot() || getExtra(slot) != null) continue;
+      ItemStack item = inv.getItem(slot);
+      if (item == null || item.getType() == Material.AIR) continue;
+      player.getInventory().addItem(item).values().forEach(dropoff::add);
+      inv.setItem(slot, null);
+    }
     if (!dropoff.isEmpty()) {
       int size = dropoff.size() / 9;
       if (dropoff.size() % 9 > 0) {

@@ -52,14 +52,14 @@ public class Logs implements List<TradeLog> {
       parent.mkdirs();
     }
     folder = new File(parent, file);
-    File[] contents;
-    if (folder.exists() && (contents = folder.listFiles()) != null) {
-      for (File child : contents) {
-        FileReader reader = new FileReader(child);
-        add(gson.fromJson(reader, TradeLog.class));
-        reader.close();
-      }
-    }
+//    File[] contents;
+//    if (folder.exists() && (contents = folder.listFiles()) != null) {
+//      for (File child : contents) {
+//        FileReader reader = new FileReader(child);
+//        add(gson.fromJson(reader, TradeLog.class));
+//        reader.close();
+//      }
+//    }
   }
 
   public Logs(File parent) throws IOException {

@@ -59,11 +59,12 @@ public class TradePlus extends JavaPlugin {
     } catch (Throwable ignored) {
       getLogger().info("Failed to hook into worldguard. Ignore this if you don't have worldguard.");
     }
-    Bukkit.getScheduler().runTaskTimer(this, () -> logs.save(), 5 * 60 * 20, 5 * 60 * 20);
   }
 
   @Override
   public void onEnable() {
+    Bukkit.getScheduler().runTaskTimer(this, () -> logs.save(), 5 * 60 * 20, 5 * 60 * 20);
+
     tradeConfig = new TradePlusConfig(this);
     taskFactory = BukkitTaskChainFactory.create(this);
     taskFactory

@@ -228,19 +228,20 @@ public class Trade implements Listener {
         event.setCancelled(true);
         return;
       }
+
+      // don't let players interact
+      // with a cancelled trade window
+      if (cancelled) {
+        event.setCancelled(true);
+        return;
+      }
+
       // if it's in the left side,
       // the event will affect the
       // player's trade
       if (slot != pl.getTradeConfig().getAcceptSlot()
           && pl.getTradeConfig().getMySlots().contains(slot)
           && getExtra(slot) == null) {
-        // don't let players interact
-        // with a cancelled trade window
-        if (cancelled) {
-          event.setCancelled(true);
-          return;
-        }
-
         if (accept1 && accept2) {
           event.setCancelled(true);
           return;

@@ -3,6 +3,7 @@ package com.trophonix.tradeplus.commands;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.MsgUtils;
+import com.trophonix.tradeplus.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -116,6 +117,7 @@ public class TradePlusCommand extends Command {
         && !full.endsWith(" ")
         && (args[0].equalsIgnoreCase("force") || args[0].equalsIgnoreCase("spectate"))) {
       return Bukkit.getOnlinePlayers().stream()
+          .filter(p -> !PlayerUtil.isVanished(p))
           .map(Player::getName)
           .filter(
               name ->

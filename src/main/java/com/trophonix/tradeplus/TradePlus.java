@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TradePlus extends JavaPlugin {
+
   public ConcurrentLinkedQueue<Trade> ongoingTrades = new ConcurrentLinkedQueue<>();
   @Getter private TaskChainFactory taskFactory;
 
@@ -63,8 +64,6 @@ public class TradePlus extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    Bukkit.getScheduler().runTaskTimer(this, () -> logs.save(), 5 * 60 * 20, 5 * 60 * 20);
-
     tradeConfig = new TradePlusConfig(this);
     taskFactory = BukkitTaskChainFactory.create(this);
     taskFactory
@@ -107,6 +106,7 @@ public class TradePlus extends JavaPlugin {
     if (logs == null && tradeConfig.isTradeLogs()) {
       try {
         logs = new Logs(new File(getDataFolder(), "logs"));
+        Bukkit.getScheduler().runTaskTimer(this, () -> logs.save(), 5 * 60 * 20, 5 * 60 * 20);
         log("Initialized trade logger.");
       } catch (IOException ex) {
         log("Failed to load trade logger. " + ex.getMessage());

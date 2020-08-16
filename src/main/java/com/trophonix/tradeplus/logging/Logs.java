@@ -56,7 +56,7 @@ public class Logs implements List<TradeLog> {
 //    if (folder.exists() && (contents = folder.listFiles()) != null) {
 //      for (File child : contents) {
 //        FileReader reader = new FileReader(child);
-//        add(gson.fromJson(reader, TradeLog.class));
+//        add(gson.fromJson(reader, String.class));
 //        reader.close();
 //      }
 //    }
@@ -86,7 +86,7 @@ public class Logs implements List<TradeLog> {
                       .replace("{player2}", log.getPlayer2().getLastKnownName()));
           if (!file.exists()) file.createNewFile();
           FileWriter writer = new FileWriter(file);
-          gson.toJson(log, TradeLog.class, writer);
+          gson.toJson(log.toString(), String.class, writer);
           writer.close();
         } catch (IOException ex) {
           System.out.println(

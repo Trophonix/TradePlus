@@ -71,4 +71,17 @@ public class TradeLog implements PostProcessor {
       this.value = value;
     }
   }
+
+  @Override
+  public String toString() {
+    return "TradeLog{" +
+        "player1=" + player1 +
+        ", player2=" + player2 +
+        ", player1Items=" + player1Items +
+        ", player2Items=" + player2Items +
+        ", player1ExtraOffers=" + player1ExtraOffers +
+        ", player2ExtraOffers=" + player2ExtraOffers +
+        ", time=" + time +
+        '}';
+  }
 }

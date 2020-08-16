@@ -7,7 +7,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -26,43 +25,44 @@ public class Logs implements List<TradeLog> {
   private File folder;
   private List<TradeLog> logs = new ArrayList<>();
 
-  private Gson gson =
-      new GsonBuilder()
-          .registerTypeAdapter(
-              UUID.class,
-              new TypeAdapter<UUID>() {
-                @Override
-                public void write(JsonWriter jsonWriter, UUID uuid) throws IOException {
-                  jsonWriter.value(uuid.toString());
-                }
+  private Gson gson;
 
-                @Override
-                public UUID read(JsonReader jsonReader) throws IOException {
-                  return UUID.fromString(jsonReader.nextString());
-                }
-              })
-          .registerTypeAdapterFactory(new PostProcessingEnabler())
-          .registerTypeHierarchyAdapter(List.class, new NullEmptyListAdapter())
-          .registerTypeHierarchyAdapter(Number.class, new NullZeroNumberAdapter())
-          .setPrettyPrinting()
-          .create();
-
-  public Logs(File parent, String file) throws IOException {
+  public Logs(File parent, String file) {
     if (!parent.exists()) {
       parent.mkdirs();
     }
     folder = new File(parent, file);
-//    File[] contents;
-//    if (folder.exists() && (contents = folder.listFiles()) != null) {
-//      for (File child : contents) {
-//        FileReader reader = new FileReader(child);
-//        add(gson.fromJson(reader, TradeLog.class));
-//        reader.close();
-//      }
-//    }
+    gson =
+        new GsonBuilder()
+            .registerTypeAdapter(
+                UUID.class,
+                new TypeAdapter<UUID>() {
+                  @Override
+                  public void write(JsonWriter jsonWriter, UUID uuid) throws IOException {
+                    jsonWriter.value(uuid.toString());
+                  }
+
+                  @Override
+                  public UUID read(JsonReader jsonReader) throws IOException {
+                    return UUID.fromString(jsonReader.nextString());
+                  }
+                })
+            .registerTypeAdapterFactory(new PostProcessingEnabler())
+            .registerTypeHierarchyAdapter(List.class, new NullEmptyListAdapter())
+            .registerTypeHierarchyAdapter(Number.class, new NullZeroNumberAdapter())
+            .setPrettyPrinting()
+            .create();
+    //    File[] contents;
+    //    if (folder.exists() && (contents = folder.listFiles()) != null) {
+    //      for (File child : contents) {
+    //        FileReader reader = new FileReader(child);
+    //        add(gson.fromJson(reader, TradeLog.class));
+    //        reader.close();
+    //      }
+    //    }
   }
 
-  public Logs(File parent) throws IOException {
+  public Logs(File parent) {
     this(parent, folderNameFormat.format(new Date()));
   }
 
@@ -71,33 +71,38 @@ public class Logs implements List<TradeLog> {
   }
 
   public void save() {
-    if (!logs.isEmpty()) {
-      if (!folder.exists()) folder.mkdirs();
-      Iterator<TradeLog> iter = iterator();
-      while (iter.hasNext()) {
-        TradeLog log = iter.next();
-        try {
-          File file =
-              new File(
-                  folder,
-                  fileNameFormat
-                      .format(log.getTime())
-                      .replace("{player1}", log.getPlayer1().getLastKnownName())
-                      .replace("{player2}", log.getPlayer2().getLastKnownName()));
-          if (!file.exists()) file.createNewFile();
-          FileWriter writer = new FileWriter(file);
-          gson.toJson(log, TradeLog.class, writer);
-          writer.close();
-        } catch (IOException ex) {
-          System.out.println(
-              "Failed to save trade log for trade between "
-                  + log.getPlayer1().getLastKnownName()
-                  + " and "
-                  + log.getPlayer2().getLastKnownName());
-          System.out.println(ex.getLocalizedMessage());
+    try {
+      if (!logs.isEmpty()) {
+        if (!folder.exists()) folder.mkdirs();
+        Iterator<TradeLog> iter = iterator();
+        while (iter.hasNext()) {
+          TradeLog log = iter.next();
+          try {
+            File file =
+                new File(
+                    folder,
+                    fileNameFormat
+                        .format(log.getTime())
+                        .replace("{player1}", log.getPlayer1().getLastKnownName())
+                        .replace("{player2}", log.getPlayer2().getLastKnownName()));
+            if (!file.exists()) file.createNewFile();
+            FileWriter writer = new FileWriter(file);
+            gson.toJson(log, TradeLog.class, writer);
+            writer.close();
+          } catch (Exception | Error ex) {
+            System.out.println(
+                "Failed to save trade log for trade between "
+                    + log.getPlayer1().getLastKnownName()
+                    + " and "
+                    + log.getPlayer2().getLastKnownName());
+            System.out.println(ex.getLocalizedMessage());
+          }
+          iter.remove();
         }
-        iter.remove();
       }
+    } catch (Exception | Error ex) {
+      System.out.println("Failed to save trade logs.");
+      logs.clear();
     }
   }
 

@@ -7,10 +7,9 @@ import org.bukkit.entity.Player;
 
 public class EssentialsHook {
 
-    public static boolean isVanished(Player player) {
-        Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-        User user = essentials.getUser(player);
-        return user.isVanished();
-    }
-
+  public static boolean isVanished(Player player) {
+    Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+    User user = essentials.getUser(player);
+    return user.isVanished();
+  }
 }

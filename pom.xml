@@ -6,11 +6,11 @@
 
     <groupId>com.trophonix</groupId>
     <artifactId>TradePlus</artifactId>
-    <version>3.78</version>
+    <version>3.79</version>
 
     <properties>
         <res>${project.basedir}/res/</res>
-        <revision>3.78.3</revision>
+        <revision>3.79</revision>
     </properties>
 
     <repositories>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <version>1.16.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 

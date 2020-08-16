@@ -27,11 +27,11 @@ public class InvUtils {
             player1.getInventory().getHolder(),
             54,
             pl.getTradeConfig().getGuiTitle().replace("%PLAYER%", player2.getName()));
-    ItemStack separator = pl.getTradeConfig().getSeparator().copy().replace("%PLAYER%", player2.getName()).build();
+    ItemStack separator =
+        pl.getTradeConfig().getSeparator().copy().replace("%PLAYER%", player2.getName()).build();
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, separator);
     if (pl.getTradeConfig().isAcceptEnabled()) {
-      if (pl.getTradeConfig().isForceEnabled()
-          && player1.hasPermission("tradeplus.admin")) {
+      if (pl.getTradeConfig().isForceEnabled() && player1.hasPermission("tradeplus.admin")) {
         inv.setItem(49, pl.getTradeConfig().getForce().build());
       }
     } else {

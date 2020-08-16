@@ -14,13 +14,12 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -106,10 +105,22 @@ public class TradePlus extends JavaPlugin {
     if (logs == null && tradeConfig.isTradeLogs()) {
       try {
         logs = new Logs(new File(getDataFolder(), "logs"));
-        Bukkit.getScheduler().runTaskTimer(this, () -> logs.save(), 5 * 60 * 20, 5 * 60 * 20);
+        new BukkitRunnable() {
+          @Override
+          public void run() {
+            try {
+              logs.save();
+            } catch (Exception | Error ex) {
+              getLogger().info("The trade logger crashed.");
+              cancel();
+              logs = null;
+            }
+          }
+        }.runTaskTimer(this, 5 * 60 * 20, 5 * 60 * 20);
         log("Initialized trade logger.");
-      } catch (IOException ex) {
-        log("Failed to load trade logger. " + ex.getMessage());
+      } catch (Exception | Error ex) {
+        log("Failed to load trade logger.");
+        ex.printStackTrace();
       }
     }
     InvUtils.reloadItems(this);

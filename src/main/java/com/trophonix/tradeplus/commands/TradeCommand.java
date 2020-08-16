@@ -217,7 +217,10 @@ public class TradeCommand extends Command {
     List<String> args0 = new ArrayList<>();
     args0.add("deny");
     args0.addAll(
-        Bukkit.getOnlinePlayers().stream().filter(p -> !PlayerUtil.isVanished(p)).map(Player::getName).collect(Collectors.toList()));
+        Bukkit.getOnlinePlayers().stream()
+            .filter(p -> !PlayerUtil.isVanished(p))
+            .map(Player::getName)
+            .collect(Collectors.toList()));
     if (args.length == 0) {
       return args0;
     } else if (args.length == 1) {

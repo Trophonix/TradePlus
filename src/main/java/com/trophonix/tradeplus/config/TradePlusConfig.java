@@ -66,7 +66,15 @@ public class TradePlusConfig {
 
   private List<Integer> mySlots, theirSlots;
   private List<Integer> myExtraSlots, theirExtraSlots;
-  private ItemFactory force, accept, cancel, complete, cancelled, theirAccept, theirCancel, separator, placeholder;
+  private ItemFactory force,
+      accept,
+      cancel,
+      complete,
+      cancelled,
+      theirAccept,
+      theirCancel,
+      separator,
+      placeholder;
   private int forceSlot, acceptSlot, theirAcceptSlot;
   private boolean forceEnabled, acceptEnabled, headEnabled;
   private String headDisplayName;
@@ -193,13 +201,13 @@ public class TradePlusConfig {
             .collect(Collectors.toList());
 
     myExtraSlots =
-            gui.getStringList("my-extra-slots").stream()
-                    .map(s -> Integer.valueOf(s))
-                    .collect(Collectors.toList());
+        gui.getStringList("my-extra-slots").stream()
+            .map(s -> Integer.valueOf(s))
+            .collect(Collectors.toList());
     theirExtraSlots =
-            gui.getStringList("their-extra-slots").stream()
-                    .map(s -> Integer.valueOf(s))
-                    .collect(Collectors.toList());
+        gui.getStringList("their-extra-slots").stream()
+            .map(s -> Integer.valueOf(s))
+            .collect(Collectors.toList());
 
     extrasTypePrefix =
         ChatColor.translateAlternateColorCodes(
@@ -364,20 +372,142 @@ public class TradePlusConfig {
     theirAcceptSlot = gui.getInt("accept.their-slot", 8);
 
     accept = new ItemFactory(gui, "accept.my-icon");
+    if (accept.getStack() == null) {
+      accept =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display("&aClick to Accept")
+              .lore(
+                  Arrays.asList(
+                      "&7If either of you change",
+                      "&7your offers during the countdown,",
+                      "&7you will have to accept",
+                      "&7the trade again."))
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 14)
+              .save(gui, "accept.my-icon");
+    }
     cancel = new ItemFactory(gui, "accept.my-cancel");
+    if (cancel.getStack() == null) {
+      cancel =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display("&cClick to Cancel")
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 13)
+              .save(gui, "accept.my-cancel");
+    }
 
     complete = new ItemFactory(gui, "complete");
+    if (complete.getStack() == null) {
+      complete =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display("&aTrade Complete!")
+              .lore(
+                  Arrays.asList(
+                      "&fReview the final agreement and",
+                      "&fclose the trade window",
+                      "&fto retrieve your items!"))
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 13)
+              .save(gui, "complete");
+    }
+
     cancelled = new ItemFactory(gui, "cancelled");
+    if (cancelled.getStack() == null) {
+      cancelled =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display("&cTrade Cancelled!")
+              .lore(
+                  Arrays.asList(
+                      "&7Your trading partner cancelled",
+                      "&7the trade. Close the window",
+                      "&7to retrieve your items."))
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 14)
+              .save(gui, "cancelled");
+    }
 
     theirAccept = new ItemFactory(gui, "accept.their-icon");
+    if (theirAccept.getStack() == null) {
+      theirAccept =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display("&aThey've accepted your offer.")
+              .lore(
+                  Arrays.asList(
+                      "&7If you're satisfied with the",
+                      "&7trade as shown right now,",
+                      "&7click your accept button!"))
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 13)
+              .save(gui, "accept.their-icon");
+    }
+
     theirCancel = new ItemFactory(gui, "accept.their-cancel");
+    if (theirCancel.getStack() == null) {
+      theirCancel =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display("&aYour partner is still considering.")
+              .lore(
+                  Arrays.asList(
+                      "&7Click your accept button to",
+                      "&7signal that you like the trade",
+                      "&7as it is now, or wait",
+                      "&7for them to offer more!"))
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 14)
+              .save(gui, "accept.their-cancel");
+    }
 
     separator = new ItemFactory(gui, "separator");
+    if (separator.getStack() == null) {
+      separator =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display(" ")
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 15)
+              .save(gui, "separator");
+    }
+
     placeholder = new ItemFactory(gui, "placeholder");
+    if (placeholder.getStack() == null) {
+      placeholder =
+          new ItemFactory(
+                  Material.getMaterial(
+                      Sounds.version > 112 ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+              .display(" ")
+              .flag("HIDE_ATTRIBUTES")
+              .damage((short) 15)
+              .save(gui, "placeholder");
+    }
 
     forceEnabled = gui.getBoolean("force.enabled", config.getBoolean("gui.force.enabled", true));
     forceSlot = gui.getInt("force.slot", 49);
     force = new ItemFactory(gui, "force.icon");
+    if (force.getStack() == null) {
+      force =
+          new ItemFactory(Material.getMaterial(Sounds.version > 112 ? "CLOCK" : "WATCH"))
+              .display(("&4&lForce Trade"))
+              .lore(
+                  Arrays.asList(
+                      "&7Click to force the trade",
+                      "&7to countdown and accept as",
+                      "&7it stands now."))
+              .flag("HIDE_ATTRIBUTES")
+              .save(gui, "force.icon");
+    }
   }
 
   public void load() {
@@ -460,7 +590,7 @@ public class TradePlusConfig {
       config.set("extras.economy.material", "gold_ingot");
       config.set("extras.economy.display", "&eYour money offer is &6%AMOUNT%");
       config.set("extras.economy.theirdisplay", "&eTheir money offer is &6%AMOUNT%");
-      config.set("extras.economy.lore", Collections.singletonList("&fClick to edit your offer!"));
+      config.set("extras.economy.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% money."));
       config.set("extras.economy.customModelData", 0);
       config.set("extras.economy.increment", 10.0);
       config.set("extras.economy.taxpercent", 0);
@@ -488,21 +618,21 @@ public class TradePlusConfig {
       config.set("extras.playerpoints.display", "&bYour PlayerPoints offer is &3%AMOUNT%");
       config.set("extras.playerpoints.theirdisplay", "&bTheir PlayerPoints offer is &3%AMOUNT%");
       config.set(
-          "extras.playerpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
+          "extras.playerpoints.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% player points."));
       config.set("extras.playerpoints.customModelData", 0);
       config.set("extras.playerpoints.increment", 5);
       config.set("extras.playerpoints.taxpercent", 0);
       config.set("extras.playerpoints.mode", "chat");
 
       config.set("extras.griefprevention.enabled", true);
-      config.set("extras.griefprevention.name", "grief prevention");
+      config.set("extras.griefprevention.name", "claim blocks");
       config.set(
           "extras.griefprevention.material", Sounds.version > 112 ? "golden_shovel" : "gold_spade");
       config.set("extras.griefprevention.display", "&eYour GriefPrevention offer is &6%AMOUNT%");
       config.set(
           "extras.griefprevention.theirdisplay", "&eTheir GriefPrevention offer is &6%AMOUNT%");
       config.set(
-          "extras.griefprevention.lore", Collections.singletonList("&fClick to edit your offer!"));
+          "extras.griefprevention.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% protection blocks."));
       config.set("extras.griefprevention.customModelData", 0);
       config.set("extras.griefprevention.increment", 1);
       config.set("extras.griefprevention.taxperecent", 0);
@@ -514,7 +644,7 @@ public class TradePlusConfig {
       config.set("extras.enjinpoints.display", "&eYour EnjinPoints offer is &6%AMOUNT%");
       config.set("extras.enjinpoints.theirdisplay", "&eTheir EnjinPoints offer is &6%AMOUNT%");
       config.set(
-          "extras.enjinpoints.lore", Collections.singletonList("&fClick to edit your offer!"));
+          "extras.enjinpoints.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% enjin points."));
       config.set("extras.enjinpoints.customModelData", 0);
       config.set("extras.enjinpoints.increment", 1);
       config.set("extras.enjinpoints.taxpercent", 0);
@@ -527,7 +657,7 @@ public class TradePlusConfig {
       config.set(
           "extras.tokenenchant.theirdisplay", "&eTheir TokenEnchants tokens offer is &6%AMOUNT%");
       config.set(
-          "extras.tokenenchant.lore", Collections.singletonList("&fClick to edit your offer!"));
+          "extras.tokenenchant.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% enchant tokens."));
       config.set("extras.tokenenchant.customModelData", 0);
       config.set("extras.tokenenchant.increment", 1);
       config.set("extras.tokenenchant.taxpercent", 0);
@@ -540,7 +670,7 @@ public class TradePlusConfig {
       config.set(
           "extras.tokenmanager.theirdisplay", "&eTheir TokenManager tokens offer is &6%AMOUNT%");
       config.set(
-          "extras.tokenmanager.lore", Collections.singletonList("&fClick to edit your offer!"));
+          "extras.tokenmanager.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% tokens."));
       config.set("extras.tokenmanager.customModelData", 0);
       config.set("extras.tokenmanager.increment", 1);
       config.set("extras.tokenmanager.taxpercent", 0);
@@ -551,7 +681,7 @@ public class TradePlusConfig {
       config.set("extras.votingplugin.material", "sunflower");
       config.set("extras.votingplugin.display", "&7Your vote points offer is &b%AMOUNT%");
       config.set("extras.votingplugin.theirdisplay", "&7Their vote points offer is &b%AMOUNT%");
-      config.set("extras.votingplugin.lore", Arrays.asList("&fClick to edit your offer!"));
+      config.set("extras.votingplugin.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% vote points."));
       config.set("extras.votingplugin.taxpercent", 0);
 
       config.set("hooks.factions.allow-trades-in-enemy-territory", false);
@@ -676,8 +806,12 @@ public class TradePlusConfig {
               .map(i -> Integer.toString(i))
               .collect(Collectors.toList()));
 
-      gui.set("my-extra-slots", Arrays.asList("45", "46", "47", "48", "39", "38", "37", "36", "27", "28", "29", "30"));
-      gui.set("their-extra-slots", Arrays.asList("50", "51", "52", "53", "44", "43", "42", "41", "32", "33", "34", "35"));
+      gui.set(
+          "my-extra-slots",
+          Arrays.asList("45", "46", "47", "48", "39", "38", "37", "36", "27", "28", "29", "30"));
+      gui.set(
+          "their-extra-slots",
+          Arrays.asList("50", "51", "52", "53", "44", "43", "42", "41", "32", "33", "34", "35"));
 
       gui.set("head.enabled", true);
       gui.set("head.display-name", "&7You are trading with: &3&l%PLAYER%");
@@ -717,25 +851,31 @@ public class TradePlusConfig {
           .damage((short) 13)
           .save(gui, "accept.my-cancel");
 
-      new ItemFactory(Material.getMaterial(
-              Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
           .display("&aTrade Complete!")
-          .lore(Arrays.asList(
+          .lore(
+              Arrays.asList(
                   "&fReview the final agreement and",
                   "&fclose the trade window",
                   "&fto retrieve your items!"))
           .flag("HIDE_ATTRIBUTES")
-          .damage((short)13)
+          .damage((short) 13)
           .save(gui, "complete");
 
-      new ItemFactory(Material.getMaterial(
-              Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
-              .display("&cTrade Cancelled!")
-              .lore(Arrays.asList(
-                      "&7Your trading partner cancelled", "&7the trade. Close the window", "&7to retrieve your items."))
-              .flag("HIDE_ATTRIBUTES")
-              .damage((short)14)
-              .save(gui, "cancelled");
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+          .display("&cTrade Cancelled!")
+          .lore(
+              Arrays.asList(
+                  "&7Your trading partner cancelled",
+                  "&7the trade. Close the window",
+                  "&7to retrieve your items."))
+          .flag("HIDE_ATTRIBUTES")
+          .damage((short) 14)
+          .save(gui, "cancelled");
 
       new ItemFactory(
               Material.getMaterial(
@@ -1492,29 +1632,37 @@ public class TradePlusConfig {
     }
 
     if (configVersion < 3.79) {
-      List<String> myExtraSlots = Arrays.asList("45", "46", "47", "48", "39", "38", "37", "36", "27", "28", "29", "30");
-      List<String> theirExtraSlots = Arrays.asList("50", "51", "52", "53", "44", "43", "42", "41", "32", "33", "34", "35");
+      List<String> myExtraSlots =
+          Arrays.asList("45", "46", "47", "48", "39", "38", "37", "36", "27", "28", "29", "30");
+      List<String> theirExtraSlots =
+          Arrays.asList("50", "51", "52", "53", "44", "43", "42", "41", "32", "33", "34", "35");
       gui.set("my-extra-slots", myExtraSlots);
       gui.set("their-extra-slots", theirExtraSlots);
 
-      new ItemFactory(Material.getMaterial(
-              Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
-              .display("&aTrade Complete!")
-              .lore(Arrays.asList(
-                      "&fReview the final agreement and",
-                      "&fclose the trade window",
-                      "&fto retrieve your items!"))
-              .flag("HIDE_ATTRIBUTES")
-              .damage((short)13)
-              .save(gui, "complete");
-      new ItemFactory(Material.getMaterial(
-              Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
-              .display("&cTrade Cancelled!")
-              .lore(Arrays.asList(
-                      "&7Your trading partner cancelled", "&7the trade. Close the window", "&7to retrieve your items."))
-              .flag("HIDE_ATTRIBUTES")
-              .damage((short)14)
-              .save(gui, "cancelled");
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+          .display("&aTrade Complete!")
+          .lore(
+              Arrays.asList(
+                  "&fReview the final agreement and",
+                  "&fclose the trade window",
+                  "&fto retrieve your items!"))
+          .flag("HIDE_ATTRIBUTES")
+          .damage((short) 13)
+          .save(gui, "complete");
+      new ItemFactory(
+              Material.getMaterial(
+                  Sounds.version > 112 ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE"))
+          .display("&cTrade Cancelled!")
+          .lore(
+              Arrays.asList(
+                  "&7Your trading partner cancelled",
+                  "&7the trade. Close the window",
+                  "&7to retrieve your items."))
+          .flag("HIDE_ATTRIBUTES")
+          .damage((short) 14)
+          .save(gui, "cancelled");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

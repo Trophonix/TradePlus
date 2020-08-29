@@ -33,8 +33,8 @@ public enum MenuAction {
         new ItemFactory(section.getString("material"))
             .amount(section.getInt("amount", 1))
             .customModelData(section.getInt("customModelData", 0))
-            .display('&', section.getString("display", "&4ERROR"))
-            .lore('&', section.getStringList("lore"))
+            .display(section.getString("display", "&4ERROR"))
+            .lore(section.getStringList("lore"))
             .flag("HIDE_ATTRIBUTES");
   }
 

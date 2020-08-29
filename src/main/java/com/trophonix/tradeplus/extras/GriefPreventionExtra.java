@@ -17,7 +17,11 @@ public class GriefPreventionExtra extends Extra {
   @Override
   public double getMax(Player player) {
     PlayerData data = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
-    return data.getRemainingClaimBlocks();
+    if (data.getRemainingClaimBlocks() < data.getBonusClaimBlocks()) {
+      return data.getRemainingClaimBlocks();
+    } else {
+      return data.getBonusClaimBlocks();
+    }
   }
 
   @Override
@@ -26,14 +30,14 @@ public class GriefPreventionExtra extends Extra {
     PlayerData data1 = inst.dataStore.getPlayerData(player1.getUniqueId());
     PlayerData data2 = inst.dataStore.getPlayerData(player2.getUniqueId());
     if (value1 > 0) {
-      data1.setAccruedClaimBlocks(data1.getAccruedClaimBlocks() - (int) value1);
-      data2.setAccruedClaimBlocks(
-          data2.getAccruedClaimBlocks() + (int) (value1 - ((value1 / 100) * taxPercent)));
+      data1.setBonusClaimBlocks(data1.getBonusClaimBlocks() - (int) value1);
+      data2.setBonusClaimBlocks(
+          data2.getBonusClaimBlocks() + (int) (value1 - ((value1 / 100) * taxPercent)));
     }
     if (value2 > 0) {
-      data2.setAccruedClaimBlocks(data2.getAccruedClaimBlocks() - (int) value2);
-      data1.setAccruedClaimBlocks(
-          data1.getAccruedClaimBlocks() + (int) (value2 - ((value2 / 100) * taxPercent)));
+      data2.setBonusClaimBlocks(data2.getBonusClaimBlocks() - (int) value2);
+      data1.setBonusClaimBlocks(
+          data1.getBonusClaimBlocks() + (int) (value2 - ((value2 / 100) * taxPercent)));
     }
     inst.dataStore.savePlayerData(player1.getUniqueId(), data1);
     inst.dataStore.savePlayerData(player2.getUniqueId(), data2);

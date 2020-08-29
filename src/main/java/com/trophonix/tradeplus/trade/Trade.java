@@ -708,6 +708,15 @@ public class Trade implements Listener {
   private void checkAcceptance() {
     if (pl.getTradeConfig().isAcceptEnabled()) {
       if (accept1 && accept2) {
+        for (Extra extra : extras) {
+          if (extra.updateMax(false)) {
+            accept1 = false;
+            accept2 = false;
+            updateAcceptance();
+            return;
+          }
+        }
+
         if (task != null) {
           return;
         }
@@ -740,6 +749,19 @@ public class Trade implements Listener {
                           pl.ongoingTrades.remove(this);
                           task.cancel();
                           task = null;
+
+                          for (Extra extra : extras) {
+                            if (extra.updateMax(false)) {
+                              pl.getTradeConfig()
+                                      .getDiscrepancyDetected()
+                                      .send(player1, "%PLAYER%", player2.getName());
+                              pl.getTradeConfig()
+                                      .getDiscrepancyDetected()
+                                      .send(player2, "%PLAYER%", player1.getName());
+                              cancel(false);
+                              return;
+                            }
+                          }
 
                           if (pl.getTradeConfig().isDiscrepancyDetection()) {
                             boolean discrepancy = false;
@@ -775,10 +797,7 @@ public class Trade implements Listener {
                               pl.getTradeConfig()
                                   .getDiscrepancyDetected()
                                   .send(player2, "%PLAYER%", player1.getName());
-                              giveItemsOnLeft(inv1, player1);
-                              giveItemsOnLeft(inv2, player2);
-                              player1.closeInventory();
-                              player2.closeInventory();
+                              cancel(false);
                               return;
                             }
                           }

@@ -2,6 +2,7 @@ package com.trophonix.tradeplus.util;
 
 import com.google.common.base.Preconditions;
 import com.trophonix.tradeplus.TradePlus;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 
 public class ItemFactory {
 
-  private ItemStack stack;
+ @Getter
+ private ItemStack stack;
 
   public ItemFactory(Material material) {
     this.stack = new ItemStack(material);
@@ -84,7 +86,7 @@ public class ItemFactory {
 
   public ItemFactory(ConfigurationSection yml, String key) {
     this.stack = yml.getItemStack(key);
-    if (stack.hasItemMeta()) {
+    if (stack != null && stack.hasItemMeta()) {
       ItemMeta meta = stack.getItemMeta();
       String displayName = null;
       List<String> lore = null;
@@ -109,6 +111,11 @@ public class ItemFactory {
 
   public ItemFactory save(ConfigurationSection yml, String key) {
     ItemStack stack = this.stack.clone();
+    ItemMeta meta = stack.getItemMeta();
+    if (meta != null) {
+        if (meta.hasDisplayName()) meta.setDisplayName(meta.getDisplayName().replace(ChatColor.COLOR_CHAR, '&'));
+        if (meta.hasLore()) meta.setLore(meta.getLore().stream().map(s -> s.replace(ChatColor.COLOR_CHAR, '&')).collect(Collectors.toList()));
+    }
     yml.set(key, stack);
     return this;
   }
@@ -202,7 +209,7 @@ public class ItemFactory {
       }
       this.lore(lore);
     }
-    meta.setDisplayName(display);
+    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', display));
     stack.setItemMeta(meta);
     return this;
   }
@@ -212,6 +219,13 @@ public class ItemFactory {
   }
 
   public ItemFactory lore(List<String> lore) {
+    for (int i = 0; i < lore.size(); i++) {
+        String line = lore.get(i);
+        if (line != null) {
+            line = ChatColor.translateAlternateColorCodes('&', line);
+            lore.set(i, line);
+        }
+    }
     ItemMeta meta = stack.getItemMeta();
     List<String> current = meta.getLore();
     if (current == null) current = new ArrayList<>();

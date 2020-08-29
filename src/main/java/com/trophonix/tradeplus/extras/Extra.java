@@ -53,13 +53,13 @@ public abstract class Extra implements Listener {
     this.increment2 = increment;
     ItemFactory factory =
         new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
-            .display('&', section.getString("display", "&4ERROR"))
+            .display(section.getString("display", "&4ERROR"))
             .customModelData(section.getInt("customModelData", 0));
-    if (section.contains("lore")) factory.lore('&', section.getStringList("lore"));
+    if (section.contains("lore")) factory.lore(section.getStringList("lore"));
     this.icon = factory.flag("HIDE_ATTRIBUTES").build();
     this.theirIcon =
         new ItemFactory(section.getString("material", "PAPER"), Material.PAPER)
-            .display('&', section.getString("theirdisplay", "&4ERROR"))
+            .display(section.getString("theirdisplay", "&4ERROR"))
             .customModelData(section.getInt("customModelData", 0))
             .build();
     this.taxPercent = section.getDouble("taxpercent", 0);
@@ -204,15 +204,23 @@ public abstract class Extra implements Listener {
     this.value2 = value2;
   }
 
-  public void updateMax(boolean delay) {
+  public boolean updateMax(boolean delay) {
     long now = System.currentTimeMillis();
     if (!delay || now > lastUpdatedMax + 5000) {
       max1 = getMax(player1);
       max2 = getMax(player2);
       lastUpdatedMax = now;
     }
-    if (value1 > max1) value1 = max1;
-    if (value2 > max2) value2 = max2;
+    boolean updated = false;
+    if (value1 > max1) {
+      value1 = max1;
+      updated = true;
+    }
+    if (value2 > max2) {
+      value2 = max2;
+      updated = true;
+    }
+    return updated;
   }
 
   protected abstract double getMax(Player player);

@@ -1,6 +1,6 @@
 <p align="center"><img src="https://image.ibb.co/e9AUuf/tradeplus.png"></p>
 
-Trade+ is a trading plugin for Spigot servers versions 1.7.10 and up. I've decided to open-source it since I don't have much time to work on it anymore.
+Trade+ is a trading plugin for Spigot servers versions 1.7.10 and up. I opened sourced it because I didn't have a ton of time to work on it anymore, and I hope to let other developers contribute and make it better if they can find issues before I can :) 
 
 If you feel like 'donating'/paying for it, you can do so on the SpigotMC resource page: https://www.spigotmc.org/resources/23138/
 

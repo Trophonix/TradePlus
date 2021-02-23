@@ -32,7 +32,7 @@ public class TradePlusConfig {
   private FileConfiguration gui;
 
   private List<String> aliases;
-  private boolean tradeCompatMode;
+  private boolean tradeCompatMode = true;
 
   private boolean tradeLogs;
   private boolean allowSameIpTrade;
@@ -142,7 +142,7 @@ public class TradePlusConfig {
     load();
 
     aliases = config.getStringList("aliases");
-    tradeCompatMode = config.getBoolean("trade-command-compatible-mode", false);
+//    tradeCompatMode = config.getBoolean("trade-command-compatible-mode", false);
 
     excessChest = config.getBoolean("excess-chest.enabled", true);
     excessTitle =

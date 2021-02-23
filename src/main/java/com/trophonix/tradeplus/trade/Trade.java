@@ -485,11 +485,7 @@ public class Trade implements Listener {
       if (System.currentTimeMillis() < startTime + 1000) {
         return;
       }
-      if (player.equals(player1)) {
-        player.teleport(location1);
-      } else {
-        player.teleport(location2);
-      }
+      event.setCancelled(true);
     }
   }
 

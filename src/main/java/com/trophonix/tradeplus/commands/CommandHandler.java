@@ -19,7 +19,6 @@ public class CommandHandler implements Listener, CommandExecutor {
   @Getter private List<Command> commands = new ArrayList<>();
 
   public CommandHandler(TradePlus pl, boolean compatMode) {
-    if (!compatMode) pl.getServer().getPluginManager().registerEvents(this, pl);
     try {
       Class.forName("org.bukkit.event.server.TabCompleteEvent");
       Bukkit.getPluginManager()
@@ -56,17 +55,17 @@ public class CommandHandler implements Listener, CommandExecutor {
     return true;
   }
 
-  @EventHandler(ignoreCancelled = true)
-  public void onCommandEvent(PlayerCommandPreprocessEvent event) {
-    String[] cmd = event.getMessage().substring(1).split("\\s+");
-    testAndRun(event, event.getPlayer(), cmd);
-  }
-
-  @EventHandler(ignoreCancelled = true)
-  public void onServerCommand(ServerCommandEvent event) {
-    String[] cmd = event.getCommand().split("\\s+");
-    testAndRun(event, event.getSender(), cmd);
-  }
+//  @EventHandler(ignoreCancelled = true)
+//  public void onCommandEvent(PlayerCommandPreprocessEvent event) {
+//    String[] cmd = event.getMessage().substring(1).split("\\s+");
+//    testAndRun(event, event.getPlayer(), cmd);
+//  }
+//
+//  @EventHandler(ignoreCancelled = true)
+//  public void onServerCommand(ServerCommandEvent event) {
+//    String[] cmd = event.getCommand().split("\\s+");
+//    testAndRun(event, event.getSender(), cmd);
+//  }
 
   private void testAndRun(Cancellable event, CommandSender sender, String[] cmd) {
     if (cmd.length > 0) {

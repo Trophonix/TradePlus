@@ -1,7 +1,7 @@
 package com.trophonix.tradeplus.extras;
 
-import com.Ben12345rocks.VotingPlugin.Objects.User;
-import com.Ben12345rocks.VotingPlugin.UserManager.UserManager;
+import com.bencodez.votingplugin.user.UserManager;
+import com.bencodez.votingplugin.user.VotingPluginUser;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
@@ -16,14 +16,14 @@ public class VotingPluginExtra extends Extra {
 
   @Override
   protected double getMax(Player player) {
-    User user = UserManager.getInstance().getVotingPluginUser(player.getUniqueId());
+    VotingPluginUser user = UserManager.getInstance().getVotingPluginUser(player.getUniqueId());
     return user.getPoints();
   }
 
   @Override
   public void onTradeEnd() {
-    User user1 = UserManager.getInstance().getVotingPluginUser(player1);
-    User user2 = UserManager.getInstance().getVotingPluginUser(player2);
+    VotingPluginUser user1 = UserManager.getInstance().getVotingPluginUser(player1);
+    VotingPluginUser user2 = UserManager.getInstance().getVotingPluginUser(player2);
     if (value1 > 0) {
       user1.setPoints(user1.getPoints() - (int) value1);
       user2.setPoints(user2.getPoints() + (int) value1);

@@ -31,7 +31,7 @@ public class TradePlus extends JavaPlugin {
 
   @Getter private TradePlusConfig tradeConfig;
 
-  private CommandHandler commandHandler;
+//  private CommandHandler commandHandler;
 
   @Getter private List<Inventory> excessChests;
 
@@ -91,13 +91,8 @@ public class TradePlus extends JavaPlugin {
   }
 
   private void setupCommands() {
-    commandHandler = new CommandHandler(this, tradeConfig.isTradeCompatMode());
-    if (tradeConfig.isTradeCompatMode()) {
-      getCommand("tradeplus").setExecutor(commandHandler);
-      getCommand("trade").setExecutor(commandHandler);
-    }
-    commandHandler.add(new TradeCommand(this));
-    commandHandler.add(new TradePlusCommand(this));
+    getCommand("trade").setExecutor(new TradeCommand(this));
+    getCommand("tradeplus").setExecutor(new TradePlusCommand(this));
   }
 
   public void reload() {
@@ -124,9 +119,6 @@ public class TradePlus extends JavaPlugin {
       }
     }
     InvUtils.reloadItems(this);
-    commandHandler.clear();
-    commandHandler.add(new TradeCommand(this));
-    commandHandler.add(new TradePlusCommand(this));
   }
 
   public void log(String message) {

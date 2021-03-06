@@ -5,7 +5,10 @@ import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.PlayerUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -13,21 +16,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TradePlusCommand extends Command {
+public class TradePlusCommand implements CommandExecutor, TabCompleter {
 
   private final TradePlus pl;
   private List<String> arg0 = Arrays.asList("reload", "rl", "force", "spectate");
 
   public TradePlusCommand(TradePlus pl) {
-    super(Collections.singletonList("tradeplus"));
+//    super(Collections.singletonList("tradeplus"));
     this.pl = pl;
   }
 
   @Override
-  public void onCommand(CommandSender sender, String[] args) {
+  public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (!sender.hasPermission("tradeplus.admin")) {
       pl.getTradeConfig().getErrorsNoPermsAdmin().send(sender);
-      return;
+      return true;
     }
 
     switch (args.length) {
@@ -35,7 +38,7 @@ public class TradePlusCommand extends Command {
         if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
           pl.reload();
           pl.getTradeConfig().getAdminConfigReloaded().send(sender);
-          return;
+          return true;
         }
         break;
       case 2:
@@ -43,7 +46,7 @@ public class TradePlusCommand extends Command {
           Player player = Bukkit.getPlayer(args[1]);
           if (player == null || !player.isOnline()) {
             pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
-            return;
+            return true;
           }
           Trade trade = pl.getTrade(player);
           if (trade == null) {
@@ -51,7 +54,7 @@ public class TradePlusCommand extends Command {
           } else {
             player.openInventory(trade.getSpectatorInv());
           }
-          return;
+          return true;
         }
         break;
       case 3:
@@ -60,7 +63,7 @@ public class TradePlusCommand extends Command {
           Player p2 = Bukkit.getPlayer(args[2]);
           if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
             pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
-            return;
+            return true;
           }
           pl.getTradeConfig()
               .getAdminForcedTrade()
@@ -70,18 +73,18 @@ public class TradePlusCommand extends Command {
           Trade trade = new Trade(p1, p2);
           if (sender instanceof Player && !(sender.equals(p1) || sender.equals(p2)))
             ((Player) sender).openInventory(trade.getSpectatorInv());
-          return;
+          return true;
         } else if (args[0].equalsIgnoreCase("spectate")) {
           if (!(sender instanceof Player)) {
             pl.getTradeConfig().getAdminPlayersOnly().send(sender);
-            return;
+            return true;
           }
           Player player = (Player) sender;
           Player p1 = Bukkit.getPlayer(args[1]);
           Player p2 = Bukkit.getPlayer(args[2]);
           if (p1 == null || p2 == null || !p1.isOnline() || !p2.isOnline() || p1.equals(p2)) {
             pl.getTradeConfig().getAdminInvalidPlayers().send(sender);
-            return;
+            return true;
           }
           Trade trade = pl.getTrade(p1, p2);
           if (trade == null) {
@@ -89,7 +92,7 @@ public class TradePlusCommand extends Command {
           } else {
             player.openInventory(trade.getSpectatorInv());
           }
-          return;
+          return true;
         }
         break;
     }
@@ -103,10 +106,16 @@ public class TradePlusCommand extends Command {
         });
     if (pl.getTradeConfig().isSpectateEnabled())
       MsgUtils.send(sender, "&e/tradeplus spectate <player(s)> &fSpectate an ongoing trade");
+    return true;
   }
 
   @Override
-  public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
+  public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    StringBuilder builder = new StringBuilder(alias.toLowerCase());
+    for (String arg : args) {
+      builder.append(" ").append(arg);
+    }
+    String full = builder.toString();
     if (args.length == 0) {
       return arg0;
     } else if (args.length == 1 && !full.endsWith(" ")) {
@@ -125,6 +134,6 @@ public class TradePlusCommand extends Command {
                       && name.toLowerCase().startsWith(args[args.length - 1]))
           .collect(Collectors.toList());
     }
-    return super.onTabComplete(sender, args, full);
+    return null;
   }
 }

@@ -50,7 +50,9 @@ public class CommandHandler implements Listener, CommandExecutor {
       CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
     String[] cmd = new String[args.length + 1];
     cmd[0] = label;
-    System.arraycopy(args, 0, cmd, 1, args.length);
+    for (int i = 0; i < args.length; i++) {
+      cmd[i+1] = args[i];
+    }
     testAndRun(null, sender, cmd);
     return true;
   }

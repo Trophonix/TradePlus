@@ -8,11 +8,15 @@ import com.trophonix.tradeplus.hooks.WorldGuardHook;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.trade.TradeRequest;
 import com.trophonix.tradeplus.util.MsgUtils;
+import com.trophonix.tradeplus.util.PDCUtils;
 import com.trophonix.tradeplus.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.net.InetSocketAddress;
@@ -22,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-public class TradeCommand extends Command {
+public class TradeCommand implements TabCompleter, CommandExecutor {
 
   private static final DecimalFormat format = new DecimalFormat("0.##");
 
@@ -30,33 +34,47 @@ public class TradeCommand extends Command {
 
   private final TradePlus pl;
 
+  private boolean pdc;
+
   public TradeCommand(TradePlus pl) {
-    super(
-        new ArrayList<String>() {
-          {
-            add("trade");
-            if (pl.getTradeConfig().getAliases() != null) {
-              addAll(pl.getTradeConfig().getAliases());
-            }
-          }
-        });
+//    super(
+//        new ArrayList<String>() {
+//          {
+//            add("trade");
+//            if (pl.getTradeConfig().getAliases() != null) {
+//              addAll(pl.getTradeConfig().getAliases());
+//            }
+//          }
+//        });
     this.pl = pl;
+    try {
+      Class.forName("org.bukkit.persistence.PersistentDataContainer");
+      PDCUtils.initialize(pl);
+      pdc = true;
+    } catch (ClassNotFoundException ignored) {
+    }
   }
 
   @Override
-  public void onCommand(CommandSender sender, String[] args) {
+  public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (!(sender instanceof Player)) {
       MsgUtils.send(sender, "&cThis command can only be executed by players!");
-      return;
+      return true;
     }
     final Player player = (Player) sender;
+
+    if (pdc && args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
+      boolean allowed = PDCUtils.toggleTrading(player);
+      (allowed ? pl.getTradeConfig().getTradingEnabled() : pl.getTradeConfig().getTradingDisabled()).send(sender);
+      return true;
+    }
 
     try {
       if (pl.getTradeConfig().isWorldguardTradingFlag()) {
         if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
           if (!WorldGuardHook.isTradingAllowed(player, player.getLocation())) {
             pl.getTradeConfig().getWorldguardTradingNotAllowed().send(player);
-            return;
+            return true;
           }
         }
       }
@@ -68,7 +86,7 @@ public class TradeCommand extends Command {
       if (!pl.getTradeConfig().isFactionsAllowTradeInEnemyTerritory()) {
         if (FactionsHook.isPlayerInEnemyTerritory(player)) {
           pl.getTradeConfig().getFactionsEnemyTerritory().send(player);
-          return;
+          return true;
         }
       }
     } catch (Throwable ignored) {
@@ -92,15 +110,15 @@ public class TradeCommand extends Command {
                 }
               });
           pl.getTradeConfig().getYouDenied().send(player);
-          return;
+          return true;
         }
         pl.getTradeConfig().getErrorsPlayerNotFound().send(player);
-        return;
+        return true;
       }
 
       if (player == receiver) {
         pl.getTradeConfig().getErrorsSelfTrade().send(player);
-        return;
+        return true;
       }
 
       if (!pl.getTradeConfig().isAllowSameIpTrade()) {
@@ -110,17 +128,17 @@ public class TradeCommand extends Command {
             && receiverAddress != null
             && address.getHostName().equals(receiverAddress.getHostName())) {
           pl.getTradeConfig().getErrorsSameIp().send(player);
-          return;
+          return true;
         }
       }
 
       if (!pl.getTradeConfig().isAllowTradeInCreative()) {
         if (player.getGameMode().equals(GameMode.CREATIVE)) {
           pl.getTradeConfig().getErrorsCreative().send(player);
-          return;
+          return true;
         } else if (receiver.getGameMode().equals(GameMode.CREATIVE)) {
           pl.getTradeConfig().getErrorsCreativeThem().send(player, "%PLAYER%", receiver.getName());
-          return;
+          return true;
         }
       }
 
@@ -131,7 +149,7 @@ public class TradeCommand extends Command {
           pl.getTradeConfig()
               .getErrorsSameWorldRange()
               .send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
-          return;
+          return true;
         }
       } else {
         if (pl.getTradeConfig().isAllowCrossWorld()) {
@@ -142,18 +160,18 @@ public class TradeCommand extends Command {
             pl.getTradeConfig()
                 .getErrorsCrossWorldRange()
                 .send(player, "%PLAYER%", receiver.getName(), "%AMOUNT%", format.format(amount));
-            return;
+            return true;
           }
         } else {
           pl.getTradeConfig().getErrorsNoCrossWorld().send(player, "%PLAYER%", receiver.getName());
-          return;
+          return true;
         }
       }
 
       for (TradeRequest req : requests) {
         if (req.sender == player) {
           pl.getTradeConfig().getErrorsWaitForExpire().send(player, "%PLAYER%", receiver.getName());
-          return;
+          return true;
         }
       }
 
@@ -164,17 +182,22 @@ public class TradeCommand extends Command {
       if (accept) {
         TradeAcceptEvent tradeAcceptEvent = new TradeAcceptEvent(receiver, player);
         Bukkit.getPluginManager().callEvent(tradeAcceptEvent);
-        if (tradeAcceptEvent.isCancelled()) return;
+        if (tradeAcceptEvent.isCancelled()) return true;
         pl.getTradeConfig().getAcceptSender().send(receiver, "%PLAYER%", player.getName());
         pl.getTradeConfig().getAcceptReceiver().send(player, "%PLAYER%", receiver.getName());
         new Trade(receiver, player);
         requests.removeIf(req -> req.contains(player) && req.contains(receiver));
       } else {
+        if (pdc && !PDCUtils.allowTrading(receiver)) {
+          pl.getTradeConfig().getErrorsTradingDisabled().send(sender, "%PLAYER%", receiver.getName());
+          return true;
+        }
+
         String sendPermission = pl.getTradeConfig().getSendPermission();
         if (permissionRequired) {
           if (!sender.hasPermission(sendPermission)) {
             pl.getTradeConfig().getErrorsNoPermsAccept().send(player);
-            return;
+            return true;
           }
         }
 
@@ -183,12 +206,12 @@ public class TradeCommand extends Command {
           pl.getTradeConfig()
               .getErrorsNoPermsReceive()
               .send(player, "%PLAYER%", receiver.getName());
-          return;
+          return true;
         }
 
         TradeRequestEvent event = new TradeRequestEvent(player, receiver);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
+        if (event.isCancelled()) return true;
         final TradeRequest request = new TradeRequest(player, receiver);
         requests.add(request);
         pl.getTradeConfig().getRequestSent().send(player, "%PLAYER%", receiver.getName());
@@ -207,13 +230,14 @@ public class TradeCommand extends Command {
                 },
                 20 * pl.getTradeConfig().getRequestCooldownSeconds());
       }
-      return;
+      return true;
     }
     pl.getTradeConfig().getErrorsInvalidUsage().send(player);
+    return true;
   }
 
   @Override
-  public List<String> onTabComplete(CommandSender sender, String[] args, String full) {
+  public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
     List<String> args0 = new ArrayList<>();
     args0.add("deny");
     args0.addAll(
@@ -231,6 +255,6 @@ public class TradeCommand extends Command {
                       && name.toLowerCase().startsWith(args[0].toLowerCase()))
           .collect(Collectors.toList());
     }
-    return super.onTabComplete(sender, args, full);
+    return null;
   }
 }

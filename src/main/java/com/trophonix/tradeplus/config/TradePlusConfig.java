@@ -99,6 +99,9 @@ public class TradePlusConfig {
   private ConfigMessage requestSent;
   private ConfigMessage requestReceived;
 
+  private ConfigMessage tradingDisabled;
+  private ConfigMessage tradingEnabled;
+
   private ConfigMessage errorsCreative, errorsCreativeThem, errorsSameIp;
   private ConfigMessage errorsSameWorldRange, errorsCrossWorldRange, errorsNoCrossWorld;
   private ConfigMessage acceptSender, acceptReceiver;
@@ -106,7 +109,8 @@ public class TradePlusConfig {
   private ConfigMessage errorsWaitForExpire,
       errorsPlayerNotFound,
       errorsSelfTrade,
-      errorsInvalidUsage;
+      errorsInvalidUsage,
+      errorsTradingDisabled;
   private ConfigMessage errorsNoPermsAccept,
       errorsNoPermsSend,
       errorsNoPermsReceive,
@@ -244,6 +248,19 @@ public class TradePlusConfig {
             "request.received",
             "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
 
+    tradingEnabled =
+            new ConfigMessage(
+                    lang,
+                    "enabled",
+                    "&6&l(!) &r&6You &aenabled &6trade requests from other players!"
+            );
+    tradingDisabled =
+            new ConfigMessage(
+                    lang,
+                    "disabled",
+                    "&6&l(!) &r&6You &cdisabled &6trade requests from other players!"
+            );
+
     errorsCreative =
         new ConfigMessage(lang, "errors.creative", "&4&l(!) &r&4You can't trade in creative mode!");
     errorsCreativeThem =
@@ -295,6 +312,12 @@ public class TradePlusConfig {
             "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
                 + "    &c- /trade <player name>%NEWLINE%"
                 + "    &c- /trade deny");
+    errorsTradingDisabled =
+            new ConfigMessage(
+                    lang,
+                    "errors.trading-disabled",
+                    "&4&l(!) &r&4That player has trading toggled off."
+            );
     errorsNoPermsAccept =
         new ConfigMessage(
             lang, "errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
@@ -718,6 +741,9 @@ public class TradePlusConfig {
           "&6&l(!) &r&6You received a trade request from &e%PLAYER%%NEWLINE%&6&l(!) &r&6Type &e/trade %PLAYER% &6to begin trading");
       lang.set("request.received.hover", "&6&lClick here to trade with &e&l%PLAYER%");
 
+      lang.set("enabled", "&6&l(!) &r&6You &aenabled &6trade requests from other players!");
+      lang.set("disabled", "&6&l(!) &r&6You &cdisabled &6trade requests from other players!");
+
       lang.set("errors.creative", "&4&l(!) &r&4You can't trade in creative mode!");
       lang.set("errors.creative-them", "&4&l(!) &r&4That player is in creative mode!");
       lang.set(
@@ -746,6 +772,10 @@ public class TradePlusConfig {
           "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
               + "    &c- /trade <player name>%NEWLINE%"
               + "    &c- /trade deny");
+      lang.set(
+              "errors.trading-disabled",
+              "&4&l(!) &r&4That player has trading toggled off."
+      );
       lang.set("errors.no-perms.accept", "&4&l(!) &r&4You do not have permission to trade");
       lang.set("errors.no-perms.send", "&4&l(!) &r&4You do not have permission to send a trade");
       lang.set(
@@ -1252,6 +1282,10 @@ public class TradePlusConfig {
       lang.set(
           "request.received.hover",
           lang.getString("received-request-hover", "&6&lClick here to trade with &e&l%PLAYER%"));
+
+      lang.set("enabled", "&6&l(!) &r&6You &aenabled &6trade requests from other players!");
+      lang.set("disabled", "&6&l(!) &r&6You &cdisabled &6trade requests from other players!");
+
       lang.set(
           "accept.sender",
           lang.getString("senderaccept", "&6&l(!) &r&e%PLAYER% &6accepted your trade request"));
@@ -1305,6 +1339,10 @@ public class TradePlusConfig {
               "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
                   + "    &c- /trade <player name>%NEWLINE%"
                   + "    &c- /trade deny"));
+      lang.set(
+              "errors.trading-disabled",
+              "&4&l(!) &r&4That player has trading toggled off."
+      );
       lang.set(
           "errors.no-perms.accept",
           lang.getString("noperms", "&4&l(!) &r&4You do not have permission to trade"));
@@ -1663,6 +1701,15 @@ public class TradePlusConfig {
           .flag("HIDE_ATTRIBUTES")
           .damage((short) 14)
           .save(gui, "cancelled");
+    }
+
+    if (configVersion < 3.81) {
+      lang.set(
+              "errors.trading-disabled",
+              "&4&l(!) &r&4That player has trading toggled off."
+      );
+      lang.set("enabled", "&6&l(!) &r&6You &aenabled &6trade requests from other players!");
+      lang.set("disabled", "&6&l(!) &r&6You &cdisabled &6trade requests from other players!");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

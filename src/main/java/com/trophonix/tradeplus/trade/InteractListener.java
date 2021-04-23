@@ -77,4 +77,5 @@ public class InteractListener implements Listener {
   public void onQuit(PlayerQuitEvent event) {
     lastTrigger.remove(event.getPlayer().getUniqueId());
   }
+
 }

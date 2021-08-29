@@ -62,12 +62,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.trophonix</groupId>
-            <artifactId>PluginBase</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.2-R0.1-SNAPSHOT</version>
@@ -187,7 +181,7 @@
         <dependency>
             <groupId>com.github.Ben12345rocks</groupId>
             <artifactId>VotingPlugin</artifactId>
-            <version>LATEST</version>
+            <version>6.6.2</version>
             <scope>provided</scope>
         </dependency>
 

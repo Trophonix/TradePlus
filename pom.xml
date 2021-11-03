@@ -189,9 +189,8 @@
         <dependency>
             <groupId>com.github.Ben12345rocks</groupId>
             <artifactId>VotingPlugin</artifactId>
-            <version>LATEST</version>
-            <scope>system</scope>
-            <systemPath>${res}/VotingPlugin.jar</systemPath>
+            <version>6.6.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

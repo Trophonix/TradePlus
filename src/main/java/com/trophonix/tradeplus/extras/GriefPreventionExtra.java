@@ -17,11 +17,7 @@ public class GriefPreventionExtra extends Extra {
   @Override
   public double getMax(Player player) {
     PlayerData data = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
-    if (data.getRemainingClaimBlocks() < data.getBonusClaimBlocks()) {
-      return data.getRemainingClaimBlocks();
-    } else {
-      return data.getBonusClaimBlocks();
-    }
+    return data.getRemainingClaimBlocks();
   }
 
   @Override

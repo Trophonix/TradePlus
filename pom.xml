@@ -121,9 +121,17 @@
         <dependency>
             <groupId>org.black_ixx</groupId>
             <artifactId>PlayerPoints</artifactId>
-            <version>2.1.4</version>
+            <version>3.1.0</version>
             <scope>system</scope>
-            <systemPath>${res}/PlayerPoints.jar</systemPath>
+            <systemPath>${res}/PlayerPointsNew.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>BeastTokens</groupId>
+            <artifactId>BeastTokens</artifactId>
+            <version>2.0</version>
+            <scope>system</scope>
+            <systemPath>${res}/BeastTokensAPI.jar</systemPath>
         </dependency>
 
         <dependency>

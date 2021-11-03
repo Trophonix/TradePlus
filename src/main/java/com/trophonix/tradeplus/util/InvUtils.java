@@ -1,6 +1,7 @@
 package com.trophonix.tradeplus.util;
 
 import com.trophonix.tradeplus.TradePlus;
+import com.trophonix.tradeplus.gui.MenuInventoryHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class InvUtils {
   public static Inventory getTradeInventory(Player player1, Player player2) {
     Inventory inv =
         Bukkit.createInventory(
-            player1.getInventory().getHolder(),
+            new MenuInventoryHolder(),
             54,
             pl.getTradeConfig().getGuiTitle().replace("%PLAYER%", player2.getName()));
     ItemStack separator =
@@ -52,7 +53,7 @@ public class InvUtils {
         ChatColor.translateAlternateColorCodes('&', pl.getTradeConfig().getSpectatorTitle());
     if (Sounds.version > 1.8)
       title = title.replace("%PLAYER1%", player1.getName()).replace("%PLAYER2%", player2.getName());
-    Inventory inv = Bukkit.createInventory(player1.getInventory().getHolder(), 54, title);
+    Inventory inv = Bukkit.createInventory(new MenuInventoryHolder(), 54, title);
     ItemStack separator = pl.getTradeConfig().getSeparator().build();
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, separator);
     for (int i = 45; i <= 53; i++) inv.setItem(i, separator);

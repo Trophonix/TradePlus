@@ -57,13 +57,14 @@ public class InvUtils {
     ItemStack separator = pl.getTradeConfig().getSeparator().build();
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, separator);
     for (int i = 45; i <= 53; i++) inv.setItem(i, separator);
-    inv.setItem(
-        pl.getTradeConfig().getAcceptSlot(),
-        ItemFactory.getPlayerSkull(player1, "&f" + player1.getName()));
-    inv.setItem(
-        pl.getTradeConfig().getTheirAcceptSlot(),
-        ItemFactory.getPlayerSkull(player2, "&f" + player2.getName()));
-    inv.setItem(4, pl.getTradeConfig().getTheirCancel().build());
+    if (pl.getTradeConfig().isHeadEnabled()){
+      inv.setItem(
+              pl.getTradeConfig().getAcceptSlot(),
+              ItemFactory.getPlayerSkull(player1, "&f" + player1.getName()));
+      inv.setItem(
+              pl.getTradeConfig().getTheirAcceptSlot(),
+              ItemFactory.getPlayerSkull(player2, "&f" + player2.getName()));
+    }
 
     return inv;
   }

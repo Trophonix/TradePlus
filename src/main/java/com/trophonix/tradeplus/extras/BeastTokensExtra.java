@@ -3,33 +3,34 @@ package com.trophonix.tradeplus.extras;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
+import me.mraxetv.beasttokens.BeastTokensAPI;
+import me.mraxetv.beasttokens.api.handlers.PlayersManager;
+import me.mraxetv.beasttokens.api.handlers.TokensManager;
 import me.realized.tokenmanager.api.TokenManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class TokenManagerExtra extends Extra {
+public class BeastTokensExtra extends Extra {
 
-  private TokenManager api;
+  private TokensManager api;
 
-  public TokenManagerExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
-    super("tokenmanager", player1, player2, pl, trade);
-    api = (TokenManager) pl.getServer().getPluginManager().getPlugin("TokenManager");
+  public BeastTokensExtra(Player player1, Player player2, TradePlus pl, Trade trade) {
+    super("beasttokens", player1, player2, pl, trade);
+    api = BeastTokensAPI.getTokensManager();
   }
 
   @Override
-  public double getMax(Player player) {
-    return api.getTokens(player).orElse(0);
-  }
+  public double getMax(Player player) { return api.getTokens(player); }
 
   @Override
   public void onTradeEnd() {
     if (value1 > 0) {
-      api.setTokens(player1, api.getTokens(player1).orElse((long) value1) - (long) value1);
-      api.setTokens(player2, api.getTokens(player2).orElse(0L) + (long) value1);
+      api.setTokens(player1, api.getTokens(player1) - (long) value1);
+      api.setTokens(player2, api.getTokens(player2) + (long) value1);
     }
     if (value2 > 0) {
-      api.setTokens(player2, api.getTokens(player2).orElse((long) value2) - (long) value2);
-      api.setTokens(player1, api.getTokens(player1).orElse(0L) + (long) value2);
+      api.setTokens(player2, api.getTokens(player2) - (long) value2);
+      api.setTokens(player1, api.getTokens(player1) + (long) value2);
     }
   }
 

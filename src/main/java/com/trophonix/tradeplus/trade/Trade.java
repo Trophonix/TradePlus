@@ -124,6 +124,10 @@ public class Trade implements Listener {
                   && pl.getServer().getPluginManager().isPluginEnabled("TokenManager")) {
                 extras.add(new TokenManagerExtra(player1, player2, pl, this));
               }
+              if (pl.getConfig().getBoolean("extras.beasttoken.enabled", true)
+                      && pl.getServer().getPluginManager().isPluginEnabled("BeastToken")) {
+                extras.add(new BeastTokensExtra(player1, player2, pl, this));
+              }
               if (pl.getConfig().getBoolean("extras.votingplugin.enabled", false)
                   && pl.getServer().getPluginManager().isPluginEnabled("VotingPlugin")) {
                 extras.add(new VotingPluginExtra(player1, player2, pl, this));
@@ -759,6 +763,19 @@ public class Trade implements Listener {
                             }
                           }
 
+                          for (Extra extra : extras) {
+                            if (extra.value1 > extra.getMax(player1) || extra.value2 > extra.getMax(player2)) {
+                              pl.getTradeConfig()
+                                      .getDiscrepancyDetected()
+                                      .send(player1, "%PLAYER%", player2.getName());
+                              pl.getTradeConfig()
+                                      .getDiscrepancyDetected()
+                                      .send(player2, "%PLAYER%", player1.getName());
+                              cancel(false);
+                              return;
+                            }
+                          }
+
                           if (pl.getTradeConfig().isDiscrepancyDetection()) {
                             boolean discrepancy = false;
                             int i = 0;
@@ -925,12 +942,13 @@ public class Trade implements Listener {
     if (item == null || item.getType().equals(Material.AIR)) {
       return false;
     }
-    if (pl.getTradeConfig().isDenyNamedItems()
-        && item.hasItemMeta()
-        && item.getItemMeta().hasDisplayName()) {
-      return true;
-    }
+
     if (item.hasItemMeta()) {
+      if (pl.getTradeConfig().isDenyNamedItems()
+              && item.getItemMeta().hasDisplayName()) {
+        return true;
+      }
+      
       String regex = pl.getConfig().getString("blocked.regex", "");
       if (!regex.isEmpty()) {
         try {

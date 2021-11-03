@@ -15,7 +15,7 @@ public class VotingPluginExtra extends Extra {
   }
 
   @Override
-  protected double getMax(Player player) {
+  public double getMax(Player player) {
     VotingPluginUser user = UserManager.getInstance().getVotingPluginUser(player.getUniqueId());
     return user.getPoints();
   }

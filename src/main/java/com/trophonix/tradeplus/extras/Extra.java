@@ -223,7 +223,7 @@ public abstract class Extra implements Listener {
     return updated;
   }
 
-  protected abstract double getMax(Player player);
+  public abstract double getMax(Player player);
 
   public abstract void onTradeEnd();
 

@@ -699,6 +699,19 @@ public class TradePlusConfig {
       config.set("extras.tokenmanager.taxpercent", 0);
       config.set("extras.tokenmanager.mode", "chat");
 
+      config.set("extras.beasttokens.enabled", true);
+      config.set("extras.beasttokens.name", "tokens");
+      config.set("extras.beasttokens.material", "emerald");
+      config.set("extras.beasttokens.display", "&eYour tokens offer is &6%AMOUNT%");
+      config.set(
+              "extras.beasttokens.theirdisplay", "&eTheir TokenManager tokens offer is &6%AMOUNT%");
+      config.set(
+              "extras.beasttokens.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% tokens."));
+      config.set("extras.beasttokens.customModelData", 0);
+      config.set("extras.beasttokens.increment", 1);
+      config.set("extras.beasttokens.taxpercent", 0);
+      config.set("extras.beasttokens.mode", "chat");
+
       config.set("extras.votingplugin.name", "vote points");
       config.set("extras.votingplugin.enabled", false);
       config.set("extras.votingplugin.material", "sunflower");
@@ -1710,6 +1723,21 @@ public class TradePlusConfig {
       );
       lang.set("enabled", "&6&l(!) &r&6You &aenabled &6trade requests from other players!");
       lang.set("disabled", "&6&l(!) &r&6You &cdisabled &6trade requests from other players!");
+    }
+
+    if (configVersion < 3.82) {
+      config.set("extras.beasttokens.enabled", true);
+      config.set("extras.beasttokens.name", "tokens");
+      config.set("extras.beasttokens.material", "emerald");
+      config.set("extras.beasttokens.display", "&eYour tokens offer is &6%AMOUNT%");
+      config.set(
+              "extras.beasttokens.theirdisplay", "&eTheir TokenManager tokens offer is &6%AMOUNT%");
+      config.set(
+              "extras.beasttokens.lore", Arrays.asList("&fClick to edit your offer!", "&fYou have %BALANCE% tokens."));
+      config.set("extras.beasttokens.customModelData", 0);
+      config.set("extras.beasttokens.increment", 1);
+      config.set("extras.beasttokens.taxpercent", 0);
+      config.set("extras.beasttokens.mode", "chat");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

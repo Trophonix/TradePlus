@@ -34,7 +34,7 @@ public class LandsExtra extends Extra {
   }
 
   @Override
-  protected double getMax(Player player) {
+  public double getMax(Player player) {
     Land land = getSelectedLand(player);
     if (land == null) {
       return 0;

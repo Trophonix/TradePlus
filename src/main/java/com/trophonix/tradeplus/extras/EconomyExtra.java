@@ -33,7 +33,7 @@ public class EconomyExtra extends Extra {
         economy.depositPlayer(player1, value2 - ((value2 / 100) * taxPercent));
     }
   }
-
+ 
   @Override
   public ItemStack _getIcon(Player player) {
     return ItemFactory.replaceInMeta(

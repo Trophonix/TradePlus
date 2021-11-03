@@ -40,10 +40,7 @@ public class InteractListener implements Listener {
           && !player.isSneaking()) return;
       if (action.contains("right")) {
         event.setCancelled(true);
-        Bukkit.getPluginManager()
-            .callEvent(
-                new PlayerCommandPreprocessEvent(
-                    event.getPlayer(), "/trade " + interacted.getName()));
+        event.getPlayer().performCommand("trade " + interacted.getName());
         lastTrigger.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
       }
     }
@@ -64,11 +61,8 @@ public class InteractListener implements Listener {
           && !player.isSneaking()) return;
       if (action.contains("left")) {
         event.setCancelled(true);
-        Bukkit.getPluginManager()
-            .callEvent(
-                new PlayerCommandPreprocessEvent(
-                    (Player) event.getDamager(), "/trade " + interacted.getName()));
-        lastTrigger.put(event.getDamager().getUniqueId(), System.currentTimeMillis());
+        player.performCommand("trade " + interacted.getName());
+        lastTrigger.put(player.getUniqueId(), System.currentTimeMillis());
       }
     }
   }

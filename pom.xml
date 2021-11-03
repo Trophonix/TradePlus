@@ -10,7 +10,7 @@
 
     <properties>
         <res>${project.basedir}/res/</res>
-        <revision>3.82.1</revision>
+        <revision>3.82.2</revision>
     </properties>
 
     <repositories>
@@ -190,7 +190,8 @@
             <groupId>com.github.Ben12345rocks</groupId>
             <artifactId>VotingPlugin</artifactId>
             <version>6.6.2</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${res}/VotingPlugin.jar</systemPath>
         </dependency>
 
         <dependency>

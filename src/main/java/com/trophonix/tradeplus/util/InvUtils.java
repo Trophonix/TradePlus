@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 public class InvUtils {
@@ -23,11 +24,13 @@ public class InvUtils {
   }
 
   public static Inventory getTradeInventory(Player player1, Player player2) {
+    MenuInventoryHolder holder = new MenuInventoryHolder();
     Inventory inv =
         Bukkit.createInventory(
-            new MenuInventoryHolder(),
+            holder,
             54,
             pl.getTradeConfig().getGuiTitle().replace("%PLAYER%", player2.getName()));
+    holder.setCurrent(inv);
     ItemStack separator =
         pl.getTradeConfig().getSeparator().copy().replace("%PLAYER%", player2.getName()).build();
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, separator);

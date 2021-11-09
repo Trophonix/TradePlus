@@ -133,10 +133,10 @@ public class TradeCommand implements TabCompleter, CommandExecutor {
       }
 
       if (!pl.getTradeConfig().isAllowTradeInCreative()) {
-        if (player.getGameMode().equals(GameMode.CREATIVE)) {
+        if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) {
           pl.getTradeConfig().getErrorsCreative().send(player);
           return true;
-        } else if (receiver.getGameMode().equals(GameMode.CREATIVE)) {
+        } else if (receiver.getGameMode().equals(GameMode.CREATIVE) || receiver.getGameMode().equals(GameMode.SPECTATOR)) {
           pl.getTradeConfig().getErrorsCreativeThem().send(player, "%PLAYER%", receiver.getName());
           return true;
         }

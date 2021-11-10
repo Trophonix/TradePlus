@@ -6,6 +6,7 @@ import com.trophonix.tradeplus.extras.*;
 import com.trophonix.tradeplus.logging.TradeLog;
 import com.trophonix.tradeplus.util.InvUtils;
 import com.trophonix.tradeplus.util.ItemFactory;
+import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -986,7 +987,7 @@ public class Trade implements Listener {
       List<String> blockedLore = pl.getTradeConfig().getLoreBlacklist();
       if (!blockedLore.isEmpty()) {
         for (int i = 0; i < blockedLore.size(); i++) {
-          String line = ChatColor.translateAlternateColorCodes('&', blockedLore.get(i));
+          String line = MsgUtils.color(blockedLore.get(i));
           if (line.length() > 2) {
             line = line.substring(1, line.length() - 1);
           }

@@ -92,13 +92,13 @@ public class ItemFactory {
       List<String> lore = null;
 
       if (meta.hasDisplayName()) {
-        displayName = ChatColor.translateAlternateColorCodes('&', meta.getDisplayName());
+        displayName = MsgUtils.color(meta.getDisplayName());
       }
 
       if (meta.hasLore()) {
         lore =
             meta.getLore().stream()
-                .map(s -> ChatColor.translateAlternateColorCodes('&', s))
+                .map(s -> MsgUtils.color(s))
                 .collect(Collectors.toList());
       }
 
@@ -126,7 +126,7 @@ public class ItemFactory {
     Preconditions.checkNotNull(skull, "Failed to load skull.");
     if (Sounds.version < 113) skull.getData().setData((byte) 3);
     SkullMeta meta = (SkullMeta) skull.getItemMeta();
-    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+    meta.setDisplayName(MsgUtils.color(displayName));
     if (Sounds.version >= 112) meta.setOwningPlayer(player);
     else meta.setOwner(player.getName());
     skull.setItemMeta(meta);
@@ -209,7 +209,7 @@ public class ItemFactory {
       }
       this.lore(lore);
     }
-    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', display));
+    meta.setDisplayName(MsgUtils.color(display));
     stack.setItemMeta(meta);
     return this;
   }
@@ -222,7 +222,7 @@ public class ItemFactory {
     for (int i = 0; i < lore.size(); i++) {
         String line = lore.get(i);
         if (line != null) {
-            line = ChatColor.translateAlternateColorCodes('&', line);
+            line = MsgUtils.color(line);
             lore.set(i, line);
         }
     }

@@ -24,10 +24,10 @@ public class ConfigMessage {
     if (text.contains("%NEWLINE%")) {
       message = text.split("%NEWLINE%");
       for (int i = 0; i < message.length; i++) {
-        message[i] = ChatColor.translateAlternateColorCodes('&', message[i]);
+        message[i] = MsgUtils.color(message[i]);
       }
     } else {
-      message = new String[] {ChatColor.translateAlternateColorCodes('&', text)};
+      message = new String[] {MsgUtils.color(text)};
     }
   }
 

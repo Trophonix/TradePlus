@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 public class InvUtils {
@@ -53,7 +52,7 @@ public class InvUtils {
 
   public static Inventory getSpectatorInventory(Player player1, Player player2) {
     String title =
-        ChatColor.translateAlternateColorCodes('&', pl.getTradeConfig().getSpectatorTitle());
+        MsgUtils.color(pl.getTradeConfig().getSpectatorTitle());
     if (Sounds.version > 1.8)
       title = title.replace("%PLAYER1%", player1.getName()).replace("%PLAYER2%", player2.getName());
     Inventory inv = Bukkit.createInventory(new MenuInventoryHolder(), 54, title);

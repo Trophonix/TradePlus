@@ -2,6 +2,7 @@ package com.trophonix.tradeplus.config;
 
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.util.ItemFactory;
+import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -150,8 +151,7 @@ public class TradePlusConfig {
 
     excessChest = config.getBoolean("excess-chest.enabled", true);
     excessTitle =
-        ChatColor.translateAlternateColorCodes(
-            '&', config.getString("excess-chest.title", "&7Your inventory is full!"));
+        MsgUtils.color(config.getString("excess-chest.title", "&7Your inventory is full!"));
 
     tradeLogs = config.getBoolean("trade-logs", false);
     allowSameIpTrade = config.getBoolean("allow-same-ip-trade", true);
@@ -189,11 +189,9 @@ public class TradePlusConfig {
     spectateBroadcast = config.getBoolean("spectate.broadcast", true);
 
     guiTitle =
-        ChatColor.translateAlternateColorCodes(
-            '&', gui.getString("title", "Your Items <|     |> Their Items"));
+        MsgUtils.color(gui.getString("title", "Your Items <|     |> Their Items"));
     spectatorTitle =
-        ChatColor.translateAlternateColorCodes(
-            '&', gui.getString("spectator-title", "Player 1 <|          |> Player 2"));
+        MsgUtils.color(gui.getString("spectator-title", "Player 1 <|          |> Player 2"));
 
     mySlots =
         gui.getStringList("my-slots").stream()
@@ -212,22 +210,17 @@ public class TradePlusConfig {
         gui.getStringList("their-extra-slots").stream()
             .map(s -> Integer.valueOf(s))
             .collect(Collectors.toList());
-
+    
     extrasTypePrefix =
-        ChatColor.translateAlternateColorCodes(
-            '&', config.getString("extras.type.prefix", "&6&l!!&6> "));
+        MsgUtils.color(config.getString("extras.type.prefix", "&6&l!!&6> "));
     extrasTypeEmpty =
-        ChatColor.translateAlternateColorCodes(
-            '&', config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
+        MsgUtils.color(config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
     extrasTypeValid =
-        ChatColor.translateAlternateColorCodes(
-            '&', config.getString("extras.type.valid", "&aClick output slot to submit offer."));
+        MsgUtils.color(config.getString("extras.type.valid", "&aClick output slot to submit offer."));
     extrasTypeInvalid =
-        ChatColor.translateAlternateColorCodes(
-            '&', config.getString("extras.type.invalid", "&cInvalid amount entered!"));
+        MsgUtils.color(config.getString("extras.type.invalid", "&cInvalid amount entered!"));
     extrasTypeMaximum =
-        ChatColor.translateAlternateColorCodes(
-            '&', config.getString("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%"));
+        MsgUtils.color(config.getString("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%"));
 
     factionsAllowTradeInEnemyTerritory =
         config.getBoolean("hooks.factions.allow-trades-in-enemy-territory", false);

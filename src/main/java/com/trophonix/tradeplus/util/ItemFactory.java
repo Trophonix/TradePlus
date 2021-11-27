@@ -214,10 +214,6 @@ public class ItemFactory {
     return this;
   }
 
-  public ItemFactory display(char colorChar, String display) {
-    return display(ChatColor.translateAlternateColorCodes(colorChar, display));
-  }
-
   public ItemFactory lore(List<String> lore) {
     for (int i = 0; i < lore.size(); i++) {
         String line = lore.get(i);
@@ -233,16 +229,6 @@ public class ItemFactory {
     meta.setLore(current);
     stack.setItemMeta(meta);
     return this;
-  }
-
-  public ItemFactory lore(char colorChar, List<String> lore) {
-    if (lore == null) {
-      return this;
-    }
-    for (int i = 0; i < lore.size(); i++) {
-      lore.set(i, ChatColor.translateAlternateColorCodes(colorChar, lore.get(i)));
-    }
-    return this.lore(lore);
   }
 
   public ItemFactory flag(String flag) {

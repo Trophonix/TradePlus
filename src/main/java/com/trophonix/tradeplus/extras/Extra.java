@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.trophonix.tradeplus.TradePlus;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.ItemFactory;
+import com.trophonix.tradeplus.util.MsgUtils;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -87,8 +88,7 @@ public abstract class Extra implements Listener {
           new ConversationFactory(pl)
               .withPrefix(
                   conversationContext ->
-                      ChatColor.translateAlternateColorCodes(
-                          '&', pl.getTradeConfig().getExtrasTypePrefix()))
+                          MsgUtils.color(pl.getTradeConfig().getExtrasTypePrefix()))
               .withFirstPrompt(
                   new NumericPrompt() {
                     @Override

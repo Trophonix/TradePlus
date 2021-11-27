@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.trophonix.tradeplus.TradePlus;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,12 +23,15 @@ public class Logs implements List<TradeLog> {
   private static final DateFormat fileNameFormat =
       new SimpleDateFormat("'{player1}-{player2}_'HH:mm:ss'.json'");
 
+  private TradePlus plugin;
+
   private File folder;
   private List<TradeLog> logs = new ArrayList<>();
 
   private Gson gson;
 
-  public Logs(File parent, String file) {
+  public Logs(TradePlus plugin, File parent, String file) {
+    this.plugin = plugin;
     if (!parent.exists()) {
       parent.mkdirs();
     }
@@ -62,8 +66,8 @@ public class Logs implements List<TradeLog> {
     //    }
   }
 
-  public Logs(File parent) {
-    this(parent, folderNameFormat.format(new Date()));
+  public Logs(TradePlus plugin, File parent) {
+    this(plugin, parent, folderNameFormat.format(new Date()));
   }
 
   public void log(TradeLog log) {
@@ -90,18 +94,18 @@ public class Logs implements List<TradeLog> {
             gson.toJson(log, TradeLog.class, writer);
             writer.close();
           } catch (Exception | Error ex) {
-            System.out.println(
+            plugin.getLogger().warning(
                 "Failed to save trade log for trade between "
                     + log.getPlayer1().getLastKnownName()
                     + " and "
                     + log.getPlayer2().getLastKnownName());
-            System.out.println(ex.getLocalizedMessage());
+            plugin.getLogger().warning(ex.getLocalizedMessage());
           }
           iter.remove();
         }
       }
     } catch (Exception | Error ex) {
-      System.out.println("Failed to save trade logs.");
+      plugin.getLogger().warning("Failed to save trade logs.");
       logs.clear();
     }
   }

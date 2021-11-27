@@ -99,7 +99,7 @@ public class TradePlus extends JavaPlugin {
     tradeConfig.reload();
     if (logs == null && tradeConfig.isTradeLogs()) {
       try {
-        logs = new Logs(new File(getDataFolder(), "logs"));
+        logs = new Logs(this, new File(getDataFolder(), "logs"));
         new BukkitRunnable() {
           @Override
           public void run() {

@@ -25,11 +25,11 @@ public class TokenManagerExtra extends Extra {
   public void onTradeEnd() {
     if (value1 > 0) {
       api.setTokens(player1, api.getTokens(player1).orElse((long) value1) - (long) value1);
-      api.setTokens(player2, api.getTokens(player2).orElse(0L) + (long) value1);
+      api.setTokens(player2, api.getTokens(player2).orElse(0L) + (long) (value1 - ((value1 / 100) * taxPercent)));
     }
     if (value2 > 0) {
       api.setTokens(player2, api.getTokens(player2).orElse((long) value2) - (long) value2);
-      api.setTokens(player1, api.getTokens(player1).orElse(0L) + (long) value2);
+      api.setTokens(player1, api.getTokens(player1).orElse(0L) + (long) (value2 - ((value2 / 100) * taxPercent)));
     }
   }
 

@@ -41,12 +41,15 @@ public class InvUtils {
       inv.setItem(pl.getTradeConfig().getAcceptSlot(), separator);
       inv.setItem(pl.getTradeConfig().getTheirAcceptSlot(), separator);
     }
-    if (pl.getTradeConfig().isHeadEnabled())
+    if (pl.getTradeConfig().isHeadEnabled()) try {
       inv.setItem(
           4,
           ItemFactory.getPlayerSkull(
               player2,
               pl.getTradeConfig().getHeadDisplayName().replace("%PLAYER%", player2.getName())));
+    } catch (Exception | Error ignored) {
+      inv.setItem(4, separator);
+    }
     return inv;
   }
 
@@ -60,12 +63,15 @@ public class InvUtils {
     for (int i = 4; i <= 49; i += 9) inv.setItem(i, separator);
     for (int i = 45; i <= 53; i++) inv.setItem(i, separator);
     if (pl.getTradeConfig().isHeadEnabled()){
+      try {
       inv.setItem(
               pl.getTradeConfig().getAcceptSlot(),
               ItemFactory.getPlayerSkull(player1, "&f" + player1.getName()));
       inv.setItem(
               pl.getTradeConfig().getTheirAcceptSlot(),
               ItemFactory.getPlayerSkull(player2, "&f" + player2.getName()));
+      } catch (Exception | Error ignored) {
+      }
     }
 
     return inv;

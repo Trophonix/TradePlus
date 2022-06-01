@@ -214,7 +214,7 @@ public class TradePlusConfig {
     extrasTypePrefix =
         MsgUtils.color(config.getString("extras.type.prefix", "&6&l!!&6> "));
     extrasTypeEmpty =
-        MsgUtils.color(config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
+        MsgUtils.color(config.getString("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'."));
     extrasTypeValid =
         MsgUtils.color(config.getString("extras.type.valid", "&aClick output slot to submit offer."));
     extrasTypeInvalid =
@@ -596,7 +596,7 @@ public class TradePlusConfig {
       config.set("spectate.broadcast", true);
 
       config.set("extras.type.prefix", "&6&l!!&6> ");
-      config.set("extras.type.empty", "&eHow much %EXTRA% to offer?");
+      config.set("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'.");
       config.set("extras.type.valid", "&aClick output slot to submit offer.");
       config.set("extras.type.invalid", "&cInvalid amount entered!");
       config.set("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%");
@@ -1731,6 +1731,12 @@ public class TradePlusConfig {
       config.set("extras.beasttokens.increment", 1);
       config.set("extras.beasttokens.taxpercent", 0);
       config.set("extras.beasttokens.mode", "chat");
+    }
+
+    if (configVersion < 3.83) {
+      if (config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?").equals("&eHow much %EXTRA% to offer?")) {
+        config.set("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'.");
+      }
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

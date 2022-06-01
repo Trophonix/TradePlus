@@ -104,11 +104,18 @@ public abstract class Extra implements Listener {
                         return this;
                       }
                       if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
-                        return new NumericPrompt() {
+                        return new StringPrompt() {
                           @Override
-                          protected Prompt acceptValidatedInput(
-                              ConversationContext conversationContext, Number number) {
+                          public Prompt acceptInput(
+                              ConversationContext conversationContext, String input) {
                             if (trade.isCancelled()) return null;
+                            if (input == null || input.equalsIgnoreCase("cancel")) return null;
+                            Number number;
+                            try {
+                              number = Double.parseDouble(input);
+                            } catch (NumberFormatException ignored) {
+                              return this;
+                            }
                             if (number.doubleValue() < 0 || number.doubleValue() > getMax(player)) {
                               return this;
                             }

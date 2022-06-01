@@ -104,7 +104,7 @@ public class TradePlusConfig {
   private ConfigMessage tradingEnabled;
 
   private ConfigMessage errorsCreative, errorsCreativeThem, errorsSameIp;
-  private ConfigMessage errorsSameWorldRange, errorsCrossWorldRange, errorsNoCrossWorld;
+  private ConfigMessage errorsBlockedWorld, errorsSameWorldRange, errorsCrossWorldRange, errorsNoCrossWorld;
   private ConfigMessage acceptSender, acceptReceiver;
   private ConfigMessage cancelledMessage, expired;
   private ConfigMessage errorsWaitForExpire,
@@ -262,6 +262,10 @@ public class TradePlusConfig {
     errorsSameIp =
         new ConfigMessage(
             lang, "errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
+
+    errorsBlockedWorld =
+        new ConfigMessage(
+            lang, "errors.blocked-world", "&4&l(!) &4You can't trade in this world.");
 
     errorsSameWorldRange =
         new ConfigMessage(
@@ -773,6 +777,7 @@ public class TradePlusConfig {
           "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
       lang.set("errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
       lang.set("errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
+      lang.set("errors.blocked-world", "&4&l(!) &r&4You can't trade in this world.");
       lang.set(
           "errors.invalid-usage",
           "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
@@ -1737,6 +1742,7 @@ public class TradePlusConfig {
       if (config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?").equals("&eHow much %EXTRA% to offer?")) {
         config.set("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'.");
       }
+      lang.set("errors.blocked-world", "&4&l(!) &r&4You can't trade in this world.");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

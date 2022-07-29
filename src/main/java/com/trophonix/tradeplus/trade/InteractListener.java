@@ -27,7 +27,7 @@ public class InteractListener implements Listener {
 
   @EventHandler
   public void onInteract(PlayerInteractAtEntityEvent event) {
-    if (event.getRightClicked() instanceof Player) {
+    if (event.getRightClicked() instanceof Player && pl.getTradeConfig().isAllowShiftRightClick()) {
       Long last = lastTrigger.get(event.getPlayer().getUniqueId());
       if (last != null && System.currentTimeMillis() < last + 5000L) return;
       Player player = event.getPlayer();

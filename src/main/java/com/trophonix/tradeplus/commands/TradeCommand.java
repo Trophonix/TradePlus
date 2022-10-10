@@ -142,6 +142,11 @@ public class TradeCommand implements TabCompleter, CommandExecutor {
         }
       }
 
+      if (pl.getTradeConfig().getBlockedWorlds().contains(player.getWorld().getName())) {
+        pl.getTradeConfig().getErrorsBlockedWorld().send(player, "%WORLD%", player.getWorld().getName());
+        return true;
+      }
+
       if (player.getWorld().equals(receiver.getWorld())) {
         double amount = pl.getTradeConfig().getSameWorldRange();
         if (amount != 0.0

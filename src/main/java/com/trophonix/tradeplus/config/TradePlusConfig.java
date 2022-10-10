@@ -104,7 +104,7 @@ public class TradePlusConfig {
   private ConfigMessage tradingEnabled;
 
   private ConfigMessage errorsCreative, errorsCreativeThem, errorsSameIp;
-  private ConfigMessage errorsSameWorldRange, errorsCrossWorldRange, errorsNoCrossWorld;
+  private ConfigMessage errorsBlockedWorld, errorsSameWorldRange, errorsCrossWorldRange, errorsNoCrossWorld;
   private ConfigMessage acceptSender, acceptReceiver;
   private ConfigMessage cancelledMessage, expired;
   private ConfigMessage errorsWaitForExpire,
@@ -214,7 +214,7 @@ public class TradePlusConfig {
     extrasTypePrefix =
         MsgUtils.color(config.getString("extras.type.prefix", "&6&l!!&6> "));
     extrasTypeEmpty =
-        MsgUtils.color(config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?"));
+        MsgUtils.color(config.getString("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'."));
     extrasTypeValid =
         MsgUtils.color(config.getString("extras.type.valid", "&aClick output slot to submit offer."));
     extrasTypeInvalid =
@@ -262,6 +262,10 @@ public class TradePlusConfig {
     errorsSameIp =
         new ConfigMessage(
             lang, "errors.same-ip", "&4&l(!) &4Players aren't allowed to trade on same IP!");
+
+    errorsBlockedWorld =
+        new ConfigMessage(
+            lang, "errors.blocked-world", "&4&l(!) &4You can't trade in this world.");
 
     errorsSameWorldRange =
         new ConfigMessage(
@@ -596,7 +600,7 @@ public class TradePlusConfig {
       config.set("spectate.broadcast", true);
 
       config.set("extras.type.prefix", "&6&l!!&6> ");
-      config.set("extras.type.empty", "&eHow much %EXTRA% to offer?");
+      config.set("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'.");
       config.set("extras.type.valid", "&aClick output slot to submit offer.");
       config.set("extras.type.invalid", "&cInvalid amount entered!");
       config.set("extras.type.maximum", "&cYou have %BALANCE% %EXTRA%");
@@ -773,6 +777,7 @@ public class TradePlusConfig {
           "&4&l(!) &r&4You still have an active trade request%NEWLINE%&4&l(!) &r&4It will expire shortly");
       lang.set("errors.player-not-found", "&4&l(!) &r&4Could not find specified player");
       lang.set("errors.self-trade", "&4&l(!) &r&4You cannot trade with yourself");
+      lang.set("errors.blocked-world", "&4&l(!) &r&4You can't trade in this world.");
       lang.set(
           "errors.invalid-usage",
           "&4&l(!) &r&4Invalid arguments. Usage: %NEWLINE%"
@@ -1731,6 +1736,13 @@ public class TradePlusConfig {
       config.set("extras.beasttokens.increment", 1);
       config.set("extras.beasttokens.taxpercent", 0);
       config.set("extras.beasttokens.mode", "chat");
+    }
+
+    if (configVersion < 3.83) {
+      if (config.getString("extras.type.empty", "&eHow much %EXTRA% to offer?").equals("&eHow much %EXTRA% to offer?")) {
+        config.set("extras.type.empty", "&ePlease enter your %EXTRA% offer, or type 'cancel'.");
+      }
+      lang.set("errors.blocked-world", "&4&l(!) &r&4You can't trade in this world.");
     }
 
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));

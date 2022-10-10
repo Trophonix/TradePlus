@@ -417,15 +417,18 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onQuit(PlayerQuitEvent event){
-    if (!event.getPlayer().equals(player1) && !event.getPlayer().equals(player2)) return;
-    Player player = event.getPlayer().equals(player1) ? player1 : player2;
-    setCancelOnClose(player, true);
-
-    player1.openInventory(inv1);
-    player1.closeInventory();
-
-    player2.openInventory(inv2);
-    player2.closeInventory();
+    if (!(event.getPlayer().equals(player1) || event.getPlayer().equals(player2))) return;
+    if (cancelled) return;
+    cancelled = true;
+    Player otherPlayer = event.getPlayer().equals(player1) ? player2 : player1;
+    Inventory otherInv = event.getPlayer().equals(player1) ? inv2 : inv1;
+    Inventory inv = event.getPlayer().equals(player1) ? inv1 : inv2;
+    giveItemsOnLeft(inv, event.getPlayer());
+    giveItemsOnLeft(otherInv, otherPlayer);
+    pl.getTradeConfig().getCancelledMessage().send(otherPlayer, "%PLAYER%", event.getPlayer().getName());
+    if (otherInv.getViewers().contains(otherPlayer)) {
+      otherPlayer.closeInventory();
+    }
   }
 
   @EventHandler

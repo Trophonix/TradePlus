@@ -42,7 +42,7 @@ public class TradePlusConfig {
   private String sendPermission, acceptPermission;
 
   private int requestCooldownSeconds;
-  private boolean allowTradeInCreative;
+  private boolean allowTradeInCreative, allowShiftRightClick;
 
   private List<String> itemBlacklist;
   private boolean denyNamedItems;
@@ -164,6 +164,7 @@ public class TradePlusConfig {
 
     requestCooldownSeconds = config.getInt("requestcooldownseconds", 20);
     allowTradeInCreative = config.getBoolean("allow-trade-in-creative", false);
+    allowShiftRightClick = config.getBoolean("allow-shift-right-click");
 
     itemBlacklist = config.getStringList("blocked.blacklist");
     denyNamedItems = config.getBoolean("blocked.named-items", false);
@@ -573,6 +574,7 @@ public class TradePlusConfig {
 
       config.set("requestcooldownseconds", 20);
       config.set("allow-trade-in-creative", false);
+      config.set("allow-shift-right-click", true);
 
       config.set("blocked.blacklist", Arrays.asList("bedrock", "monster_egg"));
       config.set("blocked.named-items", false);

@@ -1747,6 +1747,10 @@ public class TradePlusConfig {
       lang.set("errors.blocked-world", "&4&l(!) &r&4You can't trade in this world.");
     }
 
+    if (configVersion < 3.84) {
+      config.set("allow-shift-right-click", true);
+    }
+
     config.set("configversion", Double.parseDouble(plugin.getDescription().getVersion()));
   }
 }

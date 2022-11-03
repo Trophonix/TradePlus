@@ -18,10 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -521,8 +518,14 @@ public class Trade implements Listener {
 
   @EventHandler
   public void onInventoryInteract(InventoryInteractEvent event) {
-    if (accept1 && accept2 && (event.getInventory() == inv1 || event.getInventory() == inv2)) {
-      event.setCancelled(true);
+    if ((event.getInventory() == inv1 || event.getInventory() == inv2)) {
+      if (accept1 && accept2) {
+        event.setCancelled(true);
+        return;
+      }
+      if (event.getWhoClicked() == player1 || event.getWhoClicked() == player2) {
+        event.setCancelled(true);
+      }
     }
   }
 
@@ -563,13 +566,20 @@ public class Trade implements Listener {
     }
   }
 
+  @EventHandler
+  public void onInteract(PlayerInteractAtEntityEvent event) {
+    if (event.getPlayer() == player1 || event.getPlayer() == player2) {
+      event.setCancelled(true);
+    }
+  }
+
   private void giveItemsOnLeft(Inventory inv, Player player) {
     List<ItemStack> dropoff = new ArrayList<>();
     for (int slot : mySlots) {
       if (slot == pl.getTradeConfig().getAcceptSlot() || getExtra(slot) != null) continue;
       ItemStack item = inv.getItem(slot);
       if (item == null || item.getType() == Material.AIR) continue;
-      player.getInventory().addItem(item).values().forEach(dropoff::add);
+      dropoff.addAll(player.getInventory().addItem(item).values());
       inv.setItem(slot, null);
     }
     if (!dropoff.isEmpty()) {

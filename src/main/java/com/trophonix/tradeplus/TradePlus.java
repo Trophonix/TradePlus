@@ -12,9 +12,14 @@ import com.trophonix.tradeplus.logging.Logs;
 import com.trophonix.tradeplus.trade.InteractListener;
 import com.trophonix.tradeplus.trade.Trade;
 import com.trophonix.tradeplus.util.InvUtils;
+import com.trophonix.tradeplus.util.PlayerUtil;
 import com.trophonix.tradeplus.util.Sounds;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class TradePlus extends JavaPlugin {
+public class TradePlus extends JavaPlugin implements Listener {
 
   public ConcurrentLinkedQueue<Trade> ongoingTrades = new ConcurrentLinkedQueue<>();
   @Getter private TaskChainFactory taskFactory;
@@ -81,6 +86,7 @@ public class TradePlus extends JavaPlugin {
               new ExcessChestListener(this);
             })
         .execute();
+    getServer().getPluginManager().registerEvents(this, this);
   }
 
   @Override
@@ -119,6 +125,16 @@ public class TradePlus extends JavaPlugin {
       }
     }
     InvUtils.reloadItems(this);
+  }
+
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    PlayerUtil.registerIP(event.getPlayer());
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    PlayerUtil.removeIP(event.getPlayer());
   }
 
   public void log(String message) {

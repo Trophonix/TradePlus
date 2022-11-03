@@ -122,11 +122,7 @@ public class TradeCommand implements TabCompleter, CommandExecutor {
       }
 
       if (!pl.getTradeConfig().isAllowSameIpTrade()) {
-        InetSocketAddress address = player.getAddress();
-        InetSocketAddress receiverAddress = receiver.getAddress();
-        if (address != null
-            && receiverAddress != null
-            && address.getHostName().equals(receiverAddress.getHostName())) {
+        if (PlayerUtil.sameIP(player, receiver)) {
           pl.getTradeConfig().getErrorsSameIp().send(player);
           return true;
         }
@@ -233,7 +229,7 @@ public class TradeCommand implements TabCompleter, CommandExecutor {
                     pl.getTradeConfig().getExpired().send(player, "%PLAYER%", receiver.getName());
                   }
                 },
-                20 * pl.getTradeConfig().getRequestCooldownSeconds());
+                20 * (long)pl.getTradeConfig().getRequestCooldownSeconds());
       }
       return true;
     }

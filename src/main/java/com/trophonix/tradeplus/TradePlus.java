@@ -129,7 +129,9 @@ public class TradePlus extends JavaPlugin implements Listener {
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
-    PlayerUtil.registerIP(event.getPlayer());
+    if (!getTradeConfig().isAllowSameIpTrade()) {
+      PlayerUtil.registerIP(event.getPlayer());
+    }
   }
 
   @EventHandler

@@ -240,6 +240,12 @@ public class Trade implements Listener {
         return;
       }
 
+      if (!mySlots.contains(slot) &&
+              (click.equals(ClickType.SHIFT_LEFT)
+              || click.equals(ClickType.SHIFT_RIGHT))) {
+        event.setCancelled(true);
+      }
+
       // don't let players interact
       // with a cancelled trade window
       if (cancelled) {

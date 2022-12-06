@@ -285,11 +285,16 @@ public class Trade implements Listener {
           // toggle button
           if (slot == pl.getTradeConfig().getAcceptSlot()) {
             if (!forced) {
-              if (player.equals(player1)) {
-                accept1 = !accept1;
-              } else {
-                accept2 = !accept2;
-              }
+              ItemStack cursor = event.getCursor();
+
+              if (cursor != null)
+                if (cursor.getType().isAir())
+                  if (player.equals(player1)) {
+                    accept1 = !accept1;
+                  } else {
+                    accept2 = !accept2;
+                  }
+
               updateAcceptance();
               checkAcceptance();
             }

@@ -231,9 +231,7 @@ public class Trade implements Listener {
     }
 
     int slot = event.getSlot();
-    // if the event didn't occur
-    // within a trade inventory,
-    // don't bother processing
+
     if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
       if (click.equals(ClickType.DOUBLE_CLICK)) {
         event.setCancelled(true);
@@ -285,15 +283,14 @@ public class Trade implements Listener {
           // toggle button
           if (slot == pl.getTradeConfig().getAcceptSlot()) {
             if (!forced) {
-              ItemStack cursor = event.getCursor();
-
-              if (cursor != null)
-                if (cursor.getType().isAir())
-                  if (player.equals(player1)) {
-                    accept1 = !accept1;
-                  } else {
-                    accept2 = !accept2;
-                  }
+              ItemStack cursor = player.getItemOnCursor();
+              if (cursor != null && cursor.getType().isAir()) {
+                if (player.equals(player1)) {
+                  accept1 = !accept1;
+                } else {
+                  accept2 = !accept2;
+                }
+              }
 
               updateAcceptance();
               checkAcceptance();

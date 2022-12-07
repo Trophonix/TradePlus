@@ -346,6 +346,7 @@ public class Trade implements Listener {
         if (accept1 && accept2) {
           return;
         }
+
         ItemStack item = event.getCurrentItem();
         ItemStack cursor = player.getItemOnCursor();
         if ((item == null || item.getType().equals(Material.AIR))
@@ -367,6 +368,13 @@ public class Trade implements Listener {
             }
           }
         }
+
+        if (pl.getTradeConfig().isAntiscamCancelOnChange()) {
+          accept1 = false;
+          accept2 = false;
+          updateAcceptance();
+        }
+
         // Using my own shift click
         // code so items only go in
         // the left side
@@ -404,11 +412,11 @@ public class Trade implements Listener {
         return;
       }
       // cancel on change
-      if (pl.getTradeConfig().isAntiscamCancelOnChange()) {
+      //if (pl.getTradeConfig().isAntiscamCancelOnChange()) {
         accept1 = false;
         accept2 = false;
         updateAcceptance();
-      }
+      //}
       Bukkit.getScheduler().runTaskLater(pl, this::updateInventories, 1L);
     }
   }

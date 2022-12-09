@@ -284,7 +284,7 @@ public class Trade implements Listener {
           if (slot == pl.getTradeConfig().getAcceptSlot()) {
             if (!forced) {
               ItemStack cursor = player.getItemOnCursor();
-              if (cursor != null && cursor.getType().isAir()) {
+              if (cursor == null || cursor.getType() == Material.AIR) {
                 if (player.equals(player1)) {
                   accept1 = !accept1;
                 } else {

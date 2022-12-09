@@ -10,7 +10,7 @@
 
     <properties>
         <res>${project.basedir}/res/</res>
-        <revision>3.84.3</revision>
+        <revision>3.84.4</revision>
     </properties>
 
     <repositories>
@@ -99,7 +99,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>1.18.20</version>
             <scope>provided</scope>
         </dependency>
 

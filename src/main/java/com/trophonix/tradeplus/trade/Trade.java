@@ -36,8 +36,7 @@ import java.util.stream.Collectors;
 
 public class Trade implements Listener {
 
-  public final Player player1;
-  public final Player player2;
+  @Getter public final Player player1, player2;
   private final TradePlus pl = TradePlus.getPlugin(TradePlus.class);
   private List<Integer> mySlots, theirSlots, myExtraSlots, theirExtraSlots;
   private final List<Extra> extras = new ArrayList<>();
@@ -51,6 +50,7 @@ public class Trade implements Listener {
   private boolean forced = false;
   private BukkitTask task;
   @Getter private boolean cancelled;
+  private EntityPickupItemEventListener entityPickupListener;
 
   public Trade(Player p1, Player p2) {
     player1 = p1;
@@ -136,6 +136,12 @@ public class Trade implements Listener {
         .sync(
             () -> {
               Bukkit.getServer().getPluginManager().registerEvents(this, pl);
+              try {
+                Class.forName("org.bukkit.event.entity.EntityPickupItemEvent");
+                entityPickupListener = new EntityPickupItemEventListener(this);
+                Bukkit.getServer().getPluginManager().registerEvents(entityPickupListener, pl);
+              } catch (ClassNotFoundException ignored) {
+              }
 
               this.mySlots = pl.getTradeConfig().getMySlots();
               this.theirSlots = pl.getTradeConfig().getTheirSlots();
@@ -478,6 +484,8 @@ public class Trade implements Listener {
                     && inv2.getViewers().isEmpty()
                     && spectatorInv.getViewers().isEmpty()) {
                   HandlerList.unregisterAll(this);
+                  if (entityPickupListener != null)
+                    HandlerList.unregisterAll(entityPickupListener);
                 }
               },
               1L);
@@ -506,6 +514,8 @@ public class Trade implements Listener {
                     && inv2.getViewers().isEmpty()
                     && spectatorInv.getViewers().isEmpty()) {
                   HandlerList.unregisterAll(this);
+                  if (entityPickupListener != null)
+                    HandlerList.unregisterAll(entityPickupListener);
                 }
               },
               1L);
@@ -571,16 +581,6 @@ public class Trade implements Listener {
   public void onDisable(PluginDisableEvent event) {
     if (event.getPlugin().getName().equalsIgnoreCase("TradePlus")) {
       player1.closeInventory();
-    }
-  }
-
-  @EventHandler
-  public void onPickup(EntityPickupItemEvent event) {
-    if (cancelled) return;
-    if (!(event.getEntity() instanceof Player)) return;
-    Player player = (Player) event.getEntity();
-    if (player.equals(player1) || player.equals(player2)) {
-      event.setCancelled(true);
     }
   }
 

@@ -759,6 +759,7 @@ public class Trade implements Listener {
             accept1 = false;
             accept2 = false;
             updateAcceptance();
+            updateExtras();
             return;
           }
         }

@@ -1046,16 +1046,18 @@ public class Trade implements Listener {
     if (blocked.isEmpty()) {
       return false;
     }
-    List<String> checks = new ArrayList<>();
     String type = item.getType().toString();
-    byte data = item.getData().getData();
-    checks.add(type + ":" + data);
-    checks.add(type.replace("_", "") + ":" + data);
-    checks.add(type.replace("_", " ") + ":" + data);
-    try { // Throws exception for materials added after the flattening
-      checks.add(item.getType().getId() + ":" + data);
-      checks.add(Integer.toString(item.getType().getId()));
-    } catch (IllegalArgumentException ignored) {
+    List<String> checks = new ArrayList<>();
+    if (Sounds.version < 113) {
+      byte data = item.getData().getData();
+      checks.add(type + ":" + data);
+      checks.add(type.replace("_", "") + ":" + data);
+      checks.add(type.replace("_", " ") + ":" + data);
+      try { // Throws exception for materials added after the flattening
+        checks.add(item.getType().getId() + ":" + data);
+        checks.add(Integer.toString(item.getType().getId()));
+      } catch (IllegalArgumentException ignored) {
+      }
     }
     checks.add(type);
     checks.add(type.replace("_", ""));
